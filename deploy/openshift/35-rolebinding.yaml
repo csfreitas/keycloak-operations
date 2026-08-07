@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keycloak-mcp-assessor
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+  annotations:
+    description: >
+      Bind the namespaced assessor Role in each Target namespace.
+      Duplicate this RoleBinding (or use a template) for every monitored namespace.
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: keycloak-mcp-assessor
+subjects:
+  - kind: ServiceAccount
+    name: keycloak-mcp-assessor
+    namespace: keycloak-mcp

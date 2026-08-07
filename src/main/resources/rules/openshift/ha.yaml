@@ -1,19 +1,18 @@
-# OpenShift High Availability rules
+id: openshift-ha
 rules:
   - id: KC-OCP-HA-001
-    title: Minimum Keycloak replicas for HA
+    title: Keycloak deployment should run with at least 2 replicas
     category: high-availability
     severity: HIGH
     description: >
-      Production Keycloak / RHBK on OpenShift should run with at least two
-      replicas so a single pod failure does not take the identity plane offline.
+      Production Keycloak / RHBK on OpenShift or Kubernetes should run with at least
+      two replicas so a single pod failure does not take the identity plane offline.
     impact: >
       A single-replica deployment is a single point of failure for authentication
       and token issuance.
     recommendation: >
-      Scale the Keycloak Deployment or StatefulSet to at least 2 replicas
-      (prefer 3 for rolling updates without capacity loss) and verify Pod
-      Disruption Budgets and anti-affinity.
+      Scale the Keycloak Deployment or StatefulSet to at least 2 replicas.
+      Prefer 3 for rolling updates without capacity loss, and verify PDBs and anti-affinity.
     references:
       - https://www.keycloak.org/high-availability/introduction
       - https://docs.redhat.com/en/documentation/red_hat_build_of_keycloak

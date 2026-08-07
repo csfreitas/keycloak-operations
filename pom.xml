@@ -6,15 +6,15 @@
 
     <groupId>io.github.keycloakmcp</groupId>
     <artifactId>keycloak-operations-mcp</artifactId>
-    <version>0.1.0</version>
+    <version>0.4.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Keycloak / RHBK Operations MCP</name>
+    <name>Keycloak / RHBK Operations Platform</name>
     <description>
-        MCP Server for administration, diagnostics, health check and assessment
-        of Keycloak and Red Hat build of Keycloak (RHBK) environments.
+        Operations platform backend (MCP + REST) for administration, diagnostics,
+        health check and assessment of Keycloak and Red Hat build of Keycloak (RHBK).
     </description>
-    <url>https://github.com/keycloakmcp/keycloak-operations-mcp</url>
+    <url>https://github.com/csfreitas/keycloak-operations</url>
 
     <licenses>
         <license>
@@ -189,6 +189,11 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-server-mock</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

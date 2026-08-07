@@ -1,0 +1,4 @@
+# Capacity-oriented rules (placeholder pack for profile filtering).
+# Deep capacity assessment lands in milestone 0.5; keep pack id stable now.
+id: capacity
+rules: []

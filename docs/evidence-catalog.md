@@ -1,0 +1,41 @@
+# Evidence catalog
+
+Stable evidence keys emitted by infrastructure / Keycloak collectors.
+Every Evidence includes `targetId`.
+
+| Key | Category | Type | Notes |
+|-----|----------|------|-------|
+| `runtime.type` | runtime | string | `OPENSHIFT` / `KUBERNETES` / `UNKNOWN` |
+| `cluster.distribution` | cluster | string | `openshift` / `kubernetes` |
+| `cluster.version` | cluster | string | K8s or OCP version |
+| `cluster.platform` | cluster | string | From OpenShift Infrastructure status when available |
+| `cluster.nodes.count` | cluster | int | |
+| `cluster.zones.count` | cluster | int | Distinct `topology.kubernetes.io/zone` |
+| `keycloak.deployment.method` | workload | string | `KEYCLOAK_OPERATOR` / `DEPLOYMENT` / `STATEFULSET` / `UNKNOWN` |
+| `keycloak.replicas.desired` | workload | int | |
+| `keycloak.replicas.ready` | workload | int | |
+| `deployment.replicas` | workload | int | **Compat** alias of desired replicas (HA rules) |
+| `keycloak.pods.total` | pods | int | |
+| `keycloak.pods.ready` | pods | int | |
+| `keycloak.pods.restartCount` | pods | int | Sum across pods |
+| `keycloak.pods.oomKilledCount` | pods | int | |
+| `keycloak.topology.zoneCount` | topology | int | |
+| `keycloak.topology.podsByZone` | topology | map | zone → count |
+| `keycloak.topology.podsByNode` | topology | map | node → count |
+| `keycloak.scheduling.zoneSpread.present` | scheduling | bool | |
+| `keycloak.scheduling.hostnameSpread.present` | scheduling | bool | |
+| `keycloak.hpa.present` | autoscaling | bool | |
+| `keycloak.hpa.minReplicas` | autoscaling | int | |
+| `keycloak.hpa.maxReplicas` | autoscaling | int | |
+| `keycloak.pdb.present` | disruption | bool | |
+| `keycloak.resources.requests.cpu` | resources | string | |
+| `keycloak.resources.requests.memory` | resources | string | |
+| `keycloak.resources.limits.cpu` | resources | string | |
+| `keycloak.resources.limits.memory` | resources | string | |
+| `keycloak.route.present` | networking | bool | Route or Ingress |
+| `collection.warning.<resource>` | collection | string | Warning code when a section failed |
+| `keycloak.version` | server | string | From Keycloak Admin API collector |
+| `keycloak.product` | server | string | `KEYCLOAK` / `RHBK` |
+| `keycloak.realm.count` | realm | int | |
+
+Secret values are never emitted.

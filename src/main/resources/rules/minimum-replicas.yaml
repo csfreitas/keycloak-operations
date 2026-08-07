@@ -1,8 +1,5 @@
-id: KC-OCP-HA-001
-title: Keycloak deployment should run with at least 2 replicas
-category: high-availability
-severity: HIGH
-condition:
-  replicas:
-    key: deployment.replicas
-    lessThan: 3
+# Legacy single-rule file retained for documentation only.
+# Canonical HA rule KC-OCP-HA-001 is loaded from rules/openshift/ha.yaml via rules/index.yaml.
+# Do not register a duplicate KC-OCP-HA-001 here.
+deprecated: true
+note: "See rules/openshift/ha.yaml and Java MinimumReplicasRule policy (threshold=2)."

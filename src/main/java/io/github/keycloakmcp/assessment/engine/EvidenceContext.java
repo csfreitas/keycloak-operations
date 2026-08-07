@@ -58,6 +58,10 @@ public final class EvidenceContext {
         }).orElseGet(OptionalIntResult::empty);
     }
 
+    public Optional<String> findString(String key) {
+        return get(key).map(String::valueOf);
+    }
+
     public boolean hasKey(String key) {
         return find(key).isPresent();
     }

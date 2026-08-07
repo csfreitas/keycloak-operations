@@ -1,36 +1,30 @@
-package io.github.keycloakmcp.mcp.assessment;
+package io.github.keycloakmcp.mcp.inventory;
 
 import io.github.keycloakmcp.audit.AuditService;
-import io.github.keycloakmcp.discovery.EnvironmentDiscovery;
-import io.github.keycloakmcp.discovery.EnvironmentInfo;
 import io.github.keycloakmcp.domain.error.McpException;
+import io.github.keycloakmcp.domain.inventory.InfrastructureInventory;
 import io.github.keycloakmcp.observability.McpMetrics;
+import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.security.ToolAuthorization;
-import io.github.keycloakmcp.target.TargetAuthorizationService;
-import io.github.keycloakmcp.target.TargetPermission;
-import io.github.keycloakmcp.target.TargetResolver;
+import io.github.keycloakmcp.service.platform.InventoryService;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
 import io.quarkiverse.mcp.server.ToolCallException;
 import jakarta.inject.Inject;
 
-public class AssessmentTools {
+public class InventoryTools {
 
-    private static final String TOOL_NAME = "keycloak_discover_environment";
+    private static final String TOOL_NAME = "keycloak_get_inventory";
     private static final String TARGET_ID_HINT =
             "Identifies a previously registered Keycloak/RHBK environment. "
                     + "Use keycloak_list_targets when the target is unknown. "
-                    + "Infrastructure discovery uses the target binding when available; "
-                    + "global discovery flags apply as fallback in 0.1.x.";
+                    + "Never pass cluster URLs, tokens, or kubeconfig paths.";
 
     @Inject
-    EnvironmentDiscovery environmentDiscovery;
+    InventoryService inventoryService;
 
     @Inject
-    TargetResolver targetResolver;
-
-    @Inject
-    TargetAuthorizationService targetAuthorization;
+    SensitiveDataFilter sensitiveDataFilter;
 
     @Inject
     AuditService auditService;
@@ -43,19 +37,19 @@ public class AssessmentTools {
 
     @Tool(
             name = TOOL_NAME,
-            description = "Discover runtime environment for a registered target "
-                    + "(OpenShift/Kubernetes/VM/unknown) using read-only probes")
-    public EnvironmentInfo keycloakDiscoverEnvironment(
+            description = "Returns a sanitized infrastructure and Keycloak workload "
+                    + "inventory for a previously registered target. "
+                    + "This tool is read-only. "
+                    + "It never accepts arbitrary cluster URLs or credentials.")
+    public InfrastructureInventory keycloakGetInventory(
             @ToolArg(description = TARGET_ID_HINT) String targetId) {
         long start = System.currentTimeMillis();
         boolean success = false;
         try {
             toolAuthorization.assertReadOnlyOperation(TOOL_NAME);
-            var target = targetResolver.require(targetId);
-            targetAuthorization.assertAllowed(target, TargetPermission.READ);
-            EnvironmentInfo info = environmentDiscovery.discover(target);
+            InfrastructureInventory inventory = inventoryService.collect(targetId);
             success = true;
-            return info;
+            return sensitiveDataFilter.redact(inventory);
         } catch (McpException e) {
             throw new ToolCallException(e.getError().code() + ": " + e.getMessage());
         } finally {

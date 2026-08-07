@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.keycloakmcp.domain.common.ServerInfo;
 import io.github.keycloakmcp.domain.error.McpException;
+import io.github.keycloakmcp.domain.inventory.InfrastructureInventory;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.SnapshotSummary;
 import io.github.keycloakmcp.persistence.entity.EnvironmentSnapshotEntity;
@@ -39,6 +41,7 @@ public class SnapshotService {
     private final TargetResolver targetResolver;
     private final TargetAuthorizationService targetAuthorization;
     private final ServerInfoService serverInfoService;
+    private final InventoryService inventoryService;
     private final SnapshotRepository snapshotRepository;
     private final PlatformPersistenceMapper mapper;
     private final SensitiveDataFilter sensitiveDataFilter;
@@ -49,6 +52,7 @@ public class SnapshotService {
             TargetResolver targetResolver,
             TargetAuthorizationService targetAuthorization,
             ServerInfoService serverInfoService,
+            InventoryService inventoryService,
             SnapshotRepository snapshotRepository,
             PlatformPersistenceMapper mapper,
             SensitiveDataFilter sensitiveDataFilter,
@@ -56,6 +60,7 @@ public class SnapshotService {
         this.targetResolver = targetResolver;
         this.targetAuthorization = targetAuthorization;
         this.serverInfoService = serverInfoService;
+        this.inventoryService = inventoryService;
         this.snapshotRepository = snapshotRepository;
         this.mapper = mapper;
         this.sensitiveDataFilter = sensitiveDataFilter;
@@ -85,7 +90,21 @@ public class SnapshotService {
             summary.put("serverInfoError", e.getMessage());
         }
 
+        Map<String, Object> inventorySummary = new LinkedHashMap<>();
+        try {
+            InfrastructureInventory inventory = inventoryService.collect(targetId);
+            inventorySummary = toInventorySummary(inventory);
+            summary.put("inventory", inventorySummary);
+            summary.put("configurationHash", sha256(normalizeJson(configurationSlice(inventorySummary))));
+            summary.put("runtimeStateHash", sha256(normalizeJson(runtimeSlice(inventorySummary))));
+        } catch (RuntimeException e) {
+            inventorySummary = Map.of(
+                    "collectionError", e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage());
+            summary.put("inventory", inventorySummary);
+        }
+
         Map<String, Object> redacted = sensitiveDataFilter.redact(summary);
+        Map<String, Object> redactedInventory = sensitiveDataFilter.redact(inventorySummary);
         String hash = sha256(normalizeJson(redacted));
 
         String envId = UUID.randomUUID().toString();
@@ -96,15 +115,15 @@ public class SnapshotService {
         env.summary = redacted;
         env.createdAt = Instant.now();
 
-        InventorySnapshotEntity inventory = new InventorySnapshotEntity();
-        inventory.id = UUID.randomUUID().toString();
-        inventory.targetId = targetId;
-        inventory.environmentSnapshotId = envId;
-        inventory.inventoryType = "basic";
-        inventory.summary = Map.of("note", "basic inventory placeholder");
-        inventory.createdAt = Instant.now();
+        InventorySnapshotEntity inventoryEntity = new InventorySnapshotEntity();
+        inventoryEntity.id = UUID.randomUUID().toString();
+        inventoryEntity.targetId = targetId;
+        inventoryEntity.environmentSnapshotId = envId;
+        inventoryEntity.inventoryType = "infrastructure";
+        inventoryEntity.summary = redactedInventory;
+        inventoryEntity.createdAt = Instant.now();
 
-        snapshotRepository.persistWithInventory(env, inventory);
+        snapshotRepository.persistWithInventory(env, inventoryEntity);
         return mapper.toSnapshotSummary(env);
     }
 
@@ -134,13 +153,79 @@ public class SnapshotService {
         return snapshotRepository.findByIdForTarget(snapshotId, targetId);
     }
 
-    private String normalizeJson(Map<String, Object> summary) {
+    private Map<String, Object> toInventorySummary(InfrastructureInventory inventory) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("targetId", inventory.targetId());
+        map.put("runtime", inventory.runtime());
+        map.put("cluster", inventory.cluster());
+        map.put("keycloak", inventory.keycloak());
+        map.put("topology", inventory.topology());
+        map.put("scheduling", inventory.scheduling());
+        map.put("hpa", inventory.hpa());
+        map.put("pdb", inventory.pdb());
+        map.put("resources", inventory.resources());
+        map.put("networking", inventory.networking());
+        map.put("pods", inventory.pods());
+        map.put("warnings", inventory.warnings());
+        map.put("collectedAt", inventory.collectedAt() == null ? null : inventory.collectedAt().toString());
+        return map;
+    }
+
+    private Map<String, Object> configurationSlice(Map<String, Object> inventory) {
+        Map<String, Object> cfg = new LinkedHashMap<>();
+        for (String key : List.of("runtime", "cluster", "keycloak", "scheduling", "hpa", "pdb", "resources", "networking")) {
+            if (inventory.containsKey(key)) {
+                cfg.put(key, inventory.get(key));
+            }
+        }
+        return cfg;
+    }
+
+    private Map<String, Object> runtimeSlice(Map<String, Object> inventory) {
+        Map<String, Object> runtime = new LinkedHashMap<>();
+        for (String key : List.of("pods", "topology", "warnings", "collectedAt")) {
+            if (inventory.containsKey(key)) {
+                runtime.put(key, inventory.get(key));
+            }
+        }
+        return runtime;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String normalizeJson(Object value) {
         try {
-            // TreeMap for stable key ordering of top-level; nested maps may still vary
-            return objectMapper.writeValueAsString(new TreeMap<>(summary));
+            return objectMapper.writeValueAsString(deepSort(value));
         } catch (JsonProcessingException e) {
             throw McpException.internal("Failed to serialize snapshot summary", e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object deepSort(Object value) {
+        if (value instanceof Map<?, ?> map) {
+            TreeMap<String, Object> sorted = new TreeMap<>();
+            for (Map.Entry<?, ?> e : map.entrySet()) {
+                String key = String.valueOf(e.getKey());
+                // Drop volatile Kubernetes fields that cause false drift
+                if (key.equals("resourceVersion")
+                        || key.equals("managedFields")
+                        || key.equals("uid")
+                        || key.equals("creationTimestamp")
+                        || key.equals("collectedAt")) {
+                    continue;
+                }
+                sorted.put(key, deepSort(e.getValue()));
+            }
+            return sorted;
+        }
+        if (value instanceof List<?> list) {
+            List<Object> sorted = new ArrayList<>(list.size());
+            for (Object item : list) {
+                sorted.add(deepSort(item));
+            }
+            return sorted;
+        }
+        return value;
     }
 
     private static String sha256(String input) {

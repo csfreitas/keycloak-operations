@@ -6,38 +6,60 @@ metadata:
     app.kubernetes.io/name: keycloak-operations-mcp
   annotations:
     description: >
-      Read-only cluster access for environment discovery and assessment
-      evidence collection. Secrets are listed for metadata correlation only;
-      the application MUST redact secret data — Kubernetes get/list on Secret
-      objects still returns .data to authorized clients.
+      Read-only cluster-scoped access for environment discovery.
+      Workload resources should preferably be granted via a namespaced Role.
+      Cluster scope is required for nodes, OpenShift cluster config, and API discovery.
 rules:
+  # Cluster-scoped: node topology / capacity for zone distribution assessments.
   - apiGroups: [""]
-    resources:
-      - namespaces
-      - nodes
-      - pods
-      - services
-      - configmaps
+    resources: ["nodes"]
     verbs: ["get", "list", "watch"]
+  # Cluster-scoped: namespace discovery (optional; prefer known Target namespace).
   - apiGroups: [""]
-    resources:
-      - secrets
+    resources: ["namespaces"]
     verbs: ["get", "list", "watch"]
-    # NOTE: Prefer scoping Secrets to a single namespace via Role when possible.
-    # Application-level SensitiveDataFilter must redact Secret .data values.
-  - apiGroups: ["apps"]
-    resources:
-      - deployments
-      - statefulsets
-      - replicasets
-      - daemonsets
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["route.openshift.io"]
-    resources:
-      - routes
-    verbs: ["get", "list", "watch"]
+  # OpenShift cluster identity (version / platform). Not available as namespaced resources.
   - apiGroups: ["config.openshift.io"]
     resources:
       - clusterversions
       - infrastructures
+      - networks
     verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keycloak-mcp-assessor
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+  annotations:
+    description: >
+      Namespaced read-only access for Keycloak/RHBK workload inventory.
+      Bind this Role in each Target namespace (not only keycloak-mcp).
+      Secrets are intentionally omitted — secret contents are never collected.
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "serviceaccounts", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["networkpolicies", "ingresses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["route.openshift.io"]
+    resources: ["routes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["operator.openshift.io"]
+    resources: ["ingresscontrollers"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["k8s.keycloak.org"]
+    resources: ["keycloaks", "keycloakrealmimports"]
+    verbs: ["get", "list", "watch"]
