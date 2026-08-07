@@ -9,6 +9,7 @@ import io.github.keycloakmcp.assessment.engine.AssessmentResult;
 import io.github.keycloakmcp.assessment.engine.Finding;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.AssessmentRunSummary;
+import io.github.keycloakmcp.domain.platform.OperationalEvent;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.TriggerType;
 import io.github.keycloakmcp.persistence.entity.AssessmentFindingEntity;
@@ -33,6 +34,7 @@ public class AssessmentHistoryService {
     private final AssessmentRepository assessmentRepository;
     private final FindingRepository findingRepository;
     private final AssessmentPersistenceMapper mapper;
+    private final OperationalEventBus eventBus;
 
     @Inject
     public AssessmentHistoryService(
@@ -41,13 +43,15 @@ public class AssessmentHistoryService {
             TargetAuthorizationService targetAuthorization,
             AssessmentRepository assessmentRepository,
             FindingRepository findingRepository,
-            AssessmentPersistenceMapper mapper) {
+            AssessmentPersistenceMapper mapper,
+            OperationalEventBus eventBus) {
         this.assessmentEngine = assessmentEngine;
         this.targetResolver = targetResolver;
         this.targetAuthorization = targetAuthorization;
         this.assessmentRepository = assessmentRepository;
         this.findingRepository = findingRepository;
         this.mapper = mapper;
+        this.eventBus = eventBus;
     }
 
     @Transactional
@@ -62,7 +66,13 @@ public class AssessmentHistoryService {
         for (AssessmentFindingEntity finding : mapper.toFindingEntities(result, runId)) {
             findingRepository.persist(finding);
         }
-        return result.withId(runId);
+        AssessmentResult persisted = result.withId(runId);
+        eventBus.publish(OperationalEvent.of(
+                "assessment_completed",
+                targetId,
+                "Assessment score " + persisted.overallScore(),
+                runId));
+        return persisted;
     }
 
     public PageResult<AssessmentRunSummary> list(String targetId, int page, int size) {

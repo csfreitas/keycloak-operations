@@ -1,0 +1,75 @@
+# Frontend (nginx) — static Fleet Operations Console
+# No ServiceAccount cluster access; browser talks only to backend REST via same-origin proxy or Route.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-operations-ui
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-ui
+    app.kubernetes.io/component: web-ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: keycloak-operations-ui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: keycloak-operations-ui
+        app.kubernetes.io/component: web-ui
+    spec:
+      # Default SA only — do NOT bind assessor RBAC to the UI
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: ui
+          image: quay.io/keycloakmcp/keycloak-operations-ui:0.7.0-SNAPSHOT
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: cache
+              mountPath: /var/cache/nginx
+            - name: run
+              mountPath: /var/run
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+        - name: run
+          emptyDir: {}

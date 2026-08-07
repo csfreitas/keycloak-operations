@@ -5,12 +5,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jboss.logging.Logger;
 
+import io.github.keycloakmcp.domain.error.McpException;
+import io.github.keycloakmcp.domain.platform.HealthCheckDetail;
 import io.github.keycloakmcp.domain.platform.HealthCheckSummary;
+import io.github.keycloakmcp.domain.platform.HealthComponentView;
 import io.github.keycloakmcp.domain.platform.HealthStatus;
+import io.github.keycloakmcp.domain.platform.OperationalEvent;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.TriggerType;
 import io.github.keycloakmcp.health.HealthCheckEngine;
@@ -44,6 +49,7 @@ public class HealthCheckService {
     private final HealthCheckRepository healthCheckRepository;
     private final PlatformPersistenceMapper mapper;
     private final SensitiveDataFilter sensitiveDataFilter;
+    private final OperationalEventBus eventBus;
 
     @Inject
     public HealthCheckService(
@@ -52,13 +58,15 @@ public class HealthCheckService {
             HealthCheckEngine healthCheckEngine,
             HealthCheckRepository healthCheckRepository,
             PlatformPersistenceMapper mapper,
-            SensitiveDataFilter sensitiveDataFilter) {
+            SensitiveDataFilter sensitiveDataFilter,
+            OperationalEventBus eventBus) {
         this.targetResolver = targetResolver;
         this.targetAuthorization = targetAuthorization;
         this.healthCheckEngine = healthCheckEngine;
         this.healthCheckRepository = healthCheckRepository;
         this.mapper = mapper;
         this.sensitiveDataFilter = sensitiveDataFilter;
+        this.eventBus = eventBus;
     }
 
     @Transactional
@@ -91,6 +99,11 @@ public class HealthCheckService {
 
         LOG.debugf("Health check completed target=%s overall=%s components=%d", targetId, overall, results.size());
         healthCheckRepository.persistRunWithResults(run, results);
+        eventBus.publish(OperationalEvent.of(
+                "health_check_completed",
+                targetId,
+                "Health check " + overall.name(),
+                runId));
         return mapper.toHealthSummary(run);
     }
 
@@ -102,10 +115,36 @@ public class HealthCheckService {
         return new PageResult<>(items, pageResult.page(), pageResult.size(), pageResult.total());
     }
 
-    public java.util.Optional<HealthCheckSummary> latest(String targetId) {
+    public Optional<HealthCheckSummary> latest(String targetId) {
         Target target = targetResolver.require(targetId);
         targetAuthorization.assertAllowed(target, TargetPermission.READ);
         return healthCheckRepository.findLatest(targetId).map(mapper::toHealthSummary);
+    }
+
+    public HealthCheckDetail get(String targetId, String healthCheckId) {
+        Target target = targetResolver.require(targetId);
+        targetAuthorization.assertAllowed(target, TargetPermission.READ);
+        HealthCheckRunEntity run = healthCheckRepository.findByIdForTarget(healthCheckId, targetId)
+                .orElseThrow(() -> McpException.invalidArgument("health check not found: " + healthCheckId));
+        List<HealthComponentView> components = healthCheckRepository.listResults(healthCheckId).stream()
+                .map(this::toComponentView)
+                .toList();
+        return new HealthCheckDetail(
+                run.id,
+                run.targetId,
+                parseStatus(run.overallStatus),
+                parseTrigger(run.triggerType),
+                run.startedAt,
+                run.completedAt,
+                run.createdAt,
+                components,
+                run.summary == null ? Map.of() : Map.copyOf(run.summary));
+    }
+
+    public Optional<HealthCheckDetail> latestDetail(String targetId) {
+        Target target = targetResolver.require(targetId);
+        targetAuthorization.assertAllowed(target, TargetPermission.READ);
+        return healthCheckRepository.findLatest(targetId).map(run -> get(targetId, run.id));
     }
 
     private HealthCheckResultEntity toEntity(String runId, String targetId, HealthComponentResult component) {
@@ -122,5 +161,36 @@ public class HealthCheckService {
         entity.durationMs = component.durationMs();
         entity.createdAt = Instant.now();
         return entity;
+    }
+
+    private HealthComponentView toComponentView(HealthCheckResultEntity entity) {
+        return new HealthComponentView(
+                entity.checkName,
+                parseStatus(entity.status),
+                entity.message,
+                entity.durationMs,
+                entity.details == null ? Map.of() : Map.copyOf(entity.details));
+    }
+
+    private static HealthStatus parseStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return HealthStatus.UNKNOWN;
+        }
+        try {
+            return HealthStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            return HealthStatus.UNKNOWN;
+        }
+    }
+
+    private static TriggerType parseTrigger(String trigger) {
+        if (trigger == null || trigger.isBlank()) {
+            return TriggerType.API;
+        }
+        try {
+            return TriggerType.valueOf(trigger);
+        } catch (IllegalArgumentException e) {
+            return TriggerType.API;
+        }
     }
 }

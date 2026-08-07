@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-operations-ui
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-ui
+spec:
+  selector:
+    app.kubernetes.io/name: keycloak-operations-ui
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

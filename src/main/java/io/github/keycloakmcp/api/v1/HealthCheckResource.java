@@ -1,5 +1,6 @@
 package io.github.keycloakmcp.api.v1;
 
+import io.github.keycloakmcp.domain.platform.HealthCheckDetail;
 import io.github.keycloakmcp.domain.platform.HealthCheckSummary;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.TriggerType;
@@ -36,5 +37,21 @@ public class HealthCheckResource {
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("20") int size) {
         return sensitiveDataFilter.redact(healthCheckService.list(targetId, page, size));
+    }
+
+    @GET
+    @Path("/latest")
+    public HealthCheckDetail latest(@PathParam("targetId") String targetId) {
+        return sensitiveDataFilter.redact(healthCheckService.latestDetail(targetId)
+                .orElseThrow(() -> io.github.keycloakmcp.domain.error.McpException.invalidArgument(
+                        "no health check for target: " + targetId)));
+    }
+
+    @GET
+    @Path("/{healthCheckId}")
+    public HealthCheckDetail get(
+            @PathParam("targetId") String targetId,
+            @PathParam("healthCheckId") String healthCheckId) {
+        return sensitiveDataFilter.redact(healthCheckService.get(targetId, healthCheckId));
     }
 }

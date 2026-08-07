@@ -21,7 +21,7 @@ Operations Backend (REST / SSE)
 - Drives authorization for Fleet / target APIs (`TargetAuthorizationService`)
 - Must **not** be the same credential used to administer customer Targets
 
-OIDC protection of REST/UI is planned; 0.3 exposes REST without Identity A enforcement in local lab.
+OIDC protection of REST/UI is available via Quarkus profile `oidc` (`quarkus.oidc.enabled` + HTTP authenticated policy on `/api/v1/*`). Default local lab remains OPEN_LAB (`GET /api/v1/me` reports `authMode=OPEN_LAB`). The Web UI auth module is OIDC-ready (`VITE_AUTH_MODE` / `VITE_OIDC_*`) without embedding Identity B secrets.
 
 ## Identity B — Operations Platform → Target Keycloak
 

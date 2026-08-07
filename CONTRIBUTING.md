@@ -6,15 +6,17 @@ Thanks for contributing to **Keycloak / RHBK Operations** (`keycloak-operations-
 
 - **Java 21**
 - **Maven 3.9+** (wrapper not required if system Maven is available)
+- **Node.js ≥ 20** and npm (for `ui/`)
 - Docker (optional) for local Keycloak / PostgreSQL / Prometheus via `dev/compose.yaml`
 
 ## Build & test
 
 ```bash
 mvn clean verify
+cd ui && npm ci && npm run test:run && npm run build
 ```
 
-This is the default validation gate. Opt-in integration tests may require environment flags and live dependencies — see [`integration-tests/README.md`](integration-tests/README.md) and [`docs/compatibility.md`](docs/compatibility.md). Do not mark a version as tested if the IT was skipped.
+This is the default validation gate (backend + frontend). Opt-in integration tests may require environment flags and live dependencies — see [`integration-tests/README.md`](integration-tests/README.md) and [`docs/compatibility.md`](docs/compatibility.md). Do not mark a version as tested if the IT was skipped.
 
 ## Development workflow
 

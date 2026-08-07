@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.github.keycloakmcp.domain.platform.EnvironmentChange;
 import io.github.keycloakmcp.domain.platform.PageResult;
+import io.github.keycloakmcp.domain.platform.SnapshotDetail;
 import io.github.keycloakmcp.domain.platform.SnapshotSummary;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.service.platform.EnvironmentChangeService;
@@ -52,5 +53,21 @@ public class SnapshotResource {
             @QueryParam("to") String toSnapshotId) {
         return sensitiveDataFilter.redact(
                 environmentChangeService.compare(targetId, fromSnapshotId, toSnapshotId));
+    }
+
+    @GET
+    @Path("/latest")
+    public SnapshotDetail latest(@PathParam("targetId") String targetId) {
+        return sensitiveDataFilter.redact(snapshotService.latestDetail(targetId)
+                .orElseThrow(() -> io.github.keycloakmcp.domain.error.McpException.invalidArgument(
+                        "no snapshot for target: " + targetId)));
+    }
+
+    @GET
+    @Path("/{snapshotId}")
+    public SnapshotDetail get(
+            @PathParam("targetId") String targetId,
+            @PathParam("snapshotId") String snapshotId) {
+        return sensitiveDataFilter.redact(snapshotService.getDetail(targetId, snapshotId));
     }
 }

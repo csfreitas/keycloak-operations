@@ -64,5 +64,14 @@ jacoco.exec
 # Accidental agent dumps
 .project-dump/
 
+# Local Maven mirror (sandbox/dev only)
+.m2-local/
+
+# Frontend
+ui/node_modules/
+ui/dist/
+ui/coverage/
+ui/.vite/
+
 # Local AI coding prompts (not public product docs)
 .agent-prompts/
