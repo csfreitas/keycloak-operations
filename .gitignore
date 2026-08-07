@@ -1,0 +1,62 @@
+# Maven / Quarkus
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.quarkus/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.factorypath
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/mcp.json
+!.vscode/mcp.stdio.example.json
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+**/secrets/
+!deploy/openshift/50-secret.yaml
+
+# Logs / local data
+*.log
+logs/
+tmp/
+.temp/
+
+# Native
+*-runner
+*.so
+
+# Testcontainers
+.testcontainers/
+
+# Coverage
+coverage/
+jacoco.exec
+*.exec

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+    app.kubernetes.io/part-of: keycloak-mcp
+    app.kubernetes.io/component: assessor

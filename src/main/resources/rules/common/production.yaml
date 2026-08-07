@@ -1,0 +1,38 @@
+# Common production readiness stubs (0.1.0)
+# Will not fire until corresponding evidence keys are collected.
+rules:
+  - id: KC-PROD-001
+    title: Registration disabled in production
+    category: production
+    severity: MEDIUM
+    description: >
+      Self-registration is rarely appropriate for enterprise identity providers
+      unless explicitly required and hardened.
+    impact: >
+      Open registration can allow unauthorized account creation.
+    recommendation: >
+      Disable realm registrationAllowed unless product requirements demand it,
+      and combine with CAPTCHA / email verification when enabled.
+    references: []
+    condition:
+      key: realm.registrationAllowed
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - realm.registrationAllowed
+
+  - id: KC-PROD-002
+    title: Theme and branding not using default admin theme for user login
+    category: production
+    severity: LOW
+    description: >
+      Placeholder rule for future theme evidence. Does not fire in 0.1.0.
+    impact: Informational only until theme evidence is collected.
+    recommendation: Customize login themes for production customer-facing realms.
+    references: []
+    condition:
+      key: realm.loginTheme
+      equals: keycloak
+    appliesWhen:
+      evidenceRequired:
+        - realm.loginTheme

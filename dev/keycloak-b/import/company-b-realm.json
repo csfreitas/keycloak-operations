@@ -1,0 +1,198 @@
+{
+  "id": "company-b",
+  "realm": "company-b",
+  "displayName": "Company B Realm",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+  "roles": {
+    "realm": [
+      {
+        "id": "company-b-role-user",
+        "name": "user",
+        "description": "Standard application user",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "company-b"
+      },
+      {
+        "id": "company-b-role-admin",
+        "name": "admin",
+        "description": "Application administrator",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "company-b"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "company-b-group-users",
+      "name": "users",
+      "path": "/users",
+      "realmRoles": ["user"],
+      "subGroups": []
+    },
+    {
+      "id": "company-b-group-administrators",
+      "name": "administrators",
+      "path": "/administrators",
+      "realmRoles": ["admin"],
+      "subGroups": []
+    }
+  ],
+  "clients": [
+    {
+      "id": "company-b-client-portal-web",
+      "clientId": "portal-web",
+      "name": "Portal Web",
+      "description": "Public SPA / browser client for local demo",
+      "enabled": true,
+      "publicClient": true,
+      "secret": "",
+      "protocol": "openid-connect",
+      "rootUrl": "http://localhost:3000",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000"
+      ],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "frontchannelLogout": true,
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:3000/*"
+      },
+      "fullScopeAllowed": true
+    },
+    {
+      "id": "company-b-client-backend-api",
+      "clientId": "backend-api",
+      "name": "Backend API",
+      "description": "Confidential service client for local demo only",
+      "enabled": true,
+      "publicClient": false,
+      "secret": "backend-api-secret",
+      "protocol": "openid-connect",
+      "rootUrl": "http://localhost:8082",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:8082/*"
+      ],
+      "webOrigins": [
+        "+"
+      ],
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "authorizationServicesEnabled": false,
+      "frontchannelLogout": false,
+      "fullScopeAllowed": true
+    }
+  ],
+  "users": [
+    {
+      "id": "company-b-user-alice",
+      "username": "alice",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Alice",
+      "lastName": "Demo",
+      "email": "alice-b@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alice",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "user",
+        "default-roles-company-b"
+      ],
+      "groups": [
+        "/users"
+      ]
+    },
+    {
+      "id": "company-b-user-bob",
+      "username": "bob",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Bob",
+      "lastName": "Admin",
+      "email": "bob-b@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "bob",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin",
+        "default-roles-company-b"
+      ],
+      "groups": [
+        "/administrators"
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "roles",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "user.attribute": "foo",
+            "access.token.claim": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "profile",
+    "email",
+    "roles",
+    "web-origins",
+    "acr"
+  ],
+  "defaultOptionalClientScopes": [
+    "offline_access",
+    "address",
+    "phone",
+    "microprofile-jwt"
+  ]
+}

@@ -1,0 +1,43 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keycloak-mcp-assessor
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+  annotations:
+    description: >
+      Read-only cluster access for environment discovery and assessment
+      evidence collection. Secrets are listed for metadata correlation only;
+      the application MUST redact secret data — Kubernetes get/list on Secret
+      objects still returns .data to authorized clients.
+rules:
+  - apiGroups: [""]
+    resources:
+      - namespaces
+      - nodes
+      - pods
+      - services
+      - configmaps
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - secrets
+    verbs: ["get", "list", "watch"]
+    # NOTE: Prefer scoping Secrets to a single namespace via Role when possible.
+    # Application-level SensitiveDataFilter must redact Secret .data values.
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - statefulsets
+      - replicasets
+      - daemonsets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["route.openshift.io"]
+    resources:
+      - routes
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["config.openshift.io"]
+    resources:
+      - clusterversions
+      - infrastructures
+    verbs: ["get", "list"]

@@ -1,0 +1,20 @@
+{
+  "servers": {
+    "keycloak-operations-mcp-stdio": {
+      "type": "stdio",
+      "command": "mvn",
+      "args": [
+        "-q",
+        "-Pstdio",
+        "quarkus:dev",
+        "-Dquarkus.args="
+      ],
+      "env": {
+        "KEYCLOAK_URL": "${env:KEYCLOAK_URL}",
+        "KEYCLOAK_AUTH_REALM": "${env:KEYCLOAK_AUTH_REALM}",
+        "KEYCLOAK_CLIENT_ID": "${env:KEYCLOAK_CLIENT_ID}",
+        "KEYCLOAK_CLIENT_SECRET": "${env:KEYCLOAK_CLIENT_SECRET}"
+      }
+    }
+  }
+}

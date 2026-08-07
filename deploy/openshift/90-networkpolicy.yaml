@@ -1,0 +1,57 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: keycloak-operations-mcp
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: keycloak-operations-mcp
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow MCP HTTP from same namespace and from OpenShift router namespaces
+    - from:
+        - podSelector: {}
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - protocol: TCP
+          port: 8081
+    # Management / metrics — restrict to same namespace by default
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 9000
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: UDP
+          port: 5353
+    # Kubernetes API
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: default
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443
+    # Keycloak / external HTTPS (tighten to specific CIDRs or namespaces in production)
+    - ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 8443
+        - protocol: TCP
+          port: 8080
