@@ -27,7 +27,7 @@ spec:
         - podSelector: {}
       ports:
         - protocol: TCP
-          port: 9000
+          port: 9001
   egress:
     # DNS
     - to:

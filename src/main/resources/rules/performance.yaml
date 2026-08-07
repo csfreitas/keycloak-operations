@@ -112,3 +112,81 @@ rules:
     appliesWhen:
       evidenceRequired:
         - metrics.cache.hitRatioBelowMinimum
+
+  - id: KC-PERF-HTTP-P95-001
+    title: HTTP p95 latency exceeds SLO
+    category: performance
+    severity: MEDIUM
+    description: >
+      Observed HTTP p95 latency exceeds the configured assessment.performance.latency-p95-ms SLO.
+    impact: >
+      Elevated tail latency for typical authentication traffic.
+    recommendation: >
+      Investigate hot paths and pool/heap pressure; raise the SLO only if unrealistic.
+    references: []
+    condition:
+      key: metrics.slo.p95Exceeded
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.slo.p95Configured
+        - metrics.http.p95Ms
+        - metrics.slo.p95Exceeded
+
+  - id: KC-PERF-DB-002
+    title: Database pool awaiting connections critical
+    category: performance
+    severity: HIGH
+    description: >
+      Agroal awaiting connections reached the configured critical threshold with sustained average pressure.
+    impact: >
+      Request threads are likely blocking on the connection pool.
+    recommendation: >
+      Investigate slow queries and connection hold time before increasing pool size.
+    references: []
+    condition:
+      key: metrics.db.awaitingCritical
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.db.awaitingCritical
+
+  - id: KC-PERF-GC-001
+    title: Configured GC pause threshold exceeded
+    category: performance
+    severity: MEDIUM
+    description: >
+      Observed JVM GC pause exceeds assessment.performance.gc-pause-warning-ms.
+    impact: >
+      Stop-the-world pauses can increase authentication latency.
+    recommendation: >
+      Review heap sizing and allocation patterns. Do not infer a memory leak from this signal alone.
+    references: []
+    condition:
+      key: metrics.jvm.gcPauseExceeded
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.jvm.gcPauseExceeded
+        - metrics.jvm.gcPauseMaxMs
+
+  - id: KC-PERF-CLUSTER-001
+    title: Keycloak cluster size differs from ready replicas
+    category: performance
+    severity: MEDIUM
+    description: >
+      Metrics cluster membership size differs from infrastructure ready replicas.
+      This is a correlated visibility/membership signal, not a root cause.
+    impact: >
+      Inconsistent cluster view may affect cache invalidation and failover behavior.
+    recommendation: >
+      Compare Keycloak cluster metrics with workload readyReplicas and recent pod restarts.
+    references: []
+    condition:
+      key: metrics.cluster.sizeMismatch
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.cluster.size
+        - metrics.cluster.readyReplicas
+        - metrics.cluster.sizeMismatch

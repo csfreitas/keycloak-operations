@@ -44,22 +44,18 @@ public record MetricsQueryContext(
         } else if (target.hasInfrastructure()) {
             namespace = target.infrastructure().namespace();
         }
-        Map<String, String> labels = Map.of();
+        LinkedHashMap<String, String> labels = new LinkedHashMap<>();
         if (target.tags() != null && !target.tags().isEmpty()) {
-            String job = target.tags().get("job");
-            String service = target.tags().get("service");
-            if (job != null || service != null) {
-                LinkedHashMap<String, String> m = new LinkedHashMap<>();
-                if (job != null && !job.isBlank()) {
-                    m.put("job", job);
+            for (String key : List.of("target_id", "job", "service", "workload", "pod", "pod_name")) {
+                String v = target.tags().get(key);
+                if (v != null && !v.isBlank()) {
+                    labels.put(key, v);
                 }
-                if (service != null && !service.isBlank()) {
-                    m.put("service", service);
-                }
-                labels = Map.copyOf(m);
             }
         }
-        return new MetricsQueryContext(target.id().value(), namespace, scope, labels, HttpMetricScope.ALL);
+        // Prefer explicit target_id label for isolation; fall back to TargetId when tags omit it.
+        labels.putIfAbsent("target_id", target.id().value());
+        return new MetricsQueryContext(target.id().value(), namespace, scope, Map.copyOf(labels), HttpMetricScope.ALL);
     }
 
     public String selectorClause() {
@@ -72,11 +68,24 @@ public record MetricsQueryContext(
                 parts.add(PromQlEscaper.labelEq(e.getKey(), e.getValue()));
             }
         }
-        if (parts.isEmpty()) {
-            // Still isolate by job/instance label from target id when nothing else known
+        // Namespace alone is insufficient when multiple targets share a namespace.
+        if (!hasTargetDiscriminator()) {
             parts.add(PromQlEscaper.labelEq("target_id", targetId));
         }
         return String.join(",", parts);
+    }
+
+    /**
+     * True when mandatory labels already discriminate a single workload/target.
+     */
+    public boolean hasTargetDiscriminator() {
+        for (String key : List.of("target_id", "service", "job", "workload", "pod", "pod_name")) {
+            String v = mandatoryLabels.get(key);
+            if (v != null && !v.isBlank()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String withSelector(String metricName) {

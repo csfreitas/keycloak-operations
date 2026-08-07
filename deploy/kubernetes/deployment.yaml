@@ -1,5 +1,6 @@
-# Simplified single-file Kubernetes deployment (no OpenShift Route).
+# Simplified Kubernetes deployment (aligned with OpenShift RBAC model).
 # Adjust image, secrets, and ingress for your cluster.
+# Application listens on 8081 (HTTP) and 9001 (management).
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -15,12 +16,16 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: keycloak-mcp-assessor
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+  annotations:
+    description: >
+      Cluster-scoped read-only access for discovery (nodes/namespaces only).
+      Workload resources are granted via a namespaced Role.
+      Secrets are intentionally omitted.
 rules:
   - apiGroups: [""]
-    resources: ["namespaces", "nodes", "pods", "services", "configmaps", "secrets"]
-    verbs: ["get", "list", "watch"]
-  - apiGroups: ["apps"]
-    resources: ["deployments", "statefulsets", "replicasets"]
+    resources: ["nodes", "namespaces"]
     verbs: ["get", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -30,6 +35,54 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
+  name: keycloak-mcp-assessor
+subjects:
+  - kind: ServiceAccount
+    name: keycloak-mcp-assessor
+    namespace: keycloak-mcp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: keycloak-mcp-assessor
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+  annotations:
+    description: >
+      Namespaced read-only access for Keycloak/RHBK workload inventory.
+      Bind this Role in each Target namespace. Secrets are omitted.
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "configmaps", "serviceaccounts", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["networkpolicies", "ingresses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["monitoring.coreos.com"]
+    resources: ["servicemonitors"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["k8s.keycloak.org"]
+    resources: ["keycloaks", "keycloakrealmimports"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keycloak-mcp-assessor
+  namespace: keycloak-mcp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
   name: keycloak-mcp-assessor
 subjects:
   - kind: ServiceAccount
@@ -72,13 +125,13 @@ spec:
           type: RuntimeDefault
       containers:
         - name: mcp
-          image: quay.io/keycloakmcp/keycloak-operations-mcp:0.1.0
+          image: quay.io/keycloakmcp/keycloak-operations-mcp:0.6.1-SNAPSHOT
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8081
             - name: management
-              containerPort: 9000
+              containerPort: 9001
           envFrom:
             - secretRef:
                 name: keycloak-mcp-credentials
@@ -132,5 +185,5 @@ spec:
       port: 8081
       targetPort: http
     - name: management
-      port: 9000
+      port: 9001
       targetPort: management

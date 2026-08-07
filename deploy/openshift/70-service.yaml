@@ -14,6 +14,6 @@ spec:
       targetPort: http
       protocol: TCP
     - name: management
-      port: 9000
+      port: 9001
       targetPort: management
       protocol: TCP

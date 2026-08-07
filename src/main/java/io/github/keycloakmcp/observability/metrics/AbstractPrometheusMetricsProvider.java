@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jboss.logging.Logger;
 
@@ -20,6 +21,15 @@ import io.github.keycloakmcp.target.Target;
  * Shared query/status logic for Prometheus-compatible backends.
  */
 public abstract class AbstractPrometheusMetricsProvider implements MetricsProvider {
+
+    private static final Set<String> ALLOWED_PROBE_FAMILIES = Set.of(
+            "http_server_requests_seconds_count",
+            "http_server_requests_seconds_bucket",
+            "agroal_active_count",
+            "jvm_memory_used_bytes",
+            "keycloak_user_events_total",
+            "vendor_cluster_size",
+            "up");
 
     private final Logger log;
     private final PrometheusApiClient apiClient;
@@ -74,6 +84,7 @@ public abstract class AbstractPrometheusMetricsProvider implements MetricsProvid
             return SemanticMetricResult.notConfigured(null, metric, window);
         }
         MetricWindow w = window == null ? MetricWindow.defaultWindow() : window;
+        MetricsQueryBounds.validateWindow(w, metricsConfig);
         if (!matchesType(target)) {
             return SemanticMetricResult.notConfigured(target.id().value(), metric, w);
         }
@@ -98,11 +109,119 @@ public abstract class AbstractPrometheusMetricsProvider implements MetricsProvid
 
     @Override
     public List<SemanticMetricResult> queryCategory(Target target, MetricCategory category, MetricWindow window) {
+        MetricWindow w = window == null ? MetricWindow.defaultWindow() : window;
+        MetricsQueryBounds.validateWindow(w, metricsConfig);
         List<SemanticMetricResult> out = new ArrayList<>();
         for (SemanticMetric metric : MetricsCatalog.forCategory(category)) {
-            out.add(query(target, metric, window));
+            out.add(query(target, metric, w));
         }
         return List.copyOf(out);
+    }
+
+    @Override
+    public SemanticMetricResult probeSeries(Target target, String controlledMetricFamily) {
+        if (target == null || controlledMetricFamily == null || controlledMetricFamily.isBlank()) {
+            return SemanticMetricResult.notAvailable(null, null, MetricWindow.defaultWindow(), sourceName, "Invalid probe");
+        }
+        if (!ALLOWED_PROBE_FAMILIES.contains(controlledMetricFamily)) {
+            return SemanticMetricResult.notAvailable(
+                    target.id().value(), null, MetricWindow.defaultWindow(), sourceName, "Probe family not allowed");
+        }
+        if (!matchesType(target)) {
+            return SemanticMetricResult.notConfigured(target.id().value(), null, MetricWindow.defaultWindow());
+        }
+        Optional<String> endpoint = endpointResolver.resolve(target);
+        if (endpoint.isEmpty()) {
+            return SemanticMetricResult.notConfigured(target.id().value(), null, MetricWindow.defaultWindow());
+        }
+        MetricsQueryContext ctx = endpointResolver.queryContext(target);
+        String promQl = MetricsQueryBuilder.countSeries(controlledMetricFamily, ctx);
+        PrometheusApiClient.Response response = apiClient.query(
+                endpoint.get(),
+                promQl,
+                resolveCredentials(target),
+                connectTimeout(),
+                readTimeout());
+        return toResult(target.id().value(), null, MetricWindow.defaultWindow(), response);
+    }
+
+    @Override
+    public RangeMetricSummary queryRange(Target target, SemanticMetric metric, MetricWindow window) {
+        if (target == null || metric == null) {
+            return RangeMetricSummary.notAvailable("Invalid arguments");
+        }
+        MetricWindow w = window == null ? MetricWindow.defaultWindow() : window;
+        MetricsQueryBounds.validateWindow(w, metricsConfig);
+        if (!matchesType(target)) {
+            return RangeMetricSummary.notAvailable("Provider not configured");
+        }
+        Optional<String> endpoint = endpointResolver.resolve(target);
+        if (endpoint.isEmpty()) {
+            return RangeMetricSummary.notAvailable("Endpoint not configured");
+        }
+
+        MetricsQueryContext ctx = endpointResolver.queryContext(target);
+        String promQl = MetricsQueryBuilder.instantGauge(metric, ctx);
+        Instant end = Instant.now();
+        Instant start = end.minusSeconds(w.seconds());
+        Duration step = MetricsQueryBounds.stepFor(w, metricsConfig.maxPoints());
+
+        PrometheusApiClient.Response response = apiClient.queryRange(
+                endpoint.get(),
+                promQl,
+                start,
+                end,
+                step,
+                resolveCredentials(target),
+                connectTimeout(),
+                readTimeout());
+
+        if (response.status() != PrometheusApiClient.Status.OK) {
+            SemanticMetricResult fallback = query(target, metric, w);
+            return RangeMetricSummary.fromInstant(fallback);
+        }
+        List<MetricSeries> series = response.series();
+        if (MetricsQueryBounds.exceedsSeriesLimit(series.size(), metricsConfig)) {
+            return new RangeMetricSummary(
+                    null, null, null, MetricAvailability.NOT_AVAILABLE,
+                    SemanticMetricResult.REASON_SERIES_LIMIT, series.size(), 0);
+        }
+        if (series.isEmpty()) {
+            return RangeMetricSummary.notAvailable("No time series returned");
+        }
+
+        List<Double> values = new ArrayList<>();
+        for (MetricSeries s : series) {
+            if (s.samples() == null) {
+                continue;
+            }
+            for (MetricSample sample : s.samples()) {
+                if (sample != null && sample.value() != null) {
+                    values.add(sample.value());
+                }
+            }
+        }
+        if (values.isEmpty()) {
+            return RangeMetricSummary.notAvailable("No samples in window");
+        }
+        double sum = 0;
+        double max = Double.NEGATIVE_INFINITY;
+        for (Double v : values) {
+            sum += v;
+            max = Math.max(max, v);
+        }
+        Double current = values.get(values.size() - 1);
+        double average = sum / values.size();
+        Instant lastTs = lastTimestamp(series);
+        MetricAvailability availability = MetricAvailability.AVAILABLE;
+        String reason = null;
+        Duration staleAfter = MetricsQueryBounds.staleAfter(metricsConfig);
+        if (lastTs != null && Duration.between(lastTs, Instant.now()).compareTo(staleAfter) > 0) {
+            availability = MetricAvailability.STALE;
+            reason = SemanticMetricResult.REASON_STALE;
+        }
+        return new RangeMetricSummary(
+                current, average, max, availability, reason, series.size(), values.size());
     }
 
     protected abstract boolean matchesType(Target target);
@@ -122,14 +241,23 @@ public abstract class AbstractPrometheusMetricsProvider implements MetricsProvid
 
     private SemanticMetricResult toResult(
             String targetId, SemanticMetric metric, MetricWindow window, PrometheusApiClient.Response response) {
-        MetricsCatalog.Entry entry = MetricsCatalog.entry(metric);
+        MetricsCatalog.Entry entry = metric == null ? null : MetricsCatalog.entry(metric);
         String unit = entry == null ? null : entry.unit();
         return switch (response.status()) {
             case OK -> {
                 List<MetricSeries> series = response.series();
+                if (MetricsQueryBounds.exceedsSeriesLimit(series.size(), metricsConfig)) {
+                    yield SemanticMetricResult.limitExceeded(
+                            targetId, metric, window, sourceName, series.size());
+                }
                 Double value = firstValue(series);
                 Instant lastTs = lastTimestamp(series);
                 List<Map<String, String>> labels = series.stream().map(MetricSeries::labels).toList();
+                Duration staleAfter = MetricsQueryBounds.staleAfter(metricsConfig);
+                if (lastTs != null && Duration.between(lastTs, Instant.now()).compareTo(staleAfter) > 0) {
+                    yield SemanticMetricResult.stale(
+                            targetId, metric, window, value, unit, sourceName, series.size(), lastTs, labels);
+                }
                 yield SemanticMetricResult.available(
                         targetId, metric, window, value, unit, sourceName, series.size(), lastTs, labels);
             }
