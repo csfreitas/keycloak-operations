@@ -19,4 +19,8 @@ public record EvidenceSubject(
     public static EvidenceSubject client(String clientId) {
         return new EvidenceSubject(SubjectType.CLIENT, clientId, clientId);
     }
+
+    public static EvidenceSubject cache(String cacheName) {
+        return new EvidenceSubject(SubjectType.CACHE, cacheName, cacheName);
+    }
 }

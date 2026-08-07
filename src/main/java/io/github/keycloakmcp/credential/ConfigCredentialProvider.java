@@ -60,6 +60,20 @@ public class ConfigCredentialProvider implements CredentialProvider {
         return InfrastructureCredentials.inCluster();
     }
 
+    @Override
+    public MetricsCredentials getMetricsCredentials(String credentialRef) {
+        if (credentialRef == null || credentialRef.isBlank()) {
+            return MetricsCredentials.none();
+        }
+        McpRuntimeConfig.CredentialEntry entry = requireEntry(credentialRef);
+        LOG.debugf("Resolving metrics credentials for ref=%s", credentialRef);
+        String token = entry.token().filter(s -> s != null && !s.isBlank()).orElse(null);
+        String username = entry.username().filter(s -> s != null && !s.isBlank()).orElse(null);
+        String password = entry.password().filter(s -> s != null && !s.isBlank()).orElse(null);
+        String caCertData = entry.caCertData().orElse(null);
+        return new MetricsCredentials(token, username, password, caCertData, entry.trustInsecure());
+    }
+
     private McpRuntimeConfig.CredentialEntry requireEntry(String credentialRef) {
         if (credentialRef == null || credentialRef.isBlank()) {
             throw McpException.invalidArgument("credentialRef must not be blank");

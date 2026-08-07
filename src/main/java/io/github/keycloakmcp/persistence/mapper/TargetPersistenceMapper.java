@@ -59,11 +59,15 @@ public class TargetPersistenceMapper {
 
         ObservabilityTargetConfiguration observability = null;
         if (entity.observability != null && !entity.observability.isEmpty()) {
-            Object metrics = entity.observability.get("metricsType");
-            Object tracing = entity.observability.get("tracingType");
             observability = new ObservabilityTargetConfiguration(
-                    metrics == null ? null : String.valueOf(metrics),
-                    tracing == null ? null : String.valueOf(tracing));
+                    stringOrNull(entity.observability.get("metricsType")),
+                    stringOrNull(entity.observability.get("tracingType")),
+                    stringOrNull(entity.observability.get("endpointUrl")),
+                    stringOrNull(entity.observability.get("credentialRef")),
+                    stringOrNull(entity.observability.get("namespace")),
+                    stringOrNull(entity.observability.get("scope")) != null
+                            ? stringOrNull(entity.observability.get("scope"))
+                            : "NAMESPACE");
         }
 
         return new Target(
@@ -105,12 +109,14 @@ public class TargetPersistenceMapper {
 
         if (target.observability() != null) {
             Map<String, Object> obs = new LinkedHashMap<>();
-            if (target.observability().metricsType() != null) {
-                obs.put("metricsType", target.observability().metricsType());
-            }
-            if (target.observability().tracingType() != null) {
-                obs.put("tracingType", target.observability().tracingType());
-            }
+            putIfPresent(obs, "metricsType", target.observability().metricsType());
+            putIfPresent(obs, "tracingType", target.observability().tracingType());
+            putIfPresent(obs, "endpointUrl", target.observability().endpointUrl());
+            putIfPresent(obs, "credentialRef", target.observability().credentialRef());
+            putIfPresent(obs, "namespace", target.observability().namespace());
+            putIfPresent(obs, "scope", target.observability().scope() != null
+                    ? target.observability().scope()
+                    : "NAMESPACE");
             entity.observability = obs.isEmpty() ? null : obs;
         } else {
             entity.observability = null;
@@ -122,5 +128,19 @@ public class TargetPersistenceMapper {
         }
         entity.tags = tags;
         entity.updatedAt = updatedAt;
+    }
+
+    private static void putIfPresent(Map<String, Object> map, String key, String value) {
+        if (value != null && !value.isBlank()) {
+            map.put(key, value);
+        }
+    }
+
+    private static String stringOrNull(Object value) {
+        if (value == null) {
+            return null;
+        }
+        String s = String.valueOf(value);
+        return s.isBlank() || "null".equals(s) ? null : s;
     }
 }

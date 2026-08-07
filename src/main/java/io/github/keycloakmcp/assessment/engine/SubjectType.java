@@ -7,5 +7,6 @@ public enum SubjectType {
     POD,
     WORKLOAD,
     ROUTE,
-    CLUSTER
+    CLUSTER,
+    CACHE
 }

@@ -27,6 +27,9 @@ by design (SSRF protection).
 | `keycloak_get_role` | yes | `realm`, `roleName` | Role details |
 | `keycloak_discover_environment` | yes | — | Runtime discovery |
 | `keycloak_get_inventory` | yes | — | Sanitized infrastructure inventory |
+| `keycloak_get_metrics_status` | yes | — | Metrics provider status |
+| `keycloak_get_performance_summary` | yes | `window?` | Compact HTTP/DB/JVM summary |
+| `keycloak_get_metrics` | yes | `category`, `window?` | Semantic category metrics |
 | `keycloak_run_assessment` | yes | `profile?` | Run + persist assessment (compact) |
 | `keycloak_health_check` | yes | — | Lightweight health check |
 | `keycloak_list_assessment_profiles` | no | — | Built-in profiles |

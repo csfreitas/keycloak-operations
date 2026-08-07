@@ -7,7 +7,7 @@ environments.
 
 | | |
 |---|---|
-| Version | **0.5.0-SNAPSHOT** |
+| Version | **0.6.0-SNAPSHOT** |
 | Package | `io.github.keycloakmcp` |
 | License | [Apache License 2.0](LICENSE) |
 | MCP | Specification **2025-11-25** (Quarkiverse MCP Server **1.13.1**) |
@@ -49,6 +49,8 @@ flowchart LR
   InfraFactory --> OCP[OpenShift / Kubernetes]
   SVC --> Assess[Assessment Engine]
   SVC --> Inv[InventoryService]
+  SVC --> Metrics[MetricsService]
+  Metrics --> Prom[Prometheus / OpenShift Monitoring]
 ```
 
 Infrastructure discovery and inventory docs:
@@ -61,6 +63,12 @@ Assessment depth (0.5):
 [docs/assessment-profiles.md](docs/assessment-profiles.md),
 [docs/rule-catalog.md](docs/rule-catalog.md),
 [docs/scoring.md](docs/scoring.md).
+
+Metrics / performance (0.6):
+[docs/metrics-catalog.md](docs/metrics-catalog.md),
+[docs/prometheus-integration.md](docs/prometheus-integration.md),
+[docs/performance-assessment.md](docs/performance-assessment.md),
+[docs/performance-slo.md](docs/performance-slo.md).
 
 ## Database
 

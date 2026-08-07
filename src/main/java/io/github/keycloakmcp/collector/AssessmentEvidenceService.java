@@ -8,6 +8,7 @@ import org.jboss.logging.Logger;
 import io.github.keycloakmcp.assessment.engine.Evidence;
 import io.github.keycloakmcp.collector.infrastructure.InfrastructureEvidenceCollector;
 import io.github.keycloakmcp.collector.keycloak.KeycloakEvidenceCollector;
+import io.github.keycloakmcp.collector.metrics.MetricsEvidenceCollector;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.target.Target;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,13 +25,16 @@ public class AssessmentEvidenceService {
 
     private final KeycloakEvidenceCollector keycloakEvidenceCollector;
     private final InfrastructureEvidenceCollector infrastructureEvidenceCollector;
+    private final MetricsEvidenceCollector metricsEvidenceCollector;
 
     @Inject
     public AssessmentEvidenceService(
             KeycloakEvidenceCollector keycloakEvidenceCollector,
-            InfrastructureEvidenceCollector infrastructureEvidenceCollector) {
+            InfrastructureEvidenceCollector infrastructureEvidenceCollector,
+            MetricsEvidenceCollector metricsEvidenceCollector) {
         this.keycloakEvidenceCollector = keycloakEvidenceCollector;
         this.infrastructureEvidenceCollector = infrastructureEvidenceCollector;
+        this.metricsEvidenceCollector = metricsEvidenceCollector;
     }
 
     public EvidenceCollectionResult collect(Target target) {
@@ -44,6 +48,11 @@ public class AssessmentEvidenceService {
         collectSource(target, keycloakEvidenceCollector, evidence, collectedSources, failedSources);
         if (target.hasInfrastructure()) {
             collectSource(target, infrastructureEvidenceCollector, evidence, collectedSources, failedSources);
+        }
+        if (target.hasObservabilityMetrics()
+                || (target.observability() != null && target.observability().hasMetrics())) {
+            // Metrics are optional for overall assessment success; failures → failedSources only.
+            collectSource(target, metricsEvidenceCollector, evidence, collectedSources, failedSources);
         }
 
         // Target environment as evidence for appliesWhen

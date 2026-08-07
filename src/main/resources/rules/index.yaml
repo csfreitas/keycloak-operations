@@ -10,3 +10,5 @@ packs:
     path: rules/capacity.yaml
   - id: admin-security
     path: rules/common/admin-security.yaml
+  - id: performance
+    path: rules/performance.yaml

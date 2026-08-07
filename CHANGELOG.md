@@ -5,6 +5,23 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0-SNAPSHOT] — 2026-08-07
+
+### Added
+
+- Semantic metrics stack: `MetricsService` (status/summary/category), `PerformanceSummary`, availability cache
+- Real `MetricsEvidenceCollector` + performance rule pack (`KC-PERF-*`) and performance profiles
+- REST metrics: `/status`, `/summary`, `/http|database|jvm|cache|authentication|runtime|cluster`
+- MCP tools: `keycloak_get_metrics_status`, `keycloak_get_performance_summary`, `keycloak_get_metrics`
+- Lab Prometheus compose + `scripts/smoke-metrics.sh`
+- Docs: metrics-catalog, prometheus-integration, openshift-monitoring, performance-assessment, performance-slo
+
+### Changed
+
+- Artifact / app version **0.6.0-SNAPSHOT**
+- Metrics are optional for assessment completeness unless a performance profile requires them
+- No raw PromQL accepted from REST/MCP
+
 ## [0.5.0-SNAPSHOT] — 2026-08-07
 
 ### Added

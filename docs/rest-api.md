@@ -33,7 +33,10 @@ MCP tools and REST share the same application services. Tool signatures are unch
 | POST | `/targets/{targetId}/snapshots` | Create environment snapshot |
 | GET | `/targets/{targetId}/snapshots` | Snapshot history |
 | GET | `/targets/{targetId}/snapshots/changes?from=&to=` | Snapshot diff |
-| GET | `/targets/{targetId}/metrics/{requests\|latency\|jvm\|database-pool\|resources}` | Semantic metrics (may be empty) |
+| GET | `/targets/{targetId}/metrics/status` | Provider status |
+| GET | `/targets/{targetId}/metrics/summary?window=` | Performance summary |
+| GET | `/targets/{targetId}/metrics/{http\|database\|jvm\|cache\|authentication\|runtime\|cluster}?window=` | Category series |
+| GET | `/targets/{targetId}/metrics/{requests\|latency\|jvm\|database-pool\|resources}` | Legacy aliases |
 | GET | `/audit` | Audit trail (`targetId`, `source`) |
 | GET | `/events` | SSE hello + heartbeat |
 

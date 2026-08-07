@@ -102,7 +102,23 @@ public interface McpRuntimeConfig {
         Optional<TracingEntry> tracing();
 
         interface MetricsEntry {
+            /** PROMETHEUS | THANOS | OPENSHIFT_MONITORING | NONE */
             Optional<String> type();
+
+            /** Server-configured metrics endpoint (Prometheus / Thanos Querier). */
+            Optional<String> endpoint();
+
+            @WithName("endpoint-url")
+            Optional<String> endpointUrl();
+
+            @WithName("credential-ref")
+            Optional<String> credentialRef();
+
+            Optional<String> namespace();
+
+            /** NAMESPACE (default) | CLUSTER */
+            @WithDefault("NAMESPACE")
+            Optional<String> scope();
         }
 
         interface TracingEntry {
@@ -117,6 +133,12 @@ public interface McpRuntimeConfig {
 
         /** Bearer / OAuth2 token for Kubernetes/OpenShift API access. */
         Optional<String> token();
+
+        /** Optional basic-auth username for metrics backends. */
+        Optional<String> username();
+
+        /** Optional basic-auth password for metrics backends. */
+        Optional<String> password();
 
         /** Kubernetes/OpenShift API server URL (e.g. https://api.cluster:6443). */
         @WithName("api-server-url")

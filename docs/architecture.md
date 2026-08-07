@@ -31,7 +31,7 @@ both call the same services (for example `ClientService`, `AssessmentHistoryServ
 | Services | Domain orchestration, audit, metrics, persistence |
 | Persistence | JPA entities + Flyway (targets, assessments, health, audit, snapshots) |
 | Adapters | Keycloak Admin Client (stable API), future K8s/OCP/VM |
-| Observability | `MetricsProvider` abstraction (semantic queries; no raw PromQL tools) |
+| Observability | `MetricsProvider` / factory (semantic queries; no raw PromQL tools); performance evidence |
 | Security | Sensitive data redaction, read-only enforcement, target authz |
 
 ## Administration

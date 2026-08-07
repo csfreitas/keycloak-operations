@@ -26,6 +26,9 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HEALTH_ENABLED: "true"
       KC_METRICS_ENABLED: "true"
+      KC_HTTP_METRICS_HISTOGRAMS_ENABLED: "true"
+      # Optional event metrics — keep cardinality low in lab
+      KC_EVENT_METRICS_ENABLED: "true"
       KC_HTTP_PORT: "8080"
     ports:
       - "8080:8080"
@@ -53,6 +56,9 @@ services:
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HEALTH_ENABLED: "true"
       KC_METRICS_ENABLED: "true"
+      KC_HTTP_METRICS_HISTOGRAMS_ENABLED: "true"
+      # Optional event metrics — keep cardinality low in lab
+      KC_EVENT_METRICS_ENABLED: "true"
       KC_HTTP_PORT: "8080"
     ports:
       - "8180:8080"
@@ -65,3 +71,24 @@ services:
       timeout: 5s
       retries: 30
       start_period: 40s
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: keycloak-mcp-prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+    depends_on:
+      keycloak:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9090/-/healthy | grep -q 'Prometheus Server is Healthy' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 15s

@@ -136,6 +136,51 @@ class RulePackFixtureTest {
                 "KC-CAP-001", "KC-CAP-002", "KC-CAP-003");
     }
 
+    @Test
+    void performanceHealthyDoesNotEmitFindings() {
+        AssessmentProfile perf = new AssessmentProfile("perf", List.of("performance"));
+        EvidenceContext ctx = context(List.of(
+                ev("metrics.slo.p99Configured", true),
+                ev("metrics.http.p99Ms", 80.0),
+                ev("metrics.slo.p99Exceeded", false),
+                ev("metrics.http.histogram.requiredButMissing", false),
+                ev("metrics.slo.errorRateExceeded", false),
+                ev("metrics.db.awaitingWarning", false),
+                ev("metrics.jvm.heapPressure", false)));
+
+        assertThat(actionable(loader.loadForProfile(perf), ctx)).isEmpty();
+    }
+
+    @Test
+    void performanceDbContentionEmitsKcPerfDb001() {
+        AssessmentProfile perf = new AssessmentProfile("perf", List.of("performance"));
+        EvidenceContext ctx = context(List.of(ev("metrics.db.awaitingWarning", true)));
+        assertThat(actionable(loader.loadForProfile(perf), ctx))
+                .extracting(Finding::id)
+                .contains("KC-PERF-DB-001");
+    }
+
+    @Test
+    void performanceMissingHistogramEmitsHistRule() {
+        AssessmentProfile perf = new AssessmentProfile("perf", List.of("performance"));
+        EvidenceContext ctx = context(List.of(
+                ev("metrics.slo.p99Configured", true),
+                ev("metrics.http.histogram.requiredButMissing", true)));
+        assertThat(actionable(loader.loadForProfile(perf), ctx))
+                .extracting(Finding::id)
+                .contains("KC-PERF-HTTP-HIST-001");
+    }
+
+    @Test
+    void performanceUnavailableYieldsNotEvaluatedForSloRule() {
+        AssessmentProfile perf = new AssessmentProfile("perf", List.of("performance"));
+        // No metrics evidence → SLO rule NOT_EVALUATED (missing evidenceRequired)
+        EvidenceContext ctx = context(List.of());
+        RuleEvaluationResult detailed = ruleEngine.evaluateDetailed(loader.loadForProfile(perf), ctx);
+        assertThat(detailed.rulesNotEvaluated()).isGreaterThan(0);
+        assertThat(actionable(loader.loadForProfile(perf), ctx)).isEmpty();
+    }
+
     private List<Rule> haRules() {
         return loader.loadForProfile(new AssessmentProfile("ha", List.of("ha")));
     }
