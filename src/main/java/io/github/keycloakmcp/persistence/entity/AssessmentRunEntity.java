@@ -35,6 +35,28 @@ public class AssessmentRunEntity extends PanacheEntityBase {
     @Column(name = "trigger_type", length = 32, nullable = false)
     public String triggerType;
 
+    @Column(name = "evidence_completeness")
+    public Integer evidenceCompleteness;
+
+    @Column(name = "confidence", length = 16)
+    public String confidence;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "category_scores", columnDefinition = "jsonb")
+    public Map<String, Integer> categoryScores;
+
+    @Column(name = "rules_evaluated")
+    public Integer rulesEvaluated;
+
+    @Column(name = "rules_matched")
+    public Integer rulesMatched;
+
+    @Column(name = "rules_skipped")
+    public Integer rulesSkipped;
+
+    @Column(name = "rules_not_evaluated")
+    public Integer rulesNotEvaluated;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "summary", columnDefinition = "jsonb")
     public Map<String, Object> summary;

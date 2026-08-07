@@ -1,6 +1,5 @@
 package io.github.keycloakmcp.service.platform;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,7 +7,6 @@ import java.util.UUID;
 import io.github.keycloakmcp.assessment.engine.AssessmentEngine;
 import io.github.keycloakmcp.assessment.engine.AssessmentResult;
 import io.github.keycloakmcp.assessment.engine.Finding;
-import io.github.keycloakmcp.collector.EvidenceCollector;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.AssessmentRunSummary;
 import io.github.keycloakmcp.domain.platform.PageResult;
@@ -23,7 +21,6 @@ import io.github.keycloakmcp.target.TargetAuthorizationService;
 import io.github.keycloakmcp.target.TargetPermission;
 import io.github.keycloakmcp.target.TargetResolver;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
@@ -31,7 +28,6 @@ import jakarta.transaction.Transactional;
 public class AssessmentHistoryService {
 
     private final AssessmentEngine assessmentEngine;
-    private final Instance<EvidenceCollector> collectors;
     private final TargetResolver targetResolver;
     private final TargetAuthorizationService targetAuthorization;
     private final AssessmentRepository assessmentRepository;
@@ -41,14 +37,12 @@ public class AssessmentHistoryService {
     @Inject
     public AssessmentHistoryService(
             AssessmentEngine assessmentEngine,
-            Instance<EvidenceCollector> collectors,
             TargetResolver targetResolver,
             TargetAuthorizationService targetAuthorization,
             AssessmentRepository assessmentRepository,
             FindingRepository findingRepository,
             AssessmentPersistenceMapper mapper) {
         this.assessmentEngine = assessmentEngine;
-        this.collectors = collectors;
         this.targetResolver = targetResolver;
         this.targetAuthorization = targetAuthorization;
         this.assessmentRepository = assessmentRepository;
@@ -61,12 +55,7 @@ public class AssessmentHistoryService {
         Target target = targetResolver.require(targetId);
         targetAuthorization.assertAllowed(target, TargetPermission.ASSESS);
 
-        List<EvidenceCollector> collectorList = new ArrayList<>();
-        for (EvidenceCollector collector : collectors) {
-            collectorList.add(collector);
-        }
-
-        AssessmentResult result = assessmentEngine.assess(target, profile, collectorList);
+        AssessmentResult result = assessmentEngine.assess(target, profile);
         String runId = UUID.randomUUID().toString();
         AssessmentRunEntity run = mapper.toRunEntity(result, runId, triggerType == null ? TriggerType.API : triggerType);
         assessmentRepository.persist(run);

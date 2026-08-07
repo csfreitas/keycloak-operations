@@ -42,6 +42,7 @@ import io.github.keycloakmcp.domain.inventory.KeycloakWorkloadInfo;
 import io.github.keycloakmcp.domain.inventory.NetworkingInfo;
 import io.github.keycloakmcp.domain.inventory.PdbInfo;
 import io.github.keycloakmcp.domain.inventory.PodInventoryItem;
+import io.github.keycloakmcp.domain.inventory.ProbeInfo;
 import io.github.keycloakmcp.domain.inventory.ResourceConfig;
 import io.github.keycloakmcp.domain.inventory.SchedulingInfo;
 import io.github.keycloakmcp.domain.inventory.TopologyInfo;
@@ -104,6 +105,7 @@ public class InventoryService {
                     HpaInfo.absent(),
                     PdbInfo.absent(),
                     new ResourceConfig(null, null, null, null),
+                    ProbeInfo.unknown(),
                     new NetworkingInfo(false, null, false),
                     List.of(new CollectionWarning(
                             CollectionWarning.WarningCode.NOT_CONFIGURED,
@@ -135,6 +137,7 @@ public class InventoryService {
         HpaInfo hpa = collectHpa(k8s, namespace, workload, warnings);
         PdbInfo pdb = collectPdb(k8s, namespace, workload, warnings);
         ResourceConfig resources = collectResources(workload);
+        ProbeInfo probes = collectProbes(workload);
         NetworkingInfo networking = collectNetworking(k8s, clusterClient, namespace, warnings);
 
         return new InfrastructureInventory(
@@ -148,6 +151,7 @@ public class InventoryService {
                 hpa,
                 pdb,
                 resources,
+                probes,
                 networking,
                 List.copyOf(warnings),
                 Instant.now());
@@ -184,6 +188,10 @@ public class InventoryService {
             if (kc.readyReplicas() >= 0) {
                 add(out, targetId, "workload", "keycloak.replicas.ready", kc.readyReplicas(), now);
             }
+            if (kc.desiredReplicas() >= 0 && kc.readyReplicas() >= 0) {
+                add(out, targetId, "workload", "keycloak.replicas.readyBelowDesired",
+                        kc.readyReplicas() < kc.desiredReplicas(), now);
+            }
         }
         List<PodInventoryItem> pods = inventory.pods() == null ? List.of() : inventory.pods();
         add(out, targetId, "pods", "keycloak.pods.total", pods.size(), now);
@@ -199,6 +207,10 @@ public class InventoryService {
             add(out, targetId, "topology", "keycloak.topology.zoneCount", topo.zoneCount(), now);
             add(out, targetId, "topology", "keycloak.topology.podsByZone", topo.podsByZone(), now);
             add(out, targetId, "topology", "keycloak.topology.podsByNode", topo.podsByNode(), now);
+            add(out, targetId, "topology", "keycloak.topology.singleZoneConcentration",
+                    isSingleBucketConcentration(topo.podsByZone(), topo.zoneCount()), now);
+            add(out, targetId, "topology", "keycloak.topology.singleNodeConcentration",
+                    isSingleBucketConcentration(topo.podsByNode(), -1), now);
         }
         SchedulingInfo sched = inventory.scheduling();
         if (sched != null) {
@@ -225,6 +237,18 @@ public class InventoryService {
             add(out, targetId, "resources", "keycloak.resources.requests.memory", res.requestsMemory(), now);
             add(out, targetId, "resources", "keycloak.resources.limits.cpu", res.limitsCpu(), now);
             add(out, targetId, "resources", "keycloak.resources.limits.memory", res.limitsMemory(), now);
+            add(out, targetId, "resources", "keycloak.resources.requests.cpu.present",
+                    res.requestsCpu() != null && !res.requestsCpu().isBlank(), now);
+            add(out, targetId, "resources", "keycloak.resources.requests.memory.present",
+                    res.requestsMemory() != null && !res.requestsMemory().isBlank(), now);
+            add(out, targetId, "resources", "keycloak.resources.limits.memory.present",
+                    res.limitsMemory() != null && !res.limitsMemory().isBlank(), now);
+        }
+        ProbeInfo probes = inventory.probes();
+        if (probes != null) {
+            add(out, targetId, "probes", "keycloak.probes.readiness.present", probes.readinessPresent(), now);
+            add(out, targetId, "probes", "keycloak.probes.liveness.present", probes.livenessPresent(), now);
+            add(out, targetId, "probes", "keycloak.probes.startup.present", probes.startupPresent(), now);
         }
         NetworkingInfo net = inventory.networking();
         if (net != null) {
@@ -244,6 +268,29 @@ public class InventoryService {
             return;
         }
         out.add(new Evidence(targetId, "infrastructure", category, key, value, now));
+    }
+
+    /**
+     * True when pods exist and all sit in a single bucket while multiple buckets are expected
+     * (zoneCount &gt; 1) or, for nodes, whenever more than one pod shares one node exclusively.
+     */
+    private static boolean isSingleBucketConcentration(Map<String, Integer> buckets, int expectedBuckets) {
+        if (buckets == null || buckets.isEmpty()) {
+            return false;
+        }
+        int total = buckets.values().stream().mapToInt(Integer::intValue).sum();
+        if (total <= 1) {
+            return false;
+        }
+        long nonEmpty = buckets.values().stream().filter(v -> v != null && v > 0).count();
+        if (nonEmpty != 1) {
+            return false;
+        }
+        if (expectedBuckets > 1) {
+            return true;
+        }
+        // nodes: concentration if all pods on one node and there is more than one pod
+        return expectedBuckets < 0;
     }
 
     private String resolveNamespace(Target target, ClusterClient client) {
@@ -689,14 +736,10 @@ public class InventoryService {
     }
 
     private ResourceConfig collectResources(WorkloadRef workload) {
-        PodSpec spec = workload.podSpec();
-        if (spec == null || spec.getContainers() == null || spec.getContainers().isEmpty()) {
+        Container container = primaryContainer(workload.podSpec());
+        if (container == null) {
             return new ResourceConfig(null, null, null, null);
         }
-        Container container = spec.getContainers().stream()
-                .filter(c -> c.getName() != null && c.getName().toLowerCase().contains("keycloak"))
-                .findFirst()
-                .orElse(spec.getContainers().get(0));
         ResourceRequirements rr = container.getResources();
         if (rr == null) {
             return new ResourceConfig(null, null, null, null);
@@ -706,6 +749,27 @@ public class InventoryService {
                 quantity(rr.getRequests(), "memory"),
                 quantity(rr.getLimits(), "cpu"),
                 quantity(rr.getLimits(), "memory"));
+    }
+
+    private ProbeInfo collectProbes(WorkloadRef workload) {
+        Container container = primaryContainer(workload.podSpec());
+        if (container == null) {
+            return ProbeInfo.unknown();
+        }
+        return new ProbeInfo(
+                container.getReadinessProbe() != null,
+                container.getLivenessProbe() != null,
+                container.getStartupProbe() != null);
+    }
+
+    private static Container primaryContainer(PodSpec spec) {
+        if (spec == null || spec.getContainers() == null || spec.getContainers().isEmpty()) {
+            return null;
+        }
+        return spec.getContainers().stream()
+                .filter(c -> c.getName() != null && c.getName().toLowerCase().contains("keycloak"))
+                .findFirst()
+                .orElse(spec.getContainers().get(0));
     }
 
     private static String quantity(Map<String, Quantity> map, String key) {

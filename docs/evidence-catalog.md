@@ -15,6 +15,7 @@ Every Evidence includes `targetId`.
 | `keycloak.replicas.desired` | workload | int | |
 | `keycloak.replicas.ready` | workload | int | |
 | `deployment.replicas` | workload | int | **Compat** alias of desired replicas (HA rules) |
+| `keycloak.replicas.readyBelowDesired` | workload | bool | ready &lt; desired when both known |
 | `keycloak.pods.total` | pods | int | |
 | `keycloak.pods.ready` | pods | int | |
 | `keycloak.pods.restartCount` | pods | int | Sum across pods |
@@ -22,6 +23,8 @@ Every Evidence includes `targetId`.
 | `keycloak.topology.zoneCount` | topology | int | |
 | `keycloak.topology.podsByZone` | topology | map | zone → count |
 | `keycloak.topology.podsByNode` | topology | map | node → count |
+| `keycloak.topology.singleZoneConcentration` | topology | bool | multi-zone cluster, all pods in one zone |
+| `keycloak.topology.singleNodeConcentration` | topology | bool | all pods on one node |
 | `keycloak.scheduling.zoneSpread.present` | scheduling | bool | |
 | `keycloak.scheduling.hostnameSpread.present` | scheduling | bool | |
 | `keycloak.hpa.present` | autoscaling | bool | |
@@ -32,6 +35,12 @@ Every Evidence includes `targetId`.
 | `keycloak.resources.requests.memory` | resources | string | |
 | `keycloak.resources.limits.cpu` | resources | string | |
 | `keycloak.resources.limits.memory` | resources | string | |
+| `keycloak.resources.requests.cpu.present` | resources | bool | Presence flag (preferred by capacity rules) |
+| `keycloak.resources.requests.memory.present` | resources | bool | |
+| `keycloak.resources.limits.memory.present` | resources | bool | |
+| `keycloak.probes.readiness.present` | probes | bool | From pod template |
+| `keycloak.probes.liveness.present` | probes | bool | |
+| `keycloak.probes.startup.present` | probes | bool | |
 | `keycloak.route.present` | networking | bool | Route or Ingress |
 | `collection.warning.<resource>` | collection | string | Warning code when a section failed |
 | `keycloak.version` | server | string | From Keycloak Admin API collector |

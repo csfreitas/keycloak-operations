@@ -1,13 +1,14 @@
-# Common production readiness stubs (0.1.0)
-# Will not fire until corresponding evidence keys are collected.
+# Production readiness rules. Fire only when matching evidence exists.
 rules:
   - id: KC-PROD-001
-    title: Registration disabled in production
+    title: Self-registration enabled — review for production
     category: production
     severity: MEDIUM
+    subjectType: REALM
     description: >
       Self-registration is rarely appropriate for enterprise identity providers
-      unless explicitly required and hardened.
+      unless explicitly required and hardened. Review whether registrationAllowed
+      should remain enabled.
     impact: >
       Open registration can allow unauthorized account creation.
     recommendation: >
@@ -22,12 +23,14 @@ rules:
         - realm.registrationAllowed
 
   - id: KC-PROD-002
-    title: Theme and branding not using default admin theme for user login
+    title: Default login theme in use
     category: production
     severity: LOW
+    subjectType: REALM
     description: >
-      Placeholder rule for future theme evidence. Does not fire in 0.1.0.
-    impact: Informational only until theme evidence is collected.
+      Customer-facing realms often customize the login theme; the stock keycloak
+      theme may indicate incomplete production branding.
+    impact: Informational — default branding may confuse end users.
     recommendation: Customize login themes for production customer-facing realms.
     references: []
     condition:
@@ -36,3 +39,59 @@ rules:
     appliesWhen:
       evidenceRequired:
         - realm.loginTheme
+
+  - id: KC-PROD-003
+    title: Metrics endpoint disabled
+    category: production
+    severity: MEDIUM
+    description: >
+      Production Keycloak should expose metrics for capacity and availability monitoring.
+    impact: >
+      Operators cannot observe request rates, JVM, or database pool health.
+    recommendation: >
+      Enable metrics (KC_METRICS_ENABLED / http-metrics) and scrape via Prometheus.
+    references: []
+    condition:
+      key: keycloak.metrics.enabled
+      equals: false
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.metrics.enabled
+
+  - id: KC-PROD-004
+    title: Health endpoint disabled
+    category: production
+    severity: MEDIUM
+    description: >
+      Health probes depend on Keycloak health endpoints being enabled.
+    impact: >
+      Kubernetes readiness/liveness checks may be ineffective or missing.
+    recommendation: >
+      Enable health (KC_HEALTH_ENABLED) and wire readiness/liveness probes.
+    references: []
+    condition:
+      key: keycloak.health.enabled
+      equals: false
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.health.enabled
+
+  - id: KC-PROD-005
+    title: http-max-queued-requests not configured
+    category: production
+    severity: MEDIUM
+    description: >
+      Without http-max-queued-requests, overload can queue unbounded work and
+      degrade the JVM under traffic spikes.
+    impact: >
+      Latency spikes and cascading failure under sudden load.
+    recommendation: >
+      Set http-max-queued-requests (or equivalent Quarkus property) appropriate
+      for your capacity plan.
+    references: []
+    condition:
+      key: keycloak.http.maxQueuedRequests.configured
+      equals: false
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.http.maxQueuedRequests.configured

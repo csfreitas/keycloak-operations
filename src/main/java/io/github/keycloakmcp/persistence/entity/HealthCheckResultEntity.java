@@ -39,6 +39,9 @@ public class HealthCheckResultEntity extends PanacheEntityBase {
     @Column(name = "details", columnDefinition = "jsonb")
     public Map<String, Object> details;
 
+    @Column(name = "duration_ms")
+    public Long durationMs;
+
     @Column(name = "created_at", nullable = false)
     public Instant createdAt;
 }

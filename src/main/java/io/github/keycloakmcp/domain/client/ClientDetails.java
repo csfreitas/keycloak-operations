@@ -19,5 +19,7 @@ public record ClientDetails(
         boolean bearerOnly,
         int confidentialPort,
         boolean fullScopeAllowed,
-        String description) {
+        String description,
+        boolean implicitFlowEnabled,
+        String pkceChallengeMethod) {
 }

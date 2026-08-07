@@ -33,43 +33,21 @@ YAML packs under `src/main/resources/rules/` provide declarative stubs/loaders
 ### Findings
 
 Findings include id, title, category, severity (`CRITICAL`…`INFO`), status
-(`OPEN`, `PASS`, `WARNING`, `FAIL`), description, evidence map, impact,
-recommendation, and references.
+(`OPEN`, `PASS`, `WARNING`, `FAIL`, `NOT_EVALUATED`, `SKIPPED`), description,
+evidence map, impact, recommendation, references, and optional `EvidenceSubject`.
 
-When replicas ≥ 2, `MinimumReplicasRule` emits **no** finding (preferred over a
-PASS finding in 0.1.0).
+Declarative YAML packs under `src/main/resources/rules/` (indexed by
+`rules/index.yaml`) are the primary rule source. Java `MinimumReplicasRule`
+remains for unit tests; production HA uses `KC-OCP-HA-001` from the `ha` pack.
 
 ### Scoring
 
-`AssessmentScoring` starts at **100** and subtracts:
-
-| Severity | Penalty |
-|----------|---------|
-| CRITICAL | 25 |
-| HIGH | 15 |
-| MEDIUM | 8 |
-| LOW | 3 |
-| INFO | 0 |
-
-`PASS` findings do not reduce the score. Floor is **0**.
+See [scoring.md](scoring.md). Category scores and NOT_EVALUATED handling land in 0.5.
 
 ## Profiles (built-in names)
 
-| Profile | Intent |
-|---------|--------|
-| `keycloak-production` | Community Keycloak production baseline |
-| `rhbk-production` | RHBK production baseline |
-| `rhbk-openshift-production` | RHBK on OpenShift |
-| `keycloak-kubernetes-production` | Keycloak on Kubernetes |
-
-Full profile runners and MCP assessment tools are planned for **0.2.0+**.
-0.1.0 ships the engine abstractions, one concrete HA rule, YAML stubs, and unit tests.
+See [assessment-profiles.md](assessment-profiles.md) and [rule-catalog.md](rule-catalog.md).
 
 ## Assessment vs health check
 
-| Concern | Question |
-|---------|----------|
-| Health | Is the process / endpoint up? |
-| Assessment | Is the deployment production-ready (HA, security, capacity, architecture)? |
-
-Do not conflate `/q/health` with assessment scores.
+See [health-check.md](health-check.md).

@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0-SNAPSHOT] — 2026-08-07
+
+### Added
+
+- Assessment depth: HA / security / production / capacity / admin-security YAML rule packs
+- Profiles: `rhbk-openshift-production-ha`, expanded `AssessmentProfile` metadata, profile resolver
+- MCP tools: `keycloak_run_assessment`, `keycloak_health_check`, profile/assessment/findings list/get
+- REST `GET /api/v1/assessment-profiles`
+- Flyway V6: evidence completeness, confidence, category scores, rule counters, finding subject, health `duration_ms`
+- Inventory evidence: readyBelowDesired, zone/node concentration, resource present flags, probes
+- Docs: health-check, assessment-profiles, rule-catalog, scoring
+
+### Changed
+
+- Artifact / app version **0.5.0-SNAPSHOT**
+- Assessment summaries expose completeness, confidence, category scores, finding counts
+- PASS / SKIPPED / NOT_EVALUATED findings are not persisted as lifecycle OPEN
+
 ## [0.4.0-SNAPSHOT] — 2026-08-07
 
 ### Added

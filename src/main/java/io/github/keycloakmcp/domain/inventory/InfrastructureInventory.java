@@ -19,6 +19,7 @@ public record InfrastructureInventory(
         HpaInfo hpa,
         PdbInfo pdb,
         ResourceConfig resources,
+        ProbeInfo probes,
         NetworkingInfo networking,
         List<CollectionWarning> warnings,
         Instant collectedAt) {

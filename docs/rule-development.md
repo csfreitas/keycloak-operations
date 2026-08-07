@@ -19,7 +19,12 @@
 
 Reference implementation: `MinimumReplicasRule`.
 
-## YAML shape (0.1.0)
+## YAML shape (0.5)
+
+Packs are listed in `rules/index.yaml` (JAR-safe). Supported condition operators:
+`equals`, `notEquals`, `lessThan`, `lessThanOrEqual`, `greaterThan`,
+`greaterThanOrEqual`, `exists`, `notExists`, `empty`, `notEmpty`, `contains`,
+`notContains`, `sizeGreaterThan`, `sizeLessThan`, plus `all` / `any` composites.
 
 ```yaml
 rules:
@@ -34,9 +39,12 @@ rules:
     condition:
       key: deployment.replicas
       lessThan: 2
+    appliesWhen:
+      runtime: [OPENSHIFT, KUBERNETES]
 ```
 
-Loaded by `YamlRuleLoader` from classpath `rules/`.
+See [rule-catalog.md](rule-catalog.md). Java `MinimumReplicasRule` is kept for unit
+tests; production HA uses the YAML pack.
 
 ## Directory layout
 

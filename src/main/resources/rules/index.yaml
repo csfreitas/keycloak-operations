@@ -8,3 +8,5 @@ packs:
     path: rules/openshift/ha.yaml
   - id: capacity
     path: rules/capacity.yaml
+  - id: admin-security
+    path: rules/common/admin-security.yaml

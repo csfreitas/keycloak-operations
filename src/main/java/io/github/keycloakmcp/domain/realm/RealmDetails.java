@@ -11,5 +11,11 @@ public record RealmDetails(
         String sslRequired,
         boolean loginWithEmailAllowed,
         boolean duplicateEmailsAllowed,
-        boolean internationalizationEnabled) {
+        boolean internationalizationEnabled,
+        boolean verifyEmail,
+        boolean rememberMe,
+        String passwordPolicy,
+        String otpPolicyType,
+        boolean eventsEnabled,
+        boolean adminEventsEnabled) {
 }

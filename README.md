@@ -7,7 +7,7 @@ environments.
 
 | | |
 |---|---|
-| Version | **0.4.0-SNAPSHOT** |
+| Version | **0.5.0-SNAPSHOT** |
 | Package | `io.github.keycloakmcp` |
 | License | [Apache License 2.0](LICENSE) |
 | MCP | Specification **2025-11-25** (Quarkiverse MCP Server **1.13.1**) |
@@ -55,6 +55,12 @@ Infrastructure discovery and inventory docs:
 [docs/infrastructure-inventory.md](docs/infrastructure-inventory.md),
 [docs/evidence-catalog.md](docs/evidence-catalog.md),
 [docs/infrastructure-authentication.md](docs/infrastructure-authentication.md).
+
+Assessment depth (0.5):
+[docs/health-check.md](docs/health-check.md),
+[docs/assessment-profiles.md](docs/assessment-profiles.md),
+[docs/rule-catalog.md](docs/rule-catalog.md),
+[docs/scoring.md](docs/scoring.md).
 
 ## Database
 

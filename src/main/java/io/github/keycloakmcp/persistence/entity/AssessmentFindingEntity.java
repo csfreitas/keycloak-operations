@@ -64,6 +64,15 @@ public class AssessmentFindingEntity extends PanacheEntityBase {
     @Column(name = "reference_urls", columnDefinition = "jsonb")
     public List<String> references;
 
+    @Column(name = "resource_type", length = 64)
+    public String resourceType;
+
+    @Column(name = "resource_id", length = 255)
+    public String resourceId;
+
+    @Column(name = "resource_name", length = 255)
+    public String resourceName;
+
     @Column(name = "created_at", nullable = false)
     public Instant createdAt;
 }

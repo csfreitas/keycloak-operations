@@ -24,8 +24,9 @@ MCP tools and REST share the same application services. Tool signatures are unch
 | GET | `/targets/{targetId}/overview` | Overview DTO |
 | GET | `/fleet` | Fleet dashboard rows |
 | POST | `/targets/{targetId}/assessments` | Run + persist assessment |
-| GET | `/targets/{targetId}/assessments` | History (paginated) |
+| GET | `/targets/{targetId}/assessments` | History (paginated; includes completeness/confidence when present) |
 | GET | `/assessments/{id}` | Assessment by id |
+| GET | `/assessment-profiles` | Built-in assessment profiles |
 | GET | `/targets/{targetId}/findings` | Findings (`lifecycleStatus`, `severity`) |
 | POST | `/targets/{targetId}/health-checks` | Lightweight health run |
 | GET | `/targets/{targetId}/health-checks` | Health history |
