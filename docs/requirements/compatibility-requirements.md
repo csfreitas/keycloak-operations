@@ -25,3 +25,7 @@ Documentation **MUST** distinguish versions that were **actually tested** from v
 ### COMPAT-006
 
 A version **MUST NOT** be marked as integration-tested when the corresponding IT was skipped or not executed.
+
+### COMPAT-007
+
+Controlled write operations **MUST** remain capability- and version-aware. Planning **MUST** fail safely (for example `UNSUPPORTED_CAPABILITY`) when a mutation is not available on the target product/version rather than assuming upstream-only Admin features exist on RHBK.

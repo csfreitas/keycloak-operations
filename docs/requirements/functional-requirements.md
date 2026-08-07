@@ -1,6 +1,6 @@
 # Functional requirements
 
-Stable IDs for product capabilities present or planned through the documented roadmap (through **0.7**). Language: **MUST** / **SHOULD** / **MAY**.
+Stable IDs for product capabilities present or planned through the documented roadmap (through **0.8**). Language: **MUST** / **SHOULD** / **MAY**.
 
 ## Targets
 
@@ -141,3 +141,69 @@ The Web UI **MUST** consume only backend REST/SSE; the browser **MUST NOT** call
 ### FR-UI-002
 
 The Web UI **SHOULD** provide fleet, target overview, health, assessment, findings, performance, infrastructure, and history views.
+
+### FR-UI-003
+
+When Change Management is enabled, the Web UI **SHOULD** provide a minimal change experience (pending changes, detail with diff/risk/approval/apply/verification, and history) without becoming a full Keycloak administration console.
+
+## Controlled administration & change management (milestone 0.8)
+
+### FR-CHANGE-001
+
+Mutable Keycloak/RHBK operations **MUST** use semantic, target-bound change requests. Callers **MUST NOT** supply arbitrary Admin REST paths, HTTP methods, or unconstrained JSON mutation payloads.
+
+### FR-CHANGE-002
+
+Before any Keycloak mutation, the platform **MUST** produce a ChangePlan from current target state, including a safe normalized diff and a deterministic plan fingerprint.
+
+### FR-CHANGE-003
+
+Diff representations **MUST** use normalized change kinds (`ADDED`, `REMOVED`, `CHANGED`, `UNCHANGED`) and **MUST NOT** expose secret values (use redacted / configured markers instead).
+
+### FR-CHANGE-004
+
+Risk classification (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`) **MUST** be deterministic backend logic. The LLM **MUST NOT** decide risk.
+
+### FR-CHANGE-005
+
+Environment-aware policy evaluation **MUST** run before apply. Production (`PRD`) writes **MUST** require explicit approval by default. Policy decisions **MUST NOT** be delegated to the LLM.
+
+### FR-CHANGE-006
+
+Destructive operations (including generic delete) **MUST** remain denied / out of scope for the 0.8 foundation unless a later milestone explicitly enables them with stronger controls.
+
+### FR-CHANGE-007
+
+Target authorization **MUST** distinguish at least `READ`, `ASSESS`, `PLAN`, `WRITE`, and `ADMIN`. Authorization to mutate Target A **MUST NOT** grant access to Target B.
+
+### FR-CHANGE-008
+
+When policy requires approval, apply **MUST** refuse unapproved plans. Approval **MUST** be bound to the exact plan fingerprint; modifying the plan **MUST** invalidate prior approval.
+
+### FR-CHANGE-009
+
+Apply **MUST** accept a previously planned change identifier (not arbitrary desired state) when approval is required, and **MUST** re-check the target baseline before mutation. Material drift **MUST** fail with a replan/conflict error rather than silently overwriting.
+
+### FR-CHANGE-010
+
+After a successful Admin API mutation, the platform **MUST** read the resource back, compare to desired state, and persist a verification result. HTTP success alone **MUST NOT** be treated as verified desired state.
+
+### FR-CHANGE-011
+
+Change lifecycle actions (plan, approve, reject, apply, verify) **MUST** produce sanitized audit records that never contain secret values.
+
+### FR-CHANGE-012
+
+Apply **SHOULD** be idempotent where technically possible so repeated execution of the same approved plan does not create unintended duplicate resources or repeated side effects.
+
+### FR-CHANGE-013
+
+The platform **MUST** expose semantic Change Management MCP tools for get/list/approve/reject/apply/verify, plus semantic planning for the initial proof-of-concept mutation. Raw Admin write tools **MUST NOT** exist.
+
+### FR-CHANGE-014
+
+Equivalent Change Management REST endpoints under `/api/v1` **MUST** share the same application services as MCP.
+
+### FR-CHANGE-015
+
+Change lifecycle state **MUST** be persisted in PostgreSQL via versioned Flyway migrations without storing plaintext secrets.

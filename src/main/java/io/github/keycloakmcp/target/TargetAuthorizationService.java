@@ -8,10 +8,9 @@ import jakarta.inject.Inject;
 /**
  * Target-scoped authorization.
  * <p>
- * Current policy (0.1.x): {@link TargetPermission#READ} and {@link TargetPermission#ASSESS}
- * are allowed for enabled targets; {@link TargetPermission#WRITE} and
- * {@link TargetPermission#ADMIN} are denied while global read-only mode is active.
- * Future releases may add per-target RBAC.
+ * {@link TargetPermission#READ}, {@link TargetPermission#ASSESS}, and {@link TargetPermission#PLAN}
+ * are allowed for enabled targets. {@link TargetPermission#WRITE} and {@link TargetPermission#ADMIN}
+ * are denied while global read-only mode is active.
  */
 @ApplicationScoped
 public class TargetAuthorizationService {
@@ -34,7 +33,7 @@ public class TargetAuthorizationService {
             throw McpException.targetDisabled(target.id().value());
         }
         switch (permission) {
-            case READ, ASSESS -> {
+            case READ, ASSESS, PLAN -> {
                 // allowed for enabled targets
             }
             case WRITE, ADMIN -> {

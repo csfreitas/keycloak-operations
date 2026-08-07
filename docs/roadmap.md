@@ -11,9 +11,13 @@ Delivery index only. Specs: [`milestones/`](milestones/). Requirements: [`requir
 | ✅ | 0.5 Health & Assessment | [0.5](milestones/0.5-health-assessment.md) |
 | ✅ | 0.6 Metrics & Performance | [0.6](milestones/0.6-prometheus-metrics.md) |
 | ✅ | 0.6.1 Metrics Hardening | [0.6.1](milestones/0.6.1-metrics-hardening.md) |
-| ✅ | **0.7 Web UI** | [0.7](milestones/0.7-web-ui.md) |
-| 📋 | **0.8 Snapshots / drift (depth)** *(next)* | — |
+| ✅ | 0.7 Web UI | [0.7](milestones/0.7-web-ui.md) |
+| ✅ | **0.8 Controlled Administration & Change Management** | [0.8](milestones/0.8-controlled-administration.md) |
+| 📋 | **0.8.1 Realm & Client Administration** *(next)* | — |
+| 📋 | 0.8.2 Users, Groups & Roles | — |
+| 📋 | 0.8.3 Authentication Flows & Client Scopes | — |
+| 📋 | 0.8.4 Identity Providers & Advanced Realm Configuration | — |
 | 📋 | 0.9 Schedules / alerts | — |
 | 📋 | 1.0 Production-ready platform | — |
 
-Current artifact: **`0.7.0-SNAPSHOT`**.
+Current artifact: **`0.8.0-SNAPSHOT`**.

@@ -10,6 +10,7 @@ How the Keycloak / RHBK Operations Platform is structured.
 4. [security.md](security.md) — redaction, credentials, least privilege
 5. [persistence.md](persistence.md) — PostgreSQL / Flyway (not a TSDB)
 6. [observability.md](observability.md) — semantic metrics integration
+7. [controlled-administration.md](controlled-administration.md) — plan / approve / apply / verify
 
 ## Related
 

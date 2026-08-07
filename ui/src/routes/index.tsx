@@ -8,6 +8,8 @@ import { AssessmentPage } from '../pages/AssessmentPage';
 import { PerformancePage } from '../pages/PerformancePage';
 import { InfrastructurePage } from '../pages/InfrastructurePage';
 import { HistoryPage } from '../pages/HistoryPage';
+import { ChangesPage } from '../pages/ChangesPage';
+import { ChangeDetailPage } from '../pages/ChangeDetailPage';
 
 /** Forces a full remount of TargetLayout when targetId changes. */
 function TargetLayoutWrapper() {
@@ -22,6 +24,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/targets" replace /> },
       { path: 'targets', element: <FleetPage /> },
+      { path: 'changes', element: <ChangesPage /> },
+      { path: 'changes/:changeId', element: <ChangeDetailPage /> },
       {
         path: 'targets/:targetId',
         // Remount layout when targetId changes (prevents Target A state on Target B)
@@ -33,6 +37,7 @@ export const router = createBrowserRouter([
           { path: 'performance', element: <PerformancePage /> },
           { path: 'infrastructure', element: <InfrastructurePage /> },
           { path: 'history', element: <HistoryPage /> },
+          { path: 'changes', element: <ChangesPage /> },
         ],
       },
     ],

@@ -256,6 +256,53 @@ export interface OperationalEvent {
   relatedId: string | null;
 }
 
+// --- Change management (0.8) ---
+
+export type ChangeStatus =
+  | 'PLANNED'
+  | 'WAITING_APPROVAL'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'APPLYING'
+  | 'APPLIED'
+  | 'VERIFIED'
+  | 'FAILED'
+  | 'EXPIRED';
+
+export interface ChangeDiffEntry {
+  property: string;
+  kind: 'ADDED' | 'REMOVED' | 'CHANGED' | 'UNCHANGED';
+  before: string | null;
+  after: string | null;
+}
+
+export interface ChangeRecord {
+  changeId: string;
+  targetId: string;
+  environment: string;
+  resourceType: string;
+  resourceId: string;
+  realm: string;
+  operation: string;
+  status: ChangeStatus;
+  risk: string | null;
+  policyDecision: string | null;
+  policyReason: string | null;
+  requiresApproval: boolean;
+  planFingerprint: string | null;
+  baselineFingerprint: string | null;
+  approvalFingerprint: string | null;
+  diff: ChangeDiffEntry[];
+  verificationStatus: string | null;
+  verificationMessage: string | null;
+  resultMessage: string | null;
+  approvedBy: string | null;
+  approvedAt: string | null;
+  appliedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // --- Me ---
 
 export interface MeResponse {

@@ -96,6 +96,26 @@ public class StableAdminApiAdapter {
         });
     }
 
+    /**
+     * Controlled client update used by Change Management apply.
+     * Callers must only pass representations prepared from allowlisted semantic ops.
+     */
+    public void updateClient(Target target, String realm, ClientRepresentation representation) {
+        requireNonBlank(realm, "realm");
+        Objects.requireNonNull(representation, "representation");
+        requireNonBlank(representation.getId(), "representation.id");
+        execute(target, "updateClient", realm, () -> {
+            try {
+                realmResource(target, realm).clients().get(representation.getId()).update(representation);
+                return Boolean.TRUE;
+            } catch (NotFoundException e) {
+                throw McpException.clientNotFound(representation.getClientId() != null
+                        ? representation.getClientId()
+                        : representation.getId());
+            }
+        });
+    }
+
     public List<UserRepresentation> searchUsers(Target target, String realm, String search, Integer first, Integer max) {
         requireNonBlank(realm, "realm");
         return execute(target, "searchUsers", realm, () -> {

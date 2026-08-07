@@ -12,7 +12,8 @@ import jakarta.inject.Inject;
 public class ToolAuthorization {
 
     private static final Set<String> WRITE_VERBS = Set.of(
-            "create", "update", "delete", "write", "set", "add", "remove", "patch", "reset", "import", "export");
+            "create", "update", "delete", "write", "set", "add", "remove", "patch", "reset",
+            "import", "export", "apply");
 
     private final McpRuntimeConfig runtimeConfig;
 
@@ -28,6 +29,7 @@ public class ToolAuthorization {
     /**
      * Asserts that the named tool may execute under the current read-only policy.
      * Write-like tool names are rejected when {@code mcp.read-only=true}.
+     * Planning tools ({@code *_plan_*}) remain allowed so operators can dry-run.
      */
     public void assertReadOnlyOperation(String toolName) {
         if (toolName == null || toolName.isBlank()) {
@@ -41,6 +43,10 @@ public class ToolAuthorization {
 
     private static boolean looksLikeWriteTool(String toolName) {
         String normalized = toolName.toLowerCase(Locale.ROOT);
+        // Planning is not a Keycloak mutation; TargetAuthorization still enforces PLAN.
+        if (normalized.contains("_plan_")) {
+            return false;
+        }
         for (String verb : WRITE_VERBS) {
             if (normalized.contains("_" + verb + "_")
                     || normalized.startsWith(verb + "_")

@@ -23,5 +23,6 @@ Consequences
 | [0004](0004-no-arbitrary-endpoints-from-mcp.md) | No arbitrary endpoints from MCP/REST | Accepted |
 | [0005](0005-postgresql-is-not-a-tsdb.md) | PostgreSQL is not a TSDB | Accepted |
 | [0006](0006-semantic-metrics-instead-of-raw-promql.md) | Semantic metrics instead of raw PromQL | Accepted |
+| [0007](0007-plan-approve-apply-change-model.md) | Plan → Approve → Apply change model | Accepted |
 
 Requirements describe **what**; ADRs explain **why** a design satisfies them. Milestones track **when**.

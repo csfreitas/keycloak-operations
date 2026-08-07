@@ -1,8 +1,8 @@
 {
   "name": "keycloak-ops-console",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
-  "description": "Keycloak Operations Fleet Console — Web UI for milestone 0.7",
+  "description": "Keycloak Operations Fleet Console — Web UI (milestones 0.7+)",
   "engines": {
     "node": ">=20"
   },

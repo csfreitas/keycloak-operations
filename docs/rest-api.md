@@ -44,6 +44,13 @@ MCP tools and REST share the same application services. Tool signatures are unch
 | GET | `/targets/{targetId}/metrics/{requests\|latency\|jvm\|database-pool\|resources}` | Legacy aliases |
 | GET | `/audit` | Audit trail (`targetId`, `source`) |
 | GET | `/events` | SSE operational events (JSON) + heartbeat |
+| GET | `/changes` | Change lifecycle list (`targetId`, `status`) |
+| GET | `/changes/{changeId}` | Change detail (diff, risk, approval, verification) |
+| POST | `/changes/plan/client-update` | Plan allowlisted client config update |
+| POST | `/changes/{changeId}/approve` | Approve (bound to plan fingerprint) |
+| POST | `/changes/{changeId}/reject` | Reject |
+| POST | `/changes/{changeId}/apply` | Apply approved plan (`mcp.read-only=false`) |
+| POST | `/changes/{changeId}/verify` | Read-back verification |
 
 ## Pagination
 
@@ -56,8 +63,9 @@ Response shape: `{ items, page, size, total }`.
 
 ## Authz
 
-Uses `TargetAuthorizationService` with `READ` (and `ASSESS` for assessment POST).
-Responses pass through `SensitiveDataFilter`.
+Uses `TargetAuthorizationService` with `READ`, `ASSESS`, `PLAN`, `WRITE`, and `ADMIN`.
+Change planning requires `PLAN`; approve/reject/apply require `WRITE` (and global
+`mcp.read-only=false` for Keycloak mutations). Responses pass through `SensitiveDataFilter`.
 
 Identity A OIDC is **optional**: enable Quarkus profile `oidc` and set `OIDC_*` env vars. Default lab mode leaves REST open (`OPEN_LAB` via `/me`).
 

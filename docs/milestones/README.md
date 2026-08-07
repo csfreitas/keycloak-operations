@@ -12,7 +12,13 @@ Product delivery slices. Status from Git / `pom.xml` / code — not chat history
 | [0.6](0.6-prometheus-metrics.md) | Prometheus Metrics | COMPLETED |
 | [0.6.1](0.6.1-metrics-hardening.md) | Metrics Hardening | COMPLETED |
 | [0.7](0.7-web-ui.md) | Web UI | COMPLETED |
-| 0.8 | Snapshots / drift (depth) | PLANNED *(next)* |
+| [0.8](0.8-controlled-administration.md) | Controlled Administration & Change Management | COMPLETED |
+| 0.8.1 | Realm & Client Administration | PLANNED *(next)* |
+| 0.8.2 | Users, Groups & Roles | PLANNED |
+| 0.8.3 | Authentication Flows & Client Scopes | PLANNED |
+| 0.8.4 | Identity Providers & Advanced Realm Configuration | PLANNED |
+| 0.9 | Schedules / alerts | PLANNED |
+| 1.0 | Production-ready platform | PLANNED |
 
 Milestones list **requirement IDs**, scope, and acceptance — not Agent prompts.  
 Workflow: [`../../AGENTS.md`](../../AGENTS.md) · HEAD snapshot: [`../project-state.md`](../project-state.md)
@@ -27,4 +33,5 @@ Workflow: [`../../AGENTS.md`](../../AGENTS.md) · HEAD snapshot: [`../project-st
 | `a0ffe9b` | 0.5 |
 | `59461d1` | 0.6 |
 | `089f6ea` | 0.6.1 hardening |
-| *(local / upcoming)* | 0.7 Web UI |
+| `bcad150` | 0.7 Web UI |
+| *(in progress)* | 0.8 Controlled Administration |
