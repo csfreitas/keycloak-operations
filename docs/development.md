@@ -1,5 +1,7 @@
 # Development
 
+AI-assisted workflow: [`development/ai-assisted-development.md`](development/ai-assisted-development.md) and root [`AGENTS.md`](../AGENTS.md).
+
 ## Prerequisites
 
 - Java 21+

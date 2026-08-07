@@ -38,4 +38,4 @@ Returned on `AssessmentResult` (and persisted in V6 columns / summary JSON):
 | `confidence` | HIGH / MEDIUM / LOW from Keycloak (+ infra when bound) coverage |
 | `status` | COMPLETE / PARTIAL / FAILED |
 
-See [assessment-engine.md](assessment-engine.md).
+See [assessment-engine.md](architecture/assessment-engine.md).
