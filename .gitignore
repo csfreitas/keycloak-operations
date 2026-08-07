@@ -60,3 +60,6 @@ tmp/
 coverage/
 jacoco.exec
 *.exec
+
+# Accidental agent dumps
+.project-dump/

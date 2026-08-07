@@ -18,6 +18,9 @@ MCP tools and REST share the same application services. Tool signatures are unch
 | GET | `/targets` | List authorized targets |
 | GET | `/targets/{targetId}` | Target details (no secrets) |
 | GET | `/targets/{targetId}/status` | Status/overview alias |
+| GET | `/targets/{targetId}/environment` | Target-aware runtime discovery |
+| GET | `/targets/{targetId}/inventory` | Sanitized infrastructure inventory |
+| GET | `/targets/{targetId}/topology` | Pods-by-zone / pods-by-node |
 | GET | `/targets/{targetId}/overview` | Overview DTO |
 | GET | `/fleet` | Fleet dashboard rows |
 | POST | `/targets/{targetId}/assessments` | Run + persist assessment |

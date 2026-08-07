@@ -67,7 +67,7 @@ public class AssessmentEngine {
 
         List<Evidence> evidence = collectEvidence(target, collectors);
         EvidenceContext context = new EvidenceContext(targetId, evidence);
-        List<Rule> rules = yamlRuleLoader.loadBuiltInAndClasspathRules();
+        List<Rule> rules = yamlRuleLoader.loadForProfile(profile);
         LOG.debugf("Running assessment target=%s profile=%s rulePacks=%s rules=%d evidence=%d",
                 targetId, profile.name(), profile.rulePackIds(), rules.size(), evidence.size());
 

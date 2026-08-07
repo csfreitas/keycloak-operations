@@ -7,11 +7,12 @@ environments.
 
 | | |
 |---|---|
-| Version | **0.1.0** |
+| Version | **0.4.0-SNAPSHOT** |
 | Package | `io.github.keycloakmcp` |
 | License | [Apache License 2.0](LICENSE) |
 | MCP | Specification **2025-11-25** (Quarkiverse MCP Server **1.13.1**) |
 | Runtime | Java **21**, Quarkus **3.38.1** |
+| Repository | https://github.com/csfreitas/keycloak-operations |
 
 ## Overview
 
@@ -42,11 +43,18 @@ flowchart LR
   REST --> SVC
   SVC --> Registry[TargetRegistry]
   Registry --> DB[(PostgreSQL)]
-  Registry --> Cfg[Config targets]
   SVC --> Factory[KeycloakClientFactory]
+  SVC --> InfraFactory[InfrastructureClientFactory]
   Factory --> KC[Keycloak / RHBK targets]
+  InfraFactory --> OCP[OpenShift / Kubernetes]
   SVC --> Assess[Assessment Engine]
+  SVC --> Inv[InventoryService]
 ```
+
+Infrastructure discovery and inventory docs:
+[docs/infrastructure-inventory.md](docs/infrastructure-inventory.md),
+[docs/evidence-catalog.md](docs/evidence-catalog.md),
+[docs/infrastructure-authentication.md](docs/infrastructure-authentication.md).
 
 ## Database
 

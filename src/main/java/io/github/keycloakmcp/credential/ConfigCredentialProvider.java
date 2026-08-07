@@ -38,11 +38,26 @@ public class ConfigCredentialProvider implements CredentialProvider {
 
     @Override
     public InfrastructureCredentials getInfrastructureCredentials(String credentialRef) {
-        requireEntry(credentialRef);
-        LOG.debugf("Infrastructure credentials requested for ref=%s (placeholder)", credentialRef);
-        // Future: map token / kubeconfig from CredentialEntry extensions
-        throw McpException.unsupportedCapability(
-                "Infrastructure credentials are not yet supported for credential-ref '" + credentialRef + "'");
+        McpRuntimeConfig.CredentialEntry entry = requireEntry(credentialRef);
+        LOG.debugf("Resolving infrastructure credentials for ref=%s", credentialRef);
+
+        // Kubeconfig path takes precedence
+        var kubeconfigOpt = entry.kubeconfig();
+        if (kubeconfigOpt.isPresent() && !kubeconfigOpt.get().isBlank()) {
+            return InfrastructureCredentials.kubeconfig(kubeconfigOpt.get());
+        }
+
+        // Token-based auth
+        var tokenOpt = entry.token();
+        if (tokenOpt.isPresent() && !tokenOpt.get().isBlank()) {
+            String apiServerUrl = entry.apiServerUrl().orElse(null);
+            String caCertData = entry.caCertData().orElse(null);
+            boolean trustInsecure = entry.trustInsecure();
+            return InfrastructureCredentials.token(tokenOpt.get(), apiServerUrl, caCertData, trustInsecure);
+        }
+
+        // No credential material → fall back to in-cluster
+        return InfrastructureCredentials.inCluster();
     }
 
     private McpRuntimeConfig.CredentialEntry requireEntry(String credentialRef) {

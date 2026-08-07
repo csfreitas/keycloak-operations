@@ -107,5 +107,24 @@ public interface McpRuntimeConfig {
 
         @WithName("client-secret")
         Optional<String> clientSecret();
+
+        /** Bearer / OAuth2 token for Kubernetes/OpenShift API access. */
+        Optional<String> token();
+
+        /** Kubernetes/OpenShift API server URL (e.g. https://api.cluster:6443). */
+        @WithName("api-server-url")
+        Optional<String> apiServerUrl();
+
+        /** Base64-encoded PEM CA certificate for TLS verification. */
+        @WithName("ca-cert-data")
+        Optional<String> caCertData();
+
+        /** Skip TLS verification — OFF by default; enable only in dev/test. */
+        @WithName("trust-insecure")
+        @WithDefault("false")
+        boolean trustInsecure();
+
+        /** Path to a kubeconfig file; takes precedence over token when set. */
+        Optional<String> kubeconfig();
     }
 }

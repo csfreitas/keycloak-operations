@@ -1,0 +1,10 @@
+# Explicit rule pack index (JAR-safe; no filesystem directory scanning).
+packs:
+  - id: health-check
+    path: rules/common/production.yaml
+  - id: security-baseline
+    path: rules/common/security.yaml
+  - id: ha
+    path: rules/openshift/ha.yaml
+  - id: capacity
+    path: rules/capacity.yaml

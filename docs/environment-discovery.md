@@ -1,7 +1,7 @@
 # Environment Discovery
 
-`EnvironmentDiscovery` classifies where the MCP server (or target Keycloak) appears
-to run.
+`EnvironmentDiscovery.discover(Target)` classifies where a **registered Target**
+runs, using the Target's infrastructure binding and `InfrastructureClientFactory`.
 
 ## Runtime types
 
@@ -9,8 +9,10 @@ to run.
 |---------------|---------|
 | `OPENSHIFT` | OpenShift APIs observed (`route.openshift.io` / `config.openshift.io`) |
 | `KUBERNETES` | Kubernetes API observed without OpenShift API groups |
-| `VM` | Reserved for future VM collectors |
+| `VM` | Reserved |
 | `UNKNOWN` | Not configured or not confirmed |
+
+Classification uses API groups — never hostname heuristics.
 
 ## Confidence
 
@@ -20,32 +22,27 @@ to run.
 | `DETECTED` | Partial signals |
 | `UNKNOWN` | No confirmation |
 
-The discovery service **never** claims `CONFIRMED` without API evidence.
-
 ## Configuration
+
+Target binding (preferred):
+
+```properties
+mcp.targets.customer-a-prd.infrastructure.type=OPENSHIFT
+mcp.targets.customer-a-prd.infrastructure.namespace=rhbk
+mcp.targets.customer-a-prd.infrastructure.credential-ref=ocp-a
+```
+
+Global flags (fallback / in-cluster lab only):
 
 ```properties
 discovery.kubernetes.enabled=false
 discovery.openshift.enabled=false
 ```
 
-Env overrides:
+## MCP / REST
 
-- `DISCOVERY_KUBERNETES_ENABLED`
-- `DISCOVERY_OPENSHIFT_ENABLED`
+- MCP: `keycloak_discover_environment` (requires `targetId`)
+- REST: `GET /api/v1/targets/{targetId}/environment`
 
-When both are disabled (default for local unit tests / desktop),
-`discover()` returns:
-
-- `runtime = UNKNOWN`
-- `confidence = UNKNOWN`
-- evidence explaining that cluster probing is disabled
-
-## MCP tool
-
-`keycloak_discover_environment` exposes this read-only discovery for agents.
-
-## Roadmap
-
-Richer collectors (deployments, routes, PDB, resource requests) that feed the
-Assessment Engine are planned for **0.2.0**.
+See also [infrastructure-inventory.md](infrastructure-inventory.md) and
+[evidence-catalog.md](evidence-catalog.md).

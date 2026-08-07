@@ -5,6 +5,33 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0-SNAPSHOT] — 2026-08-07
+
+### Added
+
+- Real per-target `InfrastructureClientFactory` (OpenShift/Kubernetes, token/kubeconfig/in-cluster)
+- Target-aware `EnvironmentDiscovery` and structured `EnvironmentInfo`
+- `InfrastructureInventory` + `InventoryService` (workload, pods, topology, HPA, PDB, resources, networking)
+- MCP `keycloak_get_inventory`; REST `/environment`, `/inventory`, `/topology`
+- Evidence catalog and collectors that emit stable keys with `targetId`
+- Snapshots persist sanitized inventory (configurationHash / runtimeStateHash)
+- Rule pack index (`rules/index.yaml`), profile pack filtering, duplicate rule-id detection
+- GitHub Actions CI (`mvn -B clean verify`)
+- Fabric8 kubernetes-server-mock isolation/inventory tests
+- Docs: infrastructure-inventory, infrastructure-authentication, evidence-catalog
+
+### Fixed
+
+- Minimum replicas policy aligned to threshold **2** (KC-OCP-HA-001)
+- Target registry list order preserved (`LinkedHashMap`)
+- Test HTTP ports randomized to avoid local port clashes
+
+### Security
+
+- TLS verification on by default (`trust-insecure=false`)
+- Secrets omitted from namespaced RBAC; Secret contents never inventoried
+- Infra clients fingerprinted per target (no cross-target credential reuse)
+
 ## [0.1.0] — 2026-08-07
 
 ### Added
