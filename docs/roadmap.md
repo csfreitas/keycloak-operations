@@ -1,31 +1,19 @@
 # Roadmap
 
-The project is evolving from a **Keycloak MCP Server** into a **Keycloak / RHBK Operations Platform**.
+Delivery index only. Specs: [`milestones/`](milestones/). Requirements: [`requirements/`](requirements/).
 
-SemVer (`pom.xml`) and roadmap milestones are aligned starting at **0.4.0-SNAPSHOT**.
-Earlier work (0.1–0.3) shipped under artifact version `0.1.0` as foundational milestones.
+| | Milestone | Doc |
+|--|-----------|-----|
+| ✅ | 0.1 Keycloak Admin Read-only | [0.1](milestones/0.1-keycloak-admin-readonly.md) |
+| ✅ | 0.2 Multi-target | [0.2](milestones/0.2-multi-target.md) |
+| ✅ | 0.3 Platform Foundation | [0.3](milestones/0.3-platform-foundation.md) |
+| ✅ | 0.4 Infrastructure Discovery | [0.4](milestones/0.4-infrastructure-discovery.md) |
+| ✅ | 0.5 Health & Assessment | [0.5](milestones/0.5-health-assessment.md) |
+| ✅ | 0.6 Metrics & Performance | [0.6](milestones/0.6-prometheus-metrics.md) |
+| ✅ | 0.6.1 Metrics Hardening | [0.6.1](milestones/0.6.1-metrics-hardening.md) |
+| 📋 | **0.7 Web UI** *(next)* | [0.7](milestones/0.7-web-ui.md) |
+| 📋 | 0.8 Snapshots / drift (depth) | — |
+| 📋 | 0.9 Schedules / alerts | — |
+| 📋 | 1.0 Production-ready platform | — |
 
-## 0.1 — Keycloak admin read-only
-
-## 0.2 — Multi-target
-
-## 0.3 — PostgreSQL, persistence, audit, history
-
-## 0.4 — OpenShift / Kubernetes discovery
-
-## 0.5 — Health Check & Assessment Depth
-
-## 0.6 — Prometheus / metrics integration *(current — 0.6.0-SNAPSHOT)*
-
-- Semantic metrics (no PromQL from clients); Prometheus / OpenShift Monitoring providers
-- Performance summary + optional SLO evidence; `performance` rule pack
-- Profiles: `*-production-performance`; metrics optional unless profile requires them
-- REST/MCP metrics tools; lab Prometheus compose + smoke script
-
-## 0.7 — Web UI / Fleet dashboard
-
-## 0.8 — Snapshots, historical comparison, configuration drift
-
-## 0.9 — Scheduled assessments, alerts, notifications
-
-## 1.0 — Production-ready Operations Platform
+Current artifact: **`0.6.1-SNAPSHOT`**.

@@ -38,4 +38,11 @@ public interface MetricsConfig {
     @WithName("assessment-window")
     @WithDefault("15m")
     String assessmentWindow();
+
+    /**
+     * Samples older than this are marked {@code STALE} and must not drive PASS findings.
+     */
+    @WithName("stale-after")
+    @WithDefault("5m")
+    String staleAfter();
 }

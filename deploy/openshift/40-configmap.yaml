@@ -10,7 +10,7 @@ data:
     quarkus.http.host=0.0.0.0
     quarkus.http.port=8081
     quarkus.management.enabled=true
-    quarkus.management.port=9000
+    quarkus.management.port=9001
     quarkus.otel.enabled=true
     keycloak.mcp.read-only=true
     keycloak.auth-realm=master

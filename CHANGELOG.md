@@ -5,6 +5,23 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1-SNAPSHOT] — 2026-08-07
+
+### Added
+
+- Metrics query bounds enforcement (`max-range`, `max-series`, `max-points`, `stale-after`)
+- `query_range` temporal summary for Agroal awaiting (current/avg/max)
+- Performance policy wiring: p95 SLO, DB awaiting critical, GC pause, cluster size consistency
+- Histogram presence via bucket series; `NO_TRAFFIC` vs histogram missing
+- ServiceMonitor / scrape readiness evidence (best-effort)
+- Stronger multi-target / credential isolation tests; lab-b Prometheus binding
+- Kubernetes deploy RBAC aligned with OpenShift (no Secret list/get)
+
+### Changed
+
+- Artifact / app version **0.6.1-SNAPSHOT**
+- Management port references standardized to **9001**; MCP HTTP **8081**
+
 ## [0.6.0-SNAPSHOT] — 2026-08-07
 
 ### Added

@@ -79,6 +79,31 @@ public final class MetricsQueryBuilder {
                 + sel + uriFilter + "}[" + w + "]))) * 1000";
     }
 
+    /**
+     * Controlled count of a known metric family — used for series presence, not traffic.
+     */
+    public static String countSeries(String metricFamily, MetricsQueryContext ctx) {
+        Objects.requireNonNull(metricFamily, "metricFamily");
+        Objects.requireNonNull(ctx, "ctx");
+        if (!metricFamily.matches("[a-zA-Z_:][a-zA-Z0-9_:]*")) {
+            throw new IllegalArgumentException("Invalid metric family name");
+        }
+        return "count(" + metricFamily + "{" + ctx.selectorClause() + "})";
+    }
+
+    /** Instant gauge for range queries (no rate window). */
+    public static String instantGauge(SemanticMetric metric, MetricsQueryContext ctx) {
+        Objects.requireNonNull(metric, "metric");
+        Objects.requireNonNull(ctx, "ctx");
+        String sel = ctx.selectorClause();
+        return switch (metric) {
+            case DB_POOL_AWAITING -> "sum(agroal_awaiting_count{" + sel + "})";
+            case DB_POOL_ACTIVE -> "sum(agroal_active_count{" + sel + "})";
+            case DB_POOL_AVAILABLE -> "sum(agroal_available_count{" + sel + "})";
+            default -> build(metric, MetricWindow.defaultWindow(), ctx);
+        };
+    }
+
     private static String uriFilter(HttpMetricScope scope) {
         if (scope == null || scope == HttpMetricScope.ALL) {
             return "";

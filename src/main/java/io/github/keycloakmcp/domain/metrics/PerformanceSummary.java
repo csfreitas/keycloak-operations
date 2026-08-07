@@ -43,10 +43,11 @@ public record PerformanceSummary(
             Double p95Ms,
             Double p99Ms,
             Double activeRequests,
-            boolean histogramAvailable) {
+            boolean histogramAvailable,
+            boolean noTrafficInWindow) {
 
         public static Http empty() {
-            return new Http(null, null, null, null, null, null, null, false);
+            return new Http(null, null, null, null, null, null, null, false, false);
         }
 
         public Map<String, Double> asNullableMap() {
@@ -66,10 +67,12 @@ public record PerformanceSummary(
             Double poolAvailable,
             Double poolActive,
             Double poolAwaiting,
+            Double poolAwaitingAverage,
+            Double poolAwaitingMax,
             Double poolUtilization) {
 
         public static Database empty() {
-            return new Database(null, null, null, null);
+            return new Database(null, null, null, null, null, null);
         }
 
         public Map<String, Double> asNullableMap() {
@@ -77,6 +80,8 @@ public record PerformanceSummary(
             m.put("poolAvailable", poolAvailable);
             m.put("poolActive", poolActive);
             m.put("poolAwaiting", poolAwaiting);
+            m.put("poolAwaitingAverage", poolAwaitingAverage);
+            m.put("poolAwaitingMax", poolAwaitingMax);
             m.put("poolUtilization", poolUtilization);
             return m;
         }

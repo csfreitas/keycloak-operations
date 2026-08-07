@@ -15,6 +15,8 @@ import io.github.keycloakmcp.observability.metrics.MetricWindow;
 import io.github.keycloakmcp.observability.metrics.MetricsProvider;
 import io.github.keycloakmcp.observability.metrics.MetricsProviderFactory;
 import io.github.keycloakmcp.observability.metrics.MetricsProviderStatus;
+import io.github.keycloakmcp.observability.metrics.MetricsQueryBounds;
+import io.github.keycloakmcp.observability.metrics.RangeMetricSummary;
 import io.github.keycloakmcp.observability.metrics.SemanticMetric;
 import io.github.keycloakmcp.observability.metrics.SemanticMetricResult;
 import io.github.keycloakmcp.target.Target;
@@ -23,6 +25,7 @@ import jakarta.inject.Inject;
 
 /**
  * Builds {@link PerformanceSummary} from semantic queries. Missing values stay null.
+ * STALE results are exposed in availability but not used as usable numeric values.
  */
 @ApplicationScoped
 public class PerformanceSummaryService {
@@ -43,6 +46,7 @@ public class PerformanceSummaryService {
 
     public PerformanceSummary summarize(Target target, MetricWindow window) {
         MetricWindow w = window == null ? assessmentWindow() : window;
+        MetricsQueryBounds.validateWindow(w, metricsConfig);
         MetricsProvider provider = providerFactory.forTarget(target);
         MetricsProviderStatus status = provider.status(target);
         String source = sourceLabel(target, provider);
@@ -52,41 +56,64 @@ public class PerformanceSummaryService {
             results.put(metric, provider.query(target, metric, w));
         }
 
-        boolean histogram = availabilityService.hasHttpBucket(target)
-                || value(results.get(SemanticMetric.HTTP_P99_LATENCY)) != null;
+        boolean histogramPresent = availabilityService.hasHttpBucket(target);
+        boolean noTraffic = histogramPresent
+                && usable(results.get(SemanticMetric.HTTP_P99_LATENCY)) == null
+                && percentileUnavailableDueToNoTraffic(results.get(SemanticMetric.HTTP_P99_LATENCY));
+
+        // Rewrite percentile availability reasons when histogram exists but window has no observations
+        if (histogramPresent) {
+            rewriteNoTraffic(results, SemanticMetric.HTTP_P50_LATENCY);
+            rewriteNoTraffic(results, SemanticMetric.HTTP_P95_LATENCY);
+            rewriteNoTraffic(results, SemanticMetric.HTTP_P99_LATENCY);
+        }
 
         PerformanceSummary.Http http = new PerformanceSummary.Http(
-                value(results.get(SemanticMetric.HTTP_REQUEST_RATE)),
-                value(results.get(SemanticMetric.HTTP_ERROR_RATE)),
-                value(results.get(SemanticMetric.HTTP_AVERAGE_LATENCY)),
-                value(results.get(SemanticMetric.HTTP_P50_LATENCY)),
-                value(results.get(SemanticMetric.HTTP_P95_LATENCY)),
-                value(results.get(SemanticMetric.HTTP_P99_LATENCY)),
-                value(results.get(SemanticMetric.HTTP_ACTIVE_REQUESTS)),
-                histogram);
+                usable(results.get(SemanticMetric.HTTP_REQUEST_RATE)),
+                usable(results.get(SemanticMetric.HTTP_ERROR_RATE)),
+                usable(results.get(SemanticMetric.HTTP_AVERAGE_LATENCY)),
+                usable(results.get(SemanticMetric.HTTP_P50_LATENCY)),
+                usable(results.get(SemanticMetric.HTTP_P95_LATENCY)),
+                usable(results.get(SemanticMetric.HTTP_P99_LATENCY)),
+                usable(results.get(SemanticMetric.HTTP_ACTIVE_REQUESTS)),
+                histogramPresent,
+                noTraffic);
+
+        RangeMetricSummary awaitingRange = provider.queryRange(target, SemanticMetric.DB_POOL_AWAITING, w);
+        Double awaitingCurrent = awaitingRange.availability() == MetricAvailability.AVAILABLE
+                ? awaitingRange.current()
+                : usable(results.get(SemanticMetric.DB_POOL_AWAITING));
+        Double awaitingAvg = awaitingRange.availability() == MetricAvailability.AVAILABLE
+                ? awaitingRange.average()
+                : null;
+        Double awaitingMax = awaitingRange.availability() == MetricAvailability.AVAILABLE
+                ? awaitingRange.max()
+                : null;
 
         PerformanceSummary.Database database = new PerformanceSummary.Database(
-                value(results.get(SemanticMetric.DB_POOL_AVAILABLE)),
-                value(results.get(SemanticMetric.DB_POOL_ACTIVE)),
-                value(results.get(SemanticMetric.DB_POOL_AWAITING)),
-                value(results.get(SemanticMetric.DB_POOL_UTILIZATION)));
+                usable(results.get(SemanticMetric.DB_POOL_AVAILABLE)),
+                usable(results.get(SemanticMetric.DB_POOL_ACTIVE)),
+                awaitingCurrent,
+                awaitingAvg,
+                awaitingMax,
+                usable(results.get(SemanticMetric.DB_POOL_UTILIZATION)));
 
         PerformanceSummary.Jvm jvm = new PerformanceSummary.Jvm(
-                value(results.get(SemanticMetric.JVM_HEAP_USED)),
-                value(results.get(SemanticMetric.JVM_HEAP_COMMITTED)),
-                value(results.get(SemanticMetric.JVM_HEAP_MAX)),
-                value(results.get(SemanticMetric.JVM_HEAP_UTILIZATION)),
-                value(results.get(SemanticMetric.JVM_GC_PAUSE)));
+                usable(results.get(SemanticMetric.JVM_HEAP_USED)),
+                usable(results.get(SemanticMetric.JVM_HEAP_COMMITTED)),
+                usable(results.get(SemanticMetric.JVM_HEAP_MAX)),
+                usable(results.get(SemanticMetric.JVM_HEAP_UTILIZATION)),
+                usable(results.get(SemanticMetric.JVM_GC_PAUSE)));
 
         PerformanceSummary.Cache cache = new PerformanceSummary.Cache(
-                value(results.get(SemanticMetric.CACHE_HIT_RATIO)));
+                usable(results.get(SemanticMetric.CACHE_HIT_RATIO)));
 
         PerformanceSummary.Cluster cluster = new PerformanceSummary.Cluster(
-                value(results.get(SemanticMetric.KEYCLOAK_CLUSTER_SIZE)));
+                usable(results.get(SemanticMetric.KEYCLOAK_CLUSTER_SIZE)));
 
         PerformanceSummary.Runtime runtime = new PerformanceSummary.Runtime(
-                value(results.get(SemanticMetric.RUNTIME_CPU_USAGE)),
-                value(results.get(SemanticMetric.RUNTIME_MEMORY_WORKING_SET)));
+                usable(results.get(SemanticMetric.RUNTIME_CPU_USAGE)),
+                usable(results.get(SemanticMetric.RUNTIME_MEMORY_WORKING_SET)));
 
         Map<String, MetricAvailability> availability = new LinkedHashMap<>();
         for (Map.Entry<SemanticMetric, SemanticMetricResult> e : results.entrySet()) {
@@ -94,6 +121,9 @@ public class PerformanceSummaryService {
                     ? MetricAvailability.UNKNOWN
                     : e.getValue().availability();
             availability.put(e.getKey().name(), a);
+        }
+        if (awaitingRange.availability() != null) {
+            availability.put("DB_POOL_AWAITING_RANGE", awaitingRange.availability());
         }
 
         return new PerformanceSummary(
@@ -113,6 +143,7 @@ public class PerformanceSummaryService {
 
     public List<SemanticMetricResult> category(Target target, MetricCategory category, MetricWindow window) {
         MetricWindow w = window == null ? interactiveWindow() : window;
+        MetricsQueryBounds.validateWindow(w, metricsConfig);
         return providerFactory.forTarget(target).queryCategory(target, category, w);
     }
 
@@ -124,11 +155,36 @@ public class PerformanceSummaryService {
         return MetricWindow.tryParse(metricsConfig.defaultWindow()).orElse(MetricWindow.defaultWindow());
     }
 
-    private static Double value(SemanticMetricResult result) {
-        if (result == null || result.availability() != MetricAvailability.AVAILABLE) {
+    private static Double usable(SemanticMetricResult result) {
+        if (result == null || !result.usableForFindings()) {
             return null;
         }
         return result.value();
+    }
+
+    private static boolean percentileUnavailableDueToNoTraffic(SemanticMetricResult result) {
+        if (result == null) {
+            return false;
+        }
+        if (result.availability() != MetricAvailability.NOT_AVAILABLE) {
+            return false;
+        }
+        String reason = result.reason();
+        return reason == null
+                || reason.contains("No time series")
+                || SemanticMetricResult.REASON_NO_TRAFFIC.equals(reason);
+    }
+
+    private static void rewriteNoTraffic(Map<SemanticMetric, SemanticMetricResult> results, SemanticMetric metric) {
+        SemanticMetricResult r = results.get(metric);
+        if (r == null || r.availability() != MetricAvailability.NOT_AVAILABLE) {
+            return;
+        }
+        if (r.value() != null) {
+            return;
+        }
+        results.put(metric, SemanticMetricResult.notAvailable(
+                r.targetId(), metric, r.window(), r.source(), SemanticMetricResult.REASON_NO_TRAFFIC));
     }
 
     private static String sourceLabel(Target target, MetricsProvider provider) {

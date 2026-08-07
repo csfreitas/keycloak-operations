@@ -11,8 +11,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 /**
- * Detects presence of key metric series via controlled queries. Results cached briefly.
- * Never coerces missing series to available.
+ * Detects presence of key metric series via controlled probes. Results cached briefly.
+ * Histogram presence uses bucket series count — not whether p99 returned a value.
  */
 @ApplicationScoped
 public class MetricAvailabilityService {
@@ -71,24 +71,25 @@ public class MetricAvailabilityService {
 
     private Map<SeriesKey, Boolean> probe(Target target) {
         MetricsProvider provider = providerFactory.forTarget(target);
-        MetricWindow window = MetricWindow.defaultWindow();
         Map<SeriesKey, Boolean> flags = emptyFlags();
         if (!provider.supported(target)) {
             return flags;
         }
-        flags.put(SeriesKey.HTTP_COUNT, hasValue(provider.query(target, SemanticMetric.HTTP_REQUEST_RATE, window)));
-        flags.put(SeriesKey.HTTP_BUCKET, hasValue(provider.query(target, SemanticMetric.HTTP_P99_LATENCY, window)));
-        flags.put(SeriesKey.AGROAL, hasValue(provider.query(target, SemanticMetric.DB_POOL_ACTIVE, window)));
-        flags.put(SeriesKey.JVM_HEAP, hasValue(provider.query(target, SemanticMetric.JVM_HEAP_USED, window)));
-        flags.put(SeriesKey.EVENTS, hasValue(provider.query(target, SemanticMetric.LOGIN_RATE, window)));
-        flags.put(SeriesKey.CLUSTER, hasValue(provider.query(target, SemanticMetric.KEYCLOAK_CLUSTER_SIZE, window)));
+        flags.put(SeriesKey.HTTP_COUNT, seriesPresent(provider.probeSeries(target, "http_server_requests_seconds_count")));
+        flags.put(SeriesKey.HTTP_BUCKET, seriesPresent(provider.probeSeries(target, "http_server_requests_seconds_bucket")));
+        flags.put(SeriesKey.AGROAL, seriesPresent(provider.probeSeries(target, "agroal_active_count")));
+        flags.put(SeriesKey.JVM_HEAP, seriesPresent(provider.probeSeries(target, "jvm_memory_used_bytes")));
+        flags.put(SeriesKey.EVENTS, seriesPresent(provider.probeSeries(target, "keycloak_user_events_total")));
+        flags.put(SeriesKey.CLUSTER, seriesPresent(provider.probeSeries(target, "vendor_cluster_size")));
         return Map.copyOf(flags);
     }
 
-    private static boolean hasValue(SemanticMetricResult result) {
+    private static boolean seriesPresent(SemanticMetricResult result) {
         return result != null
-                && result.availability() == MetricAvailability.AVAILABLE
-                && result.value() != null;
+                && (result.availability() == MetricAvailability.AVAILABLE
+                        || result.availability() == MetricAvailability.STALE)
+                && result.value() != null
+                && result.value() > 0;
     }
 
     private static Map<SeriesKey, Boolean> emptyFlags() {
