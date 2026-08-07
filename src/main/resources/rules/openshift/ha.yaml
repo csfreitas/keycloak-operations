@@ -23,3 +23,174 @@ rules:
       runtime:
         - OPENSHIFT
         - KUBERNETES
+
+  - id: KC-HA-002
+    title: Ready replicas below desired
+    category: high-availability
+    severity: HIGH
+    description: >
+      At least one desired Keycloak pod is not ready. Inventory emits
+      keycloak.replicas.readyBelowDesired when ready and desired counts are known.
+    impact: >
+      Reduced capacity and possible failed rollouts or sticky sessions under load.
+    recommendation: >
+      Inspect pod events, readiness probes, and recent Deployments/StatefulSet revisions.
+      Restore readyReplicas to match desiredReplicas.
+    references:
+      - https://www.keycloak.org/high-availability/introduction
+    condition:
+      key: keycloak.replicas.readyBelowDesired
+      equals: true
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      evidenceRequired:
+        - keycloak.replicas.readyBelowDesired
+
+  - id: KC-HA-003
+    title: Pods concentrated in a single availability zone
+    category: high-availability
+    severity: HIGH
+    description: >
+      The cluster reports multiple zones, but all Keycloak pods run in one zone
+      (keycloak.topology.singleZoneConcentration).
+    impact: >
+      A zone outage takes down the entire identity plane despite multi-replica sizing.
+    recommendation: >
+      Add topology spread constraints or pod anti-affinity across
+      topology.kubernetes.io/zone and rebalance pods.
+    references: []
+    condition:
+      key: keycloak.topology.singleZoneConcentration
+      equals: true
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      evidenceRequired:
+        - keycloak.topology.singleZoneConcentration
+
+  - id: KC-HA-004
+    title: Zone topology spread missing in production
+    category: high-availability
+    severity: MEDIUM
+    description: >
+      Production workloads on OpenShift/Kubernetes should declare zone topology
+      spread so pods are not scheduled into a single failure domain by accident.
+    impact: >
+      Scheduler may pack pods into one zone under node pressure.
+    recommendation: >
+      Configure TopologySpreadConstraints with topologyKey topology.kubernetes.io/zone.
+    references: []
+    condition:
+      key: keycloak.scheduling.zoneSpread.present
+      equals: false
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      environment:
+        - PRD
+      evidenceRequired:
+        - keycloak.scheduling.zoneSpread.present
+
+  - id: KC-HA-005
+    title: Hostname topology spread missing in production
+    category: high-availability
+    severity: MEDIUM
+    description: >
+      Production Keycloak should spread pods across nodes (hostname topology) so a
+      single node failure does not remove all replicas.
+    impact: >
+      Multiple pods may land on one node, amplifying node failure impact.
+    recommendation: >
+      Configure TopologySpreadConstraints with topologyKey kubernetes.io/hostname
+      or equivalent pod anti-affinity.
+    references: []
+    condition:
+      key: keycloak.scheduling.hostnameSpread.present
+      equals: false
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      environment:
+        - PRD
+      evidenceRequired:
+        - keycloak.scheduling.hostnameSpread.present
+
+  - id: KC-HA-006
+    title: PodDisruptionBudget absent when replicas >= 2
+    category: high-availability
+    severity: MEDIUM
+    description: >
+      Multi-replica Keycloak deployments should have a PodDisruptionBudget so
+      voluntary disruptions keep at least one pod available.
+    impact: >
+      Cluster upgrades or node drains can take all Keycloak pods offline at once.
+    recommendation: >
+      Create a PDB with minAvailable: 1 (or maxUnavailable tuned for your replica count).
+    references: []
+    condition:
+      all:
+        - key: deployment.replicas
+          greaterThanOrEqual: 2
+        - key: keycloak.pdb.present
+          equals: false
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      evidenceRequired:
+        - deployment.replicas
+        - keycloak.pdb.present
+
+  - id: KC-HA-007
+    title: HPA minReplicas below 2 in production
+    category: high-availability
+    severity: HIGH
+    description: >
+      When an HPA manages Keycloak in production, minReplicas must be at least 2
+      so scale-to-one cannot reintroduce a single point of failure.
+    impact: >
+      Autoscaling can reduce the deployment to one pod under low load.
+    recommendation: >
+      Set HorizontalPodAutoscaler minReplicas to 2 (or higher) for production.
+    references: []
+    condition:
+      all:
+        - key: keycloak.hpa.present
+          equals: true
+        - key: keycloak.hpa.minReplicas
+          lessThan: 2
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      environment:
+        - PRD
+      evidenceRequired:
+        - keycloak.hpa.present
+        - keycloak.hpa.minReplicas
+
+  - id: KC-HA-008
+    title: All pods scheduled on the same node
+    category: high-availability
+    severity: HIGH
+    description: >
+      Multiple Keycloak pods share a single node (keycloak.topology.singleNodeConcentration).
+    impact: >
+      A node failure or drain removes all replicas simultaneously.
+    recommendation: >
+      Enforce hostname topology spread or anti-affinity and ensure enough worker nodes.
+    references: []
+    condition:
+      key: keycloak.topology.singleNodeConcentration
+      equals: true
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      evidenceRequired:
+        - keycloak.topology.singleNodeConcentration

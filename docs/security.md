@@ -54,3 +54,9 @@ Keys are sensitive (case-insensitive) when they match exact names such as
 `password`, `clientSecret`, `secret`, `token`, `accessToken`, `refreshToken`,
 `privateKey`, `credentials`, or contain `secret`, `password`, or `credential`.
 Metadata such as `name` and `namespace` is preserved.
+
+## Assessment / MCP output
+
+Assessment MCP tools return **compact** DTOs (scores, finding ids, evidence *keys*
+only) and always pass through `SensitiveDataFilter`. Full evidence maps are not
+dumped to LLM tool responses.

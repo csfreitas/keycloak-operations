@@ -88,11 +88,22 @@ public class ConfigurationTargetRegistry implements TargetRegistry {
         if (kc.credentialRef() == null || kc.credentialRef().isBlank()) {
             throw new IllegalArgumentException("keycloak.credential-ref is required");
         }
+        String managementUrl = null;
+        if (kc.managementUrl() != null && kc.managementUrl().isPresent()) {
+            String raw = kc.managementUrl().get();
+            if (raw != null) {
+                String trimmed = raw.trim();
+                if (!trimmed.isBlank()) {
+                    managementUrl = trimmed;
+                }
+            }
+        }
         KeycloakTargetConfiguration keycloak = new KeycloakTargetConfiguration(
                 kc.url().trim(),
                 kc.authRealm(),
                 kc.clientId().trim(),
-                kc.credentialRef().trim());
+                kc.credentialRef().trim(),
+                managementUrl);
 
         InfrastructureTargetConfiguration infrastructure = entry.infrastructure()
                 .map(ConfigurationTargetRegistry::toInfrastructure)

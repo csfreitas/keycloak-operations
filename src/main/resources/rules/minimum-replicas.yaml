@@ -1,5 +1,5 @@
 # Legacy single-rule file retained for documentation only.
 # Canonical HA rule KC-OCP-HA-001 is loaded from rules/openshift/ha.yaml via rules/index.yaml.
-# Do not register a duplicate KC-OCP-HA-001 here.
+# Do not register a duplicate KC-OCP-HA-001 here. Not listed in rules/index.yaml.
 deprecated: true
-note: "See rules/openshift/ha.yaml and Java MinimumReplicasRule policy (threshold=2)."
+note: "See rules/openshift/ha.yaml. Java MinimumReplicasRule remains for unit tests only."

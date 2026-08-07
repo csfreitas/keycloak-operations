@@ -31,6 +31,7 @@ Flyway scripts under `src/main/resources/db/migration/`:
 | V3 | `health_check_runs`, `health_check_results` |
 | V4 | `audit_events` |
 | V5 | `environment_snapshots`, `inventory_snapshots` |
+| V6 | Assessment depth columns + finding subject + health `duration_ms` |
 
 ## Secrets
 

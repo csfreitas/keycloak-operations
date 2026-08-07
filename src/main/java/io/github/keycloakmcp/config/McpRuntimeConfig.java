@@ -72,6 +72,13 @@ public interface McpRuntimeConfig {
 
         @WithName("credential-ref")
         String credentialRef();
+
+        /**
+         * Optional Keycloak management interface base URL (e.g. http://localhost:9000).
+         * Used for /health probes; omit when not configured. Do not expose publicly.
+         */
+        @WithName("management-url")
+        Optional<String> managementUrl();
     }
 
     interface InfrastructureEntry {

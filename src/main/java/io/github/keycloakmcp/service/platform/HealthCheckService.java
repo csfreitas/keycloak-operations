@@ -9,17 +9,18 @@ import java.util.UUID;
 
 import org.jboss.logging.Logger;
 
-import io.github.keycloakmcp.domain.common.ServerInfo;
 import io.github.keycloakmcp.domain.platform.HealthCheckSummary;
 import io.github.keycloakmcp.domain.platform.HealthStatus;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.TriggerType;
+import io.github.keycloakmcp.health.HealthCheckEngine;
+import io.github.keycloakmcp.health.HealthCheckEngine.HealthRunResult;
+import io.github.keycloakmcp.health.HealthComponentResult;
 import io.github.keycloakmcp.persistence.entity.HealthCheckResultEntity;
 import io.github.keycloakmcp.persistence.entity.HealthCheckRunEntity;
 import io.github.keycloakmcp.persistence.mapper.PlatformPersistenceMapper;
 import io.github.keycloakmcp.persistence.repository.HealthCheckRepository;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
-import io.github.keycloakmcp.service.ServerInfoService;
 import io.github.keycloakmcp.target.Target;
 import io.github.keycloakmcp.target.TargetAuthorizationService;
 import io.github.keycloakmcp.target.TargetPermission;
@@ -29,7 +30,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 /**
- * Lightweight health checks (Admin API reachability + optional discovery signals).
+ * Target health checks — delegates execution to {@link HealthCheckEngine}.
  * Distinct from full assessments.
  */
 @ApplicationScoped
@@ -39,7 +40,7 @@ public class HealthCheckService {
 
     private final TargetResolver targetResolver;
     private final TargetAuthorizationService targetAuthorization;
-    private final ServerInfoService serverInfoService;
+    private final HealthCheckEngine healthCheckEngine;
     private final HealthCheckRepository healthCheckRepository;
     private final PlatformPersistenceMapper mapper;
     private final SensitiveDataFilter sensitiveDataFilter;
@@ -48,13 +49,13 @@ public class HealthCheckService {
     public HealthCheckService(
             TargetResolver targetResolver,
             TargetAuthorizationService targetAuthorization,
-            ServerInfoService serverInfoService,
+            HealthCheckEngine healthCheckEngine,
             HealthCheckRepository healthCheckRepository,
             PlatformPersistenceMapper mapper,
             SensitiveDataFilter sensitiveDataFilter) {
         this.targetResolver = targetResolver;
         this.targetAuthorization = targetAuthorization;
-        this.serverInfoService = serverInfoService;
+        this.healthCheckEngine = healthCheckEngine;
         this.healthCheckRepository = healthCheckRepository;
         this.mapper = mapper;
         this.sensitiveDataFilter = sensitiveDataFilter;
@@ -65,34 +66,15 @@ public class HealthCheckService {
         Target target = targetResolver.require(targetId);
         targetAuthorization.assertAllowed(target, TargetPermission.READ);
 
-        Instant started = Instant.now();
         String runId = UUID.randomUUID().toString();
+        HealthRunResult runResult = healthCheckEngine.run(target);
+        HealthStatus overall = runResult.overallStatus() == null ? HealthStatus.UNKNOWN : runResult.overallStatus();
+
         List<HealthCheckResultEntity> results = new ArrayList<>();
-        HealthStatus overall = HealthStatus.HEALTHY;
-
-        try {
-            ServerInfo info = serverInfoService.getServerInfo(targetId);
-            results.add(result(runId, targetId, "keycloak.serverInfo", HealthStatus.HEALTHY,
-                    "Server info reachable", Map.of(
-                            "product", info.product() == null ? "UNKNOWN" : info.product().name(),
-                            "version", info.version() == null ? "" : info.version())));
-        } catch (RuntimeException e) {
-            LOG.warnf(e, "Health check serverInfo failed for target=%s", targetId);
-            overall = HealthStatus.CRITICAL;
-            results.add(result(runId, targetId, "keycloak.serverInfo", HealthStatus.CRITICAL,
-                    e.getMessage(), Map.of()));
+        for (HealthComponentResult component : runResult.results()) {
+            results.add(toEntity(runId, targetId, component));
         }
 
-        if (target.hasInfrastructure()) {
-            results.add(result(runId, targetId, "infrastructure.configured", HealthStatus.HEALTHY,
-                    "Infrastructure configuration present",
-                    Map.of("type", target.infrastructureTypeOrNone().name())));
-        } else {
-            results.add(result(runId, targetId, "infrastructure.configured", HealthStatus.UNKNOWN,
-                    "No infrastructure configuration", Map.of()));
-        }
-
-        Instant completed = Instant.now();
         HealthCheckRunEntity run = new HealthCheckRunEntity();
         run.id = runId;
         run.targetId = targetId;
@@ -101,11 +83,13 @@ public class HealthCheckService {
         Map<String, Object> summary = new HashMap<>();
         summary.put("resultCount", results.size());
         summary.put("overallStatus", overall.name());
+        summary.put("components", runResult.componentStatuses());
         run.summary = sensitiveDataFilter.redact(summary);
-        run.startedAt = started;
-        run.completedAt = completed;
+        run.startedAt = runResult.startedAt() == null ? Instant.now() : runResult.startedAt();
+        run.completedAt = runResult.completedAt() == null ? Instant.now() : runResult.completedAt();
         run.createdAt = Instant.now();
 
+        LOG.debugf("Health check completed target=%s overall=%s components=%d", targetId, overall, results.size());
         healthCheckRepository.persistRunWithResults(run, results);
         return mapper.toHealthSummary(run);
     }
@@ -124,21 +108,18 @@ public class HealthCheckService {
         return healthCheckRepository.findLatest(targetId).map(mapper::toHealthSummary);
     }
 
-    private HealthCheckResultEntity result(
-            String runId,
-            String targetId,
-            String name,
-            HealthStatus status,
-            String message,
-            Map<String, Object> details) {
+    private HealthCheckResultEntity toEntity(String runId, String targetId, HealthComponentResult component) {
         HealthCheckResultEntity entity = new HealthCheckResultEntity();
         entity.id = UUID.randomUUID().toString();
         entity.healthCheckId = runId;
         entity.targetId = targetId;
-        entity.checkName = name;
-        entity.status = status.name();
-        entity.message = sensitiveDataFilter.redactString(message);
-        entity.details = details == null ? null : sensitiveDataFilter.redact(new HashMap<>(details));
+        entity.checkName = component.name();
+        entity.status = component.status() == null ? HealthStatus.UNKNOWN.name() : component.status().name();
+        entity.message = sensitiveDataFilter.redactString(component.message());
+        entity.details = component.details() == null
+                ? null
+                : sensitiveDataFilter.redact(new HashMap<>(component.details()));
+        entity.durationMs = component.durationMs();
         entity.createdAt = Instant.now();
         return entity;
     }

@@ -1,0 +1,41 @@
+# Admin / master-realm oriented security pack (optional profile inclusion).
+# Rules fire only when master-realm specific evidence is collected.
+id: admin-security
+rules:
+  - id: KC-ADM-001
+    title: Master realm self-registration enabled
+    category: security
+    severity: HIGH
+    subjectType: REALM
+    description: >
+      The master realm should never allow self-registration in production.
+    impact: >
+      Attackers could create privileged admin accounts if registration is open.
+    recommendation: >
+      Ensure registrationAllowed is false on the master realm.
+    references: []
+    condition:
+      key: realm.master.registrationAllowed
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - realm.master.registrationAllowed
+
+  - id: KC-ADM-002
+    title: Master realm SSL not required
+    category: security
+    severity: HIGH
+    subjectType: REALM
+    description: >
+      Admin console traffic on the master realm must require SSL.
+    impact: >
+      Admin credentials may traverse the network in cleartext.
+    recommendation: >
+      Set sslRequired to external or all on the master realm.
+    references: []
+    condition:
+      key: realm.master.sslRequired
+      equals: none
+    appliesWhen:
+      evidenceRequired:
+        - realm.master.sslRequired

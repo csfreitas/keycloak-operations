@@ -25,17 +25,21 @@ by design (SSRF protection).
 | `keycloak_get_group` | yes | `realm`, `groupId` | Group details |
 | `keycloak_list_roles` | yes | `realm`, `first?`, `max?` | List realm roles |
 | `keycloak_get_role` | yes | `realm`, `roleName` | Role details |
-| `keycloak_discover_environment` | yes | — | Runtime discovery (limited in 0.1.x) |
+| `keycloak_discover_environment` | yes | — | Runtime discovery |
+| `keycloak_get_inventory` | yes | — | Sanitized infrastructure inventory |
+| `keycloak_run_assessment` | yes | `profile?` | Run + persist assessment (compact) |
+| `keycloak_health_check` | yes | — | Lightweight health check |
+| `keycloak_list_assessment_profiles` | no | — | Built-in profiles |
+| `keycloak_list_assessments` | yes | `page?`, `size?` | Assessment history |
+| `keycloak_get_assessment` | yes | `assessmentId` | Assessment summary |
+| `keycloak_get_latest_assessment` | yes | — | Latest assessment |
+| `keycloak_get_findings` | yes | filters / page | Persisted findings (compact) |
 
-## Planned assessment tools (0.2.0+)
+## Planned later
 
 | Tool | Planned purpose |
 |------|-----------------|
-| `keycloak_run_assessment` | Run a named assessment profile for a target |
 | `keycloak_compare_targets` | Compare two targets |
-| `keycloak_assess_ha` | High availability assessment |
-| `keycloak_assess_security` | Security assessment |
-| `keycloak_assess_capacity` | Capacity assessment |
 
 ## Error shape
 

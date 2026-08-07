@@ -5,28 +5,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 import io.github.keycloakmcp.assessment.profile.AssessmentProfile;
-import io.github.keycloakmcp.config.AssessmentConfig;
+import io.github.keycloakmcp.config.TestAssessmentConfig;
 
 class YamlRuleLoaderTest {
 
     @Test
     void loadsPacksFromIndexAndFiltersByProfile() {
-        AssessmentConfig assessmentConfig = new AssessmentConfig() {
-            @Override
-            public String rulesPath() {
-                return "rules";
-            }
-
-            @Override
-            public String defaultProfile() {
-                return "keycloak-production";
-            }
-        };
-
-        YamlRuleLoader loader = new YamlRuleLoader(assessmentConfig);
+        YamlRuleLoader loader = new YamlRuleLoader(TestAssessmentConfig.defaults());
         loader.init();
 
-        assertThat(loader.rulesByPack()).containsKeys("ha", "health-check", "security-baseline", "capacity");
+        assertThat(loader.rulesByPack())
+                .containsKeys("ha", "health-check", "security-baseline", "capacity", "admin-security");
         assertThat(loader.loadBuiltInAndClasspathRules())
                 .extracting(Rule::id)
                 .contains("KC-OCP-HA-001");

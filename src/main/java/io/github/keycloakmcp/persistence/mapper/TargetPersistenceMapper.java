@@ -36,11 +36,17 @@ public class TargetPersistenceMapper {
     }
 
     public Target toDomain(TargetEntity entity) {
+        Map<String, String> tags = entity.tags == null ? Map.of() : Map.copyOf(entity.tags);
+        String managementUrl = tags.get("management-url");
+        if (managementUrl != null && managementUrl.isBlank()) {
+            managementUrl = null;
+        }
         KeycloakTargetConfiguration keycloak = new KeycloakTargetConfiguration(
                 entity.keycloakUrl,
                 entity.keycloakAuthRealm,
                 entity.keycloakClientId,
-                entity.keycloakCredentialRef);
+                entity.keycloakCredentialRef,
+                managementUrl);
 
         InfrastructureTargetConfiguration infrastructure = null;
         if (entity.infraType != null && !entity.infraType.isBlank()) {
@@ -59,8 +65,6 @@ public class TargetPersistenceMapper {
                     metrics == null ? null : String.valueOf(metrics),
                     tracing == null ? null : String.valueOf(tracing));
         }
-
-        Map<String, String> tags = entity.tags == null ? Map.of() : Map.copyOf(entity.tags);
 
         return new Target(
                 TargetId.of(entity.id),
@@ -112,7 +116,11 @@ public class TargetPersistenceMapper {
             entity.observability = null;
         }
 
-        entity.tags = target.tags() == null ? new HashMap<>() : new HashMap<>(target.tags());
+        Map<String, String> tags = target.tags() == null ? new HashMap<>() : new HashMap<>(target.tags());
+        if (target.keycloak().managementUrl() != null && !target.keycloak().managementUrl().isBlank()) {
+            tags.putIfAbsent("management-url", target.keycloak().managementUrl());
+        }
+        entity.tags = tags;
         entity.updatedAt = updatedAt;
     }
 }

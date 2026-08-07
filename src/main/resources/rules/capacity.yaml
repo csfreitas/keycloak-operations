@@ -1,4 +1,67 @@
-# Capacity-oriented rules (placeholder pack for profile filtering).
-# Deep capacity assessment lands in milestone 0.5; keep pack id stable now.
+# Capacity-oriented rules. Use boolean presence flags because InventoryService
+# skips null scalar resource values in toEvidence.
 id: capacity
-rules: []
+rules:
+  - id: KC-CAP-001
+    title: CPU request missing
+    category: capacity
+    severity: MEDIUM
+    description: >
+      Keycloak containers should declare a CPU request so the scheduler can place
+      pods predictably and avoid noisy-neighbor starvation.
+    impact: >
+      Pods may be overpacked onto busy nodes, causing latency and restarts.
+    recommendation: >
+      Set resources.requests.cpu on the Keycloak container (and Operator CR if used).
+    references: []
+    condition:
+      key: keycloak.resources.requests.cpu.present
+      equals: false
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      evidenceRequired:
+        - keycloak.resources.requests.cpu.present
+
+  - id: KC-CAP-002
+    title: Memory request missing
+    category: capacity
+    severity: MEDIUM
+    description: >
+      Keycloak containers should declare a memory request for predictable scheduling.
+    impact: >
+      Memory pressure on the node can OOM-kill Keycloak unexpectedly.
+    recommendation: >
+      Set resources.requests.memory based on heap and native memory needs.
+    references: []
+    condition:
+      key: keycloak.resources.requests.memory.present
+      equals: false
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      evidenceRequired:
+        - keycloak.resources.requests.memory.present
+
+  - id: KC-CAP-003
+    title: Memory limit missing
+    category: capacity
+    severity: MEDIUM
+    description: >
+      A memory limit bounds Keycloak heap growth and protects the node from runaway usage.
+    impact: >
+      Unbounded memory use can destabilize the node and other workloads.
+    recommendation: >
+      Set resources.limits.memory slightly above the expected working set.
+    references: []
+    condition:
+      key: keycloak.resources.limits.memory.present
+      equals: false
+    appliesWhen:
+      runtime:
+        - OPENSHIFT
+        - KUBERNETES
+      evidenceRequired:
+        - keycloak.resources.limits.memory.present

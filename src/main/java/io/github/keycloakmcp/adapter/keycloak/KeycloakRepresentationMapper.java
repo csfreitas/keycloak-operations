@@ -50,7 +50,13 @@ public final class KeycloakRepresentationMapper {
                 representation.getSslRequired(),
                 Boolean.TRUE.equals(representation.isLoginWithEmailAllowed()),
                 Boolean.TRUE.equals(representation.isDuplicateEmailsAllowed()),
-                Boolean.TRUE.equals(representation.isInternationalizationEnabled()));
+                Boolean.TRUE.equals(representation.isInternationalizationEnabled()),
+                Boolean.TRUE.equals(representation.isVerifyEmail()),
+                Boolean.TRUE.equals(representation.isRememberMe()),
+                representation.getPasswordPolicy(),
+                representation.getOtpPolicyType(),
+                Boolean.TRUE.equals(representation.isEventsEnabled()),
+                Boolean.TRUE.equals(representation.isAdminEventsEnabled()));
     }
 
     public static ClientSummary toClientSummary(ClientRepresentation representation) {
@@ -75,6 +81,10 @@ public final class KeycloakRepresentationMapper {
         if (representation == null) {
             return null;
         }
+        String pkce = null;
+        if (representation.getAttributes() != null) {
+            pkce = representation.getAttributes().get("pkce.code.challenge.method");
+        }
         // confidentialPort was removed from Keycloak 26 ClientRepresentation; keep DTO field as 0.
         return new ClientDetails(
                 representation.getId(),
@@ -93,7 +103,9 @@ public final class KeycloakRepresentationMapper {
                 Boolean.TRUE.equals(representation.isBearerOnly()),
                 0,
                 Boolean.TRUE.equals(representation.isFullScopeAllowed()),
-                representation.getDescription());
+                representation.getDescription(),
+                Boolean.TRUE.equals(representation.isImplicitFlowEnabled()),
+                pkce);
     }
 
     public static UserSummary toUserSummary(UserRepresentation representation) {

@@ -11,21 +11,15 @@ Earlier work (0.1–0.3) shipped under artifact version `0.1.0` as foundational 
 
 ## 0.3 — PostgreSQL, persistence, audit, history
 
-## 0.4 — OpenShift / Kubernetes discovery *(current — 0.4.0-SNAPSHOT)*
+## 0.4 — OpenShift / Kubernetes discovery
 
-- Real `InfrastructureClientFactory` (per-target OpenShift/Kubernetes clients)
-- Target-aware `EnvironmentDiscovery`
-- Infrastructure inventory (workload, pods, topology, HPA, PDB, routes/ingress)
-- Evidence catalog + collectors wired to inventory
-- Snapshots use sanitized inventory (no basic placeholder)
-- Rule packs via `rules/index.yaml`, profile filtering, duplicate ID detection
-- CI workflow + Fabric8 mock tests
-- Manual validation path: CRC / OpenShift Local
+## 0.5 — Health Check & Assessment Depth *(current — 0.5.0-SNAPSHOT)*
 
-## 0.5 — Health Check & Assessment Depth *(next)*
-
-Use the evidence produced in 0.4 for HA / zone / PDB / HPA / resources / scheduling /
-security / ingress / production configuration rules — without reinventing collectors.
+- Full HA / security / production / capacity / admin-security declarative packs
+- Profiles + resolver (explicit profile never overridden)
+- MCP assessment/health tools; REST assessment-profiles
+- Persistence V6 depth fields; scoring categories / NOT_EVALUATED
+- Inventory boolean evidence for HA and capacity rules
 
 ## 0.6 — Prometheus / metrics integration
 

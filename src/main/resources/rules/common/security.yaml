@@ -1,11 +1,10 @@
-# Common security rule stubs (0.1.0)
-# These rules require evidence that collectors do not yet emit in 0.1.0,
-# so they will not fire until security evidence collection lands (planned 0.2.0+).
+# Security baseline rules. Require corresponding evidence keys from Keycloak collectors.
 rules:
   - id: KC-SEC-001
     title: Brute-force protection enabled
     category: security
     severity: HIGH
+    subjectType: REALM
     description: >
       Realms used in production should enable brute-force detection to slow
       credential stuffing and password guessing attacks.
@@ -28,6 +27,7 @@ rules:
     title: SSL required for external requests
     category: security
     severity: MEDIUM
+    subjectType: REALM
     description: >
       Production realms should require SSL for external requests so credentials
       and tokens are never sent in cleartext.
@@ -43,3 +43,96 @@ rules:
     appliesWhen:
       evidenceRequired:
         - realm.sslRequired
+
+  - id: KC-SEC-003
+    title: Wildcard redirect URIs present
+    category: security
+    severity: HIGH
+    description: >
+      Clients must not use wildcard redirect URIs; they weaken OAuth redirect URI
+      validation and enable open-redirect style attacks.
+    impact: >
+      Attackers may register malicious redirect targets that still match a wildcard.
+    recommendation: >
+      Replace wildcard redirect URIs with exact allow-listed callback URLs.
+    references: []
+    condition:
+      key: keycloak.clients.wildcardRedirectUri
+      greaterThan: 0
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.clients.wildcardRedirectUri
+
+  - id: KC-SEC-004
+    title: Wildcard web origins present
+    category: security
+    severity: HIGH
+    description: >
+      Clients should not allow wildcard web origins ("*"), which disable CORS origin checks.
+    impact: >
+      Any origin can call the client with browser-based flows.
+    recommendation: >
+      Replace "*" web origins with explicit trusted origins.
+    references: []
+    condition:
+      key: keycloak.clients.wildcardWebOrigin
+      greaterThan: 0
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.clients.wildcardWebOrigin
+
+  - id: KC-SEC-005
+    title: Implicit flow enabled on clients
+    category: security
+    severity: HIGH
+    description: >
+      The OAuth implicit flow is deprecated and exposes tokens in the browser URL.
+    impact: >
+      Tokens may leak via browser history, Referer headers, or XSS.
+    recommendation: >
+      Disable implicit flow; use authorization code + PKCE for public clients.
+    references: []
+    condition:
+      key: keycloak.clients.implicitFlowCount
+      greaterThan: 0
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.clients.implicitFlowCount
+
+  - id: KC-SEC-006
+    title: Public clients without PKCE S256
+    category: security
+    severity: HIGH
+    description: >
+      Public clients that use standard flow should require PKCE with S256.
+    impact: >
+      Authorization code interception becomes practical without PKCE.
+    recommendation: >
+      Set pkce.code.challenge.method=S256 (or require PKCE) on public clients.
+    references: []
+    condition:
+      key: keycloak.clients.publicWithoutPkceS256
+      greaterThan: 0
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.clients.publicWithoutPkceS256
+
+  - id: KC-SEC-007
+    title: Management interface publicly exposed
+    category: security
+    severity: HIGH
+    description: >
+      The Keycloak management / metrics interface should not be exposed on a public
+      Route or Ingress without network controls.
+    impact: >
+      Attackers may scrape metrics or hit management endpoints from the internet.
+    recommendation: >
+      Restrict management port exposure to cluster-internal Networks or authenticated
+      admin networks only.
+    references: []
+    condition:
+      key: keycloak.management.publiclyExposed
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - keycloak.management.publiclyExposed
