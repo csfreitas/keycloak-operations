@@ -63,3 +63,6 @@ jacoco.exec
 
 # Accidental agent dumps
 .project-dump/
+
+# Local AI coding prompts (not public product docs)
+.agent-prompts/
