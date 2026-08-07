@@ -17,6 +17,7 @@ const NAV_TABS: NavTab[] = [
   { path: 'performance', label: 'Performance' },
   { path: 'infrastructure', label: 'Infrastructure' },
   { path: 'history', label: 'History' },
+  { path: 'changes', label: 'Changes' },
 ];
 
 function TargetTabs({ targetId }: { targetId: string }) {

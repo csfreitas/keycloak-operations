@@ -1,8 +1,8 @@
 # Persistence
 
 PostgreSQL stores **operational state** for the Keycloak/RHBK Operations Platform:
-targets (credential refs only), assessment history, health checks, audit events, and
-environment snapshots.
+targets (credential refs only), assessment history, health checks, audit events,
+environment snapshots, and change-management lifecycle records.
 
 PostgreSQL is **not** a time-series database. Metrics belong in Prometheus (or similar);
 this schema holds discrete runs, findings, and snapshots.
@@ -32,6 +32,7 @@ Flyway scripts under `src/main/resources/db/migration/`:
 | V4 | `audit_events` |
 | V5 | `environment_snapshots`, `inventory_snapshots` |
 | V6 | Assessment depth columns + finding subject + health `duration_ms` |
+| V7 | `change_records` (plan / approval / apply / verification lifecycle) |
 
 ## Secrets
 

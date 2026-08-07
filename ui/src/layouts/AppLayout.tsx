@@ -39,6 +39,14 @@ export function AppLayout() {
           >
             Fleet
           </NavLink>
+          <NavLink
+            to="/changes"
+            className={({ isActive }) =>
+              'topbar__nav-link' + (isActive ? ' topbar__nav-link--active' : '')
+            }
+          >
+            Changes
+          </NavLink>
         </nav>
 
         <div className="topbar__spacer" />

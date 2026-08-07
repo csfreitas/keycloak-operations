@@ -10,6 +10,10 @@ Multi-target isolation **MUST** be preserved for Keycloak admin clients, infrast
 
 Assessments **MUST** be deterministic for the same evidence and rule configuration.
 
+### NFR-CHANGE-001
+
+Change risk classification, policy evaluation, approval validity, stale-plan detection, and verification outcomes **MUST** be deterministic for the same inputs. The LLM **MUST NOT** own those decisions.
+
 ## Resilience & degradation
 
 ### NFR-RES-001

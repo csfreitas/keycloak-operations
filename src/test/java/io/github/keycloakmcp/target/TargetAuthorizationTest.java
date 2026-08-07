@@ -27,10 +27,11 @@ class TargetAuthorizationTest {
     }
 
     @Test
-    void allowsReadAndAssessOnEnabledTarget() {
+    void allowsReadAssessAndPlanOnEnabledTarget() {
         Target target = sample(true);
         authz.assertAllowed(target, TargetPermission.READ);
         authz.assertAllowed(target, TargetPermission.ASSESS);
+        authz.assertAllowed(target, TargetPermission.PLAN);
     }
 
     @Test

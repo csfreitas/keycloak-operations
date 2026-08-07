@@ -127,4 +127,43 @@ public class McpException extends RuntimeException {
     public static McpException of(ErrorCode code, String message, Map<String, Object> details) {
         return new McpException(McpError.of(code, message, details));
     }
+
+    public static McpException changeNotFound(String changeId) {
+        return forNotFound(ErrorCode.CHANGE_NOT_FOUND, "change", changeId == null ? "" : changeId);
+    }
+
+    public static McpException changeNotApproved(String changeId) {
+        return of(ErrorCode.CHANGE_NOT_APPROVED, "change is not approved: " + changeId,
+                Map.of("changeId", changeId == null ? "" : changeId));
+    }
+
+    public static McpException changeConflict(String message) {
+        return of(ErrorCode.CHANGE_CONFLICT, message);
+    }
+
+    public static McpException changeAlreadyApplied(String changeId) {
+        return of(ErrorCode.CHANGE_ALREADY_APPLIED, "change already applied: " + changeId,
+                Map.of("changeId", changeId == null ? "" : changeId));
+    }
+
+    public static McpException policyDenied(String message) {
+        return of(ErrorCode.POLICY_DENIED, message);
+    }
+
+    public static McpException approvalRequired(String changeId) {
+        return of(ErrorCode.APPROVAL_REQUIRED, "approval required for change: " + changeId,
+                Map.of("changeId", changeId == null ? "" : changeId));
+    }
+
+    public static McpException approvalInvalid(String message) {
+        return of(ErrorCode.APPROVAL_INVALID, message);
+    }
+
+    public static McpException verificationFailed(String message) {
+        return of(ErrorCode.VERIFICATION_FAILED, message);
+    }
+
+    public static McpException writeNotSupported(String message) {
+        return of(ErrorCode.WRITE_NOT_SUPPORTED, message);
+    }
 }

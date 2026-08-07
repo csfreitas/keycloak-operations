@@ -17,18 +17,19 @@ Derive current commit with `git rev-parse --short HEAD` (do not treat any SHA be
 
 ## What is this project?
 
-**Keycloak / RHBK Operations Platform** (`keycloak-operations-mcp` + `ui/`): MCP + REST `/api/v1`, multi-target Keycloak/RHBK admin (read-oriented), OpenShift/Kubernetes inventory, health & deterministic assessments, PostgreSQL history, semantic Prometheus metrics, and a **Fleet Operations Console** (Web UI).
+**Keycloak / RHBK Operations Platform** (`keycloak-operations-mcp` + `ui/`): MCP + REST `/api/v1`, multi-target Keycloak/RHBK admin, OpenShift/Kubernetes inventory, health & deterministic assessments, PostgreSQL history, semantic Prometheus metrics, Fleet Operations Console (Web UI), and **controlled administration** (plan → approve → apply → verify).
 
 Repo: https://github.com/csfreitas/keycloak-operations
 
 ## Current Version
 
-`0.7.0-SNAPSHOT` (`pom.xml` / `ui/package.json`)
+`0.8.0-SNAPSHOT` (`pom.xml` / `ui/package.json`)
 
 Historical milestone commits (immutable):
 
 | Milestone | Commit |
 |-----------|--------|
+| 0.7 Web UI | `bcad150` |
 | 0.6.1 Metrics Hardening | `089f6ea` |
 | 0.6 Metrics | `59461d1` |
 | 0.5 Assessment depth | `a0ffe9b` |
@@ -38,37 +39,38 @@ Historical milestone commits (immutable):
 
 | | |
 |--|--|
-| Latest completed | **0.7** Web UI / Fleet Operations Console |
-| Next (PLANNED) | **0.8** Snapshots / drift depth |
+| Latest completed | **0.8** Controlled Administration & Change Management |
+| Next (PLANNED) | **0.8.1** Realm & Client Administration |
 | Index | [milestones/README.md](milestones/README.md) |
 
 ## What already works
 
-MCP + REST shared services; multi-target registry; Keycloak Admin reads; Flyway V1–V6; inventory/discovery; assessment engine + profiles; HealthCheckEngine; semantic metrics with bounds/stale/histogram semantics; performance rules; ServiceMonitor/scrape evidence when accessible; lab compose (Keycloak A/B, PostgreSQL, Prometheus); **Fleet Operations Console** (`ui/`) consuming REST/SSE only; enriched fleet/overview DTOs; health/snapshot detail endpoints; optional OIDC profile (`%oidc`); OpenShift UI manifests (no assessor SA).
+MCP + REST shared services; multi-target registry; Keycloak Admin reads + controlled writes via change lifecycle; Flyway V1–V7; inventory/discovery; assessment engine + profiles; HealthCheckEngine; semantic metrics; performance rules; lab compose; Fleet Operations Console with Changes views; optional OIDC profile (`%oidc`); OpenShift UI manifests.
+
+**0.8 foundation:** ChangeRequest/ChangePlan lifecycle, safe diff, risk, environment policy, approval bound to plan fingerprint, apply with stale-plan protection, read-back verification, audit, semantic MCP/REST change tools, proof-of-concept non-sensitive client config update (`name` / `description` / `pkceCodeChallengeMethod`).
 
 ## Known limitations
 
-- Opt-in ITs skipped without `RUN_*_IT` + live stack
-- ServiceMonitor requires monitoring CRD + RBAC
-- Management health needs management URL when used
-- Identity A OIDC disabled by default (OPEN_LAB); full browser OIDC login UX is scaffolded, production IdP wiring is operator-configured
+- Opt-in ITs skipped without `RUN_*_IT` + live stack (`ControlledClientChangeIT` placeholder)
+- Full realm/client/user/flow/IdP administration deferred to 0.8.1–0.8.4
+- Destructive ops, password/secret workflows out of scope
 - SSE is in-process (not multi-replica fan-out)
+- Identity A OIDC disabled by default (OPEN_LAB)
 - VM inventory still future
+- `mcp.read-only=true` by default; apply requires explicit opt-out + WRITE
 
-## Test baseline
-
-Recorded after 0.7 Web UI:
+## Test baseline (after 0.8)
 
 ```bash
 mvn clean verify
-cd ui && npm ci && npm run test:run && npm run build
+cd ui && npm run test:run && npm run build
 ```
 
 | | Result |
 |--|--------|
-| Backend unit | **129** run, 0 fail |
-| Failsafe | **4** run, **4** skipped |
-| Frontend | **49** Vitest tests |
+| Backend unit | **153** run, 0 fail |
+| Failsafe | **5** run, **5** skipped |
+| Frontend | **50** Vitest tests |
 | Builds | Backend + UI **SUCCESS** |
 
 ## New Agent Quick Start
@@ -76,7 +78,7 @@ cd ui && npm ci && npm run test:run && npm run build
 1. Read [`AGENTS.md`](../AGENTS.md).
 2. Read this file.
 3. Read [`milestones/README.md`](milestones/README.md) → CURRENT/next milestone.
-4. Read related requirements + architecture.
+4. Read related requirements + architecture (for writes: [`architecture/controlled-administration.md`](architecture/controlled-administration.md)).
 5. Run `mvn clean verify` (and `cd ui && npm test` when touching UI).
 6. Inspect code before changing anything.
 7. Implement only the agreed scope.

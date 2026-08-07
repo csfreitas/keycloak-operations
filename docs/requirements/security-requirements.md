@@ -70,7 +70,29 @@ TLS certificate validation **MUST** be enabled by default (no trust-all / insecu
 
 ### SEC-RO-001
 
-Assessments and operational MCP tools **MUST** be read-only by default unless a later milestone explicitly introduces controlled writes.
+Assessments and operational MCP tools **MUST** remain read-only by default (`mcp.read-only=true`). Controlled writes introduced in milestone 0.8 **MUST** still require explicit opt-out of global read-only mode plus target `WRITE`/`ADMIN` authorization and change-management policy/approval gates.
+
+## Controlled writes
+
+### SEC-CHANGE-001
+
+MCP/REST **MUST NOT** expose raw Keycloak Admin write endpoints, arbitrary HTTP methods, or arbitrary JSON mutation tools.
+
+### SEC-CHANGE-002
+
+Change plans, diffs, audit events, logs, and API responses **MUST NOT** contain passwords, client secrets, IdP secrets, tokens, or private keys.
+
+### SEC-CHANGE-003
+
+Approval **MUST** be cryptographically or deterministically bound to the exact plan fingerprint so a modified plan cannot reuse a prior approval.
+
+### SEC-CHANGE-004
+
+Destructive operations **MUST** be denied by default in the 0.8 foundation.
+
+### SEC-CHANGE-005
+
+Change records and apply effects for Target A **MUST NOT** be readable or writable as Target B through authorization or query bugs.
 
 ## Multi-target isolation
 
