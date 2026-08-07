@@ -32,6 +32,15 @@ public record Target(
                 && infrastructure.type() != InfrastructureType.NONE;
     }
 
+    public boolean hasMetrics() {
+        return observability != null && observability.hasMetrics();
+    }
+
+    /** Alias for assessment/evidence wiring — same as {@link #hasMetrics()}. */
+    public boolean hasObservabilityMetrics() {
+        return hasMetrics();
+    }
+
     public InfrastructureType infrastructureTypeOrNone() {
         if (infrastructure == null || infrastructure.type() == null) {
             return InfrastructureType.NONE;

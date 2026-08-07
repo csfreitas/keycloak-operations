@@ -1,0 +1,114 @@
+# Performance / SLO rules. Fire only when evidence exists (boolean findings from MetricsEvidenceCollector).
+id: performance
+rules:
+  - id: KC-PERF-HTTP-001
+    title: HTTP p99 latency exceeds SLO
+    category: performance
+    severity: HIGH
+    description: >
+      Observed HTTP p99 latency exceeds the configured assessment.performance.latency-p99-ms SLO.
+    impact: >
+      Users may experience slow login and token responses under load.
+    recommendation: >
+      Investigate hot paths, enable HTTP histograms if missing, tune pool/heap, or raise the SLO if unrealistic.
+    references: []
+    condition:
+      key: metrics.slo.p99Exceeded
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.slo.p99Configured
+        - metrics.http.p99Ms
+        - metrics.slo.p99Exceeded
+
+  - id: KC-PERF-HTTP-002
+    title: HTTP server error rate exceeds SLO
+    category: performance
+    severity: HIGH
+    description: >
+      Server error rate percent exceeds the configured assessment.performance.server-error-rate-percent.
+    impact: >
+      Elevated 5xx rates degrade authentication availability.
+    recommendation: >
+      Check Keycloak logs, upstream dependencies, and recent configuration changes.
+    references: []
+    condition:
+      key: metrics.slo.errorRateExceeded
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.slo.errorRateExceeded
+
+  - id: KC-PERF-HTTP-HIST-001
+    title: HTTP latency histograms required but missing
+    category: performance
+    severity: MEDIUM
+    description: >
+      A p99 latency SLO is configured but histogram bucket series are unavailable,
+      so percentile latency cannot be evaluated.
+    impact: >
+      Performance SLOs based on percentiles cannot be enforced.
+    recommendation: >
+      Enable KC_HTTP_METRICS_HISTOGRAMS_ENABLED (or equivalent) and ensure Prometheus scrapes buckets.
+    references: []
+    condition:
+      key: metrics.http.histogram.requiredButMissing
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.slo.p99Configured
+        - metrics.http.histogram.requiredButMissing
+
+  - id: KC-PERF-DB-001
+    title: Database pool awaiting connections elevated
+    category: performance
+    severity: MEDIUM
+    description: >
+      Agroal awaiting connection count is at or above the configured warning threshold.
+    impact: >
+      Request threads may block waiting for DB connections, increasing latency.
+    recommendation: >
+      Increase pool size, reduce connection hold time, or investigate slow queries.
+    references: []
+    condition:
+      key: metrics.db.awaitingWarning
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.db.awaitingWarning
+
+  - id: KC-PERF-JVM-001
+    title: JVM heap pressure
+    category: performance
+    severity: MEDIUM
+    description: >
+      Heap utilization is at or above the configured warning percent.
+    impact: >
+      Elevated GC pause risk and potential OutOfMemory errors under load.
+    recommendation: >
+      Increase heap / memory limits or investigate retention and cache sizing.
+    references: []
+    condition:
+      key: metrics.jvm.heapPressure
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.jvm.heapPressure
+
+  - id: KC-PERF-CACHE-001
+    title: Cache hit ratio below minimum
+    category: performance
+    severity: LOW
+    description: >
+      Cache hit ratio is below the configured minimum.
+    impact: >
+      More backend load and higher latency for identity lookups.
+    recommendation: >
+      Review cache sizing and invalidation patterns.
+    references: []
+    condition:
+      key: metrics.cache.hitRatioBelowMinimum
+      equals: true
+    appliesWhen:
+      evidenceRequired:
+        - metrics.cache.hitRatioBelowMinimum

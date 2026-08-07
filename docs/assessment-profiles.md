@@ -11,14 +11,14 @@ Profiles select which **rule packs** run and which **evidence sources** are expe
 | `rhbk-openshift-production` | RHBK | OPENSHIFT | + capacity, ha |
 | `keycloak-kubernetes-production` | KEYCLOAK/RHBK | KUBERNETES | + capacity, ha |
 | `rhbk-openshift-production-ha` | RHBK | OPENSHIFT | + capacity, ha, admin-security |
+| `keycloak-production-performance` | KEYCLOAK | (any) | health + security + **performance** (metrics required) |
+| `rhbk-production-performance` | RHBK | (any) | health + security + **performance** (metrics required) |
+| `rhbk-openshift-production-performance` | RHBK | OPENSHIFT | + capacity, ha, performance (metrics required) |
 
 Alias `default` → `keycloak-production`.
 
-## Resolution
-
-`AssessmentProfileResolver` suggests a profile from target type, runtime evidence,
-and environment. **An explicit profile name always wins** — the resolver is only
-used when the caller passes blank/null.
+When metrics are configured on a target and no explicit profile is passed, the resolver
+may suggest a `*-performance` profile. **An explicit profile name always wins.**
 
 ## MCP / REST
 

@@ -53,5 +53,16 @@ is **not** indexed (HA min-replicas is `KC-OCP-HA-001` in the `ha` pack).
 | KC-ADM-001 | HIGH | master realm registration allowed |
 | KC-ADM-002 | HIGH | master realm sslRequired = none |
 
+## performance (`rules/performance.yaml`)
+
+| Id | Severity | Condition |
+|----|----------|-----------|
+| KC-PERF-HTTP-001 | HIGH | `metrics.slo.p99Exceeded` = true |
+| KC-PERF-HTTP-002 | HIGH | `metrics.slo.errorRateExceeded` = true |
+| KC-PERF-HTTP-HIST-001 | MEDIUM | histogram required but missing |
+| KC-PERF-DB-001 | MEDIUM | `metrics.db.awaitingWarning` = true |
+| KC-PERF-JVM-001 | MEDIUM | `metrics.jvm.heapPressure` = true |
+| KC-PERF-CACHE-001 | LOW | cache hit ratio below minimum |
+
 Rules with `appliesWhen.evidenceRequired` become `NOT_EVALUATED` (no score impact)
 when evidence is missing. See [rule-development.md](rule-development.md).

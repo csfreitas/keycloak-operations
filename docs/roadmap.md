@@ -13,15 +13,14 @@ Earlier work (0.1–0.3) shipped under artifact version `0.1.0` as foundational 
 
 ## 0.4 — OpenShift / Kubernetes discovery
 
-## 0.5 — Health Check & Assessment Depth *(current — 0.5.0-SNAPSHOT)*
+## 0.5 — Health Check & Assessment Depth
 
-- Full HA / security / production / capacity / admin-security declarative packs
-- Profiles + resolver (explicit profile never overridden)
-- MCP assessment/health tools; REST assessment-profiles
-- Persistence V6 depth fields; scoring categories / NOT_EVALUATED
-- Inventory boolean evidence for HA and capacity rules
+## 0.6 — Prometheus / metrics integration *(current — 0.6.0-SNAPSHOT)*
 
-## 0.6 — Prometheus / metrics integration
+- Semantic metrics (no PromQL from clients); Prometheus / OpenShift Monitoring providers
+- Performance summary + optional SLO evidence; `performance` rule pack
+- Profiles: `*-production-performance`; metrics optional unless profile requires them
+- REST/MCP metrics tools; lab Prometheus compose + smoke script
 
 ## 0.7 — Web UI / Fleet dashboard
 

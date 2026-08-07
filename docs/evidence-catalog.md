@@ -38,6 +38,13 @@ Every Evidence includes `targetId`.
 | `keycloak.resources.requests.cpu.present` | resources | bool | Presence flag (preferred by capacity rules) |
 | `keycloak.resources.requests.memory.present` | resources | bool | |
 | `keycloak.resources.limits.memory.present` | resources | bool | |
+| `metrics.source.available` | performance | bool | Metrics backend reachable |
+| `metrics.window` / `metrics.source` | performance | string | Provenance |
+| `metrics.http.*` / `metrics.db.*` / `metrics.jvm.*` | performance | number | Nullable — omitted when missing |
+| `metrics.http.histogram.available` | performance | bool | |
+| `metrics.slo.p99Configured` / `p99Exceeded` / `errorRateExceeded` | performance | bool | When SLO configured |
+| `metrics.http.histogram.requiredButMissing` | performance | bool | p99 SLO without buckets |
+| `metrics.db.awaitingWarning` / `metrics.jvm.heapPressure` | performance | bool | Threshold findings |
 | `keycloak.probes.readiness.present` | probes | bool | From pod template |
 | `keycloak.probes.liveness.present` | probes | bool | |
 | `keycloak.probes.startup.present` | probes | bool | |

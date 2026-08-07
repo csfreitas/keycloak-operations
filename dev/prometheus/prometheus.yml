@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: keycloak
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - keycloak:9000
+        labels:
+          target_id: lab-keycloak-a
+          service: keycloak
+
+  # Scraped when multi-target profile is up (keycloak-b). Harmless if down.
+  - job_name: keycloak-b
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - keycloak-b:9000
+        labels:
+          target_id: lab-keycloak-b
+          service: keycloak-b

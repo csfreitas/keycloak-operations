@@ -152,9 +152,9 @@ public class AssessmentEngine {
 
         int overallScore = scoring.score(findings);
         var categoryScores = scoring.categoryScores(findings);
-        int completeness = computeCompleteness(target, collection, evaluation.rulesNotEvaluated());
-        AssessmentConfidence confidence = computeConfidence(target, collection);
-        AssessmentStatus status = computeStatus(collection, evaluation.rulesNotEvaluated());
+        int completeness = computeCompleteness(target, profile, collection, evaluation.rulesNotEvaluated());
+        AssessmentConfidence confidence = computeConfidence(target, profile, collection);
+        AssessmentStatus status = computeStatus(profile, collection, evaluation.rulesNotEvaluated());
 
         metrics.recordAssessmentRun(findings.size());
 
@@ -187,15 +187,23 @@ public class AssessmentEngine {
     }
 
     private static int computeCompleteness(
-            Target target, EvidenceCollectionResult collection, int rulesNotEvaluated) {
-        int required = 1; // keycloak always essential
+            Target target,
+            AssessmentProfile profile,
+            EvidenceCollectionResult collection,
+            int rulesNotEvaluated) {
+        // Metrics are OPTIONAL unless the profile lists them in requiredEvidenceSources.
+        List<String> requiredSources = profile.requiredEvidenceSources().isEmpty()
+                ? defaultRequiredSources(target)
+                : profile.requiredEvidenceSources();
+        int required = 0;
         int collected = 0;
-        if (collection.collectedSources().contains("keycloak")) {
-            collected++;
-        }
-        if (target.hasInfrastructure()) {
+        for (String source : requiredSources) {
+            if ("metrics".equals(source) && !profileRequiresMetrics(profile) && !target.hasMetrics()) {
+                continue; // treat as optional when not required by profile
+            }
             required++;
-            if (collection.collectedSources().contains("infrastructure")) {
+            if (collection.collectedSources().contains(source)
+                    && !collection.failedSources().contains(source)) {
                 collected++;
             }
         }
@@ -204,7 +212,22 @@ public class AssessmentEngine {
         return Math.max(0, Math.min(100, adjusted));
     }
 
-    private static AssessmentConfidence computeConfidence(Target target, EvidenceCollectionResult collection) {
+    private static List<String> defaultRequiredSources(Target target) {
+        java.util.ArrayList<String> sources = new java.util.ArrayList<>();
+        sources.add("keycloak");
+        if (target.hasInfrastructure()) {
+            sources.add("infrastructure");
+        }
+        // metrics intentionally omitted from defaults — optional
+        return List.copyOf(sources);
+    }
+
+    private static boolean profileRequiresMetrics(AssessmentProfile profile) {
+        return profile.requiredEvidenceSources().contains("metrics");
+    }
+
+    private static AssessmentConfidence computeConfidence(
+            Target target, AssessmentProfile profile, EvidenceCollectionResult collection) {
         boolean keycloakOk = collection.collectedSources().contains("keycloak")
                 && !collection.failedSources().contains("keycloak");
         if (!keycloakOk) {
@@ -213,16 +236,35 @@ public class AssessmentEngine {
         if (target.hasInfrastructure()) {
             boolean infraOk = collection.collectedSources().contains("infrastructure")
                     && !collection.failedSources().contains("infrastructure");
-            return infraOk ? AssessmentConfidence.HIGH : AssessmentConfidence.MEDIUM;
+            if (!infraOk) {
+                return AssessmentConfidence.MEDIUM;
+            }
+        }
+        if (profileRequiresMetrics(profile)) {
+            boolean metricsOk = collection.collectedSources().contains("metrics")
+                    && !collection.failedSources().contains("metrics");
+            return metricsOk ? AssessmentConfidence.HIGH : AssessmentConfidence.MEDIUM;
+        }
+        // Metrics failure alone does not downgrade confidence when optional
+        if (target.hasInfrastructure()) {
+            return AssessmentConfidence.HIGH;
         }
         return AssessmentConfidence.MEDIUM;
     }
 
-    private static AssessmentStatus computeStatus(EvidenceCollectionResult collection, int rulesNotEvaluated) {
+    private static AssessmentStatus computeStatus(
+            AssessmentProfile profile, EvidenceCollectionResult collection, int rulesNotEvaluated) {
         if (collection.failedSources().contains("keycloak")) {
             return AssessmentStatus.FAILED;
         }
-        if (!collection.failedSources().isEmpty() || rulesNotEvaluated > 0) {
+        // Metrics is optional unless required by profile — filter optional failures
+        List<String> materialFailures = collection.failedSources().stream()
+                .filter(s -> !"metrics".equals(s) || profileRequiresMetrics(profile))
+                .toList();
+        if (!materialFailures.isEmpty() || rulesNotEvaluated > 0) {
+            return AssessmentStatus.PARTIAL;
+        }
+        if (profileRequiresMetrics(profile) && !collection.collectedSources().contains("metrics")) {
             return AssessmentStatus.PARTIAL;
         }
         return AssessmentStatus.COMPLETE;

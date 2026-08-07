@@ -37,16 +37,28 @@ public class AssessmentProfileResolver {
         boolean kubernetes = runtime != null && runtime.equalsIgnoreCase("KUBERNETES");
 
         if (rhbk && openshift && prd) {
+            if (target.hasMetrics()) {
+                return Optional.of(PerformanceProfile.RHBK_OPENSHIFT_PRODUCTION_PERFORMANCE);
+            }
             return Optional.of(CapacityProfile.RHBK_OPENSHIFT_PRODUCTION_HA);
         }
         if (rhbk && openshift) {
+            if (target.hasMetrics()) {
+                return Optional.of(PerformanceProfile.RHBK_OPENSHIFT_PRODUCTION_PERFORMANCE);
+            }
             return Optional.of(CapacityProfile.RHBK_OPENSHIFT_PRODUCTION);
         }
         if (kubernetes) {
             return Optional.of(CapacityProfile.KEYCLOAK_KUBERNETES_PRODUCTION);
         }
         if (rhbk) {
+            if (target.hasMetrics()) {
+                return Optional.of(PerformanceProfile.RHBK_PRODUCTION_PERFORMANCE);
+            }
             return Optional.of(HealthCheckProfile.RHBK_PRODUCTION);
+        }
+        if (target.hasMetrics()) {
+            return Optional.of(PerformanceProfile.KEYCLOAK_PRODUCTION_PERFORMANCE);
         }
         return Optional.of(HealthCheckProfile.KEYCLOAK_PRODUCTION);
     }

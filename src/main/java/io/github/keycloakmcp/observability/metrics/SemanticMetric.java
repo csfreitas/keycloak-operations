@@ -1,0 +1,32 @@
+package io.github.keycloakmcp.observability.metrics;
+
+/**
+ * Semantic metrics — callers never supply PromQL.
+ */
+public enum SemanticMetric {
+    HTTP_REQUEST_RATE,
+    HTTP_ERROR_RATE,
+    HTTP_AVERAGE_LATENCY,
+    HTTP_P50_LATENCY,
+    HTTP_P95_LATENCY,
+    HTTP_P99_LATENCY,
+    HTTP_ACTIVE_REQUESTS,
+    DB_POOL_AVAILABLE,
+    DB_POOL_ACTIVE,
+    DB_POOL_AWAITING,
+    DB_POOL_UTILIZATION,
+    JVM_HEAP_USED,
+    JVM_HEAP_COMMITTED,
+    JVM_HEAP_MAX,
+    JVM_HEAP_UTILIZATION,
+    JVM_GC_PAUSE,
+    PROCESS_CPU,
+    KEYCLOAK_CLUSTER_SIZE,
+    LOGIN_RATE,
+    LOGIN_ERROR_RATE,
+    LOGOUT_RATE,
+    TOKEN_REFRESH_RATE,
+    CACHE_HIT_RATIO,
+    RUNTIME_CPU_USAGE,
+    RUNTIME_MEMORY_WORKING_SET
+}

@@ -139,6 +139,37 @@ public class ConfigurationTargetRegistry implements TargetRegistry {
     private static ObservabilityTargetConfiguration toObservability(McpRuntimeConfig.ObservabilityEntry entry) {
         String metricsType = entry.metrics().flatMap(McpRuntimeConfig.ObservabilityEntry.MetricsEntry::type).orElse(null);
         String tracingType = entry.tracing().flatMap(McpRuntimeConfig.ObservabilityEntry.TracingEntry::type).orElse(null);
-        return new ObservabilityTargetConfiguration(metricsType, tracingType);
+        String endpoint = entry.metrics()
+                .flatMap(m -> firstPresent(m.endpointUrl(), m.endpoint()))
+                .orElse(null);
+        String credentialRef = entry.metrics()
+                .flatMap(McpRuntimeConfig.ObservabilityEntry.MetricsEntry::credentialRef)
+                .orElse(null);
+        String namespace = entry.metrics()
+                .flatMap(McpRuntimeConfig.ObservabilityEntry.MetricsEntry::namespace)
+                .orElse(null);
+        String scope = entry.metrics()
+                .flatMap(McpRuntimeConfig.ObservabilityEntry.MetricsEntry::scope)
+                .orElse("NAMESPACE");
+        return new ObservabilityTargetConfiguration(
+                metricsType, tracingType, blankToNull(endpoint), blankToNull(credentialRef),
+                blankToNull(namespace), scope);
+    }
+
+    private static Optional<String> firstPresent(Optional<String> a, Optional<String> b) {
+        if (a != null && a.isPresent() && a.get() != null && !a.get().isBlank()) {
+            return a;
+        }
+        if (b != null && b.isPresent() && b.get() != null && !b.get().isBlank()) {
+            return b;
+        }
+        return Optional.empty();
+    }
+
+    private static String blankToNull(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
     }
 }
