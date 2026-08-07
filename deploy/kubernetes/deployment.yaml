@@ -1,0 +1,136 @@
+# Simplified single-file Kubernetes deployment (no OpenShift Route).
+# Adjust image, secrets, and ingress for your cluster.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keycloak-mcp
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keycloak-mcp-assessor
+  namespace: keycloak-mcp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keycloak-mcp-assessor
+rules:
+  - apiGroups: [""]
+    resources: ["namespaces", "nodes", "pods", "services", "configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: keycloak-mcp-assessor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: keycloak-mcp-assessor
+subjects:
+  - kind: ServiceAccount
+    name: keycloak-mcp-assessor
+    namespace: keycloak-mcp
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: keycloak-mcp-credentials
+  namespace: keycloak-mcp
+type: Opaque
+stringData:
+  KEYCLOAK_URL: "https://REPLACE_WITH_KEYCLOAK_URL"
+  KEYCLOAK_AUTH_REALM: "master"
+  KEYCLOAK_CLIENT_ID: "keycloak-mcp"
+  KEYCLOAK_CLIENT_SECRET: "REPLACE_WITH_CLIENT_SECRET"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-operations-mcp
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: keycloak-operations-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: keycloak-operations-mcp
+    spec:
+      serviceAccountName: keycloak-mcp-assessor
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mcp
+          image: quay.io/keycloakmcp/keycloak-operations-mcp:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8081
+            - name: management
+              containerPort: 9000
+          envFrom:
+            - secretRef:
+                name: keycloak-mcp-credentials
+          env:
+            - name: DISCOVERY_KUBERNETES_ENABLED
+              value: "true"
+            - name: DISCOVERY_OPENSHIFT_ENABLED
+              value: "false"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: management
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: management
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-operations-mcp
+  namespace: keycloak-mcp
+spec:
+  selector:
+    app.kubernetes.io/name: keycloak-operations-mcp
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
+    - name: management
+      port: 9000
+      targetPort: management

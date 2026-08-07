@@ -1,0 +1,8 @@
+id: KC-OCP-HA-001
+title: Keycloak deployment should run with at least 2 replicas
+category: high-availability
+severity: HIGH
+condition:
+  replicas:
+    key: deployment.replicas
+    lessThan: 3

@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: keycloak-mcp-postgres
+    environment:
+      POSTGRES_DB: kcops
+      POSTGRES_USER: kcops
+      POSTGRES_PASSWORD: kcops
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kcops -d kcops"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.1
+    container_name: keycloak-mcp-demo-a
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_HTTP_PORT: "8080"
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import:Z
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '\"status\": \"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+  # Second Keycloak for multi-target isolation demos.
+  # Start with: podman compose -f dev/compose.yaml --profile multi-target up -d
+  keycloak-b:
+    profiles: ["multi-target"]
+    image: quay.io/keycloak/keycloak:26.7.1
+    container_name: keycloak-mcp-demo-b
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_HTTP_PORT: "8080"
+    ports:
+      - "8180:8080"
+      - "9002:9000"
+    volumes:
+      - ./keycloak-b/import:/opt/keycloak/data/import:Z
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '\"status\": \"UP\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s

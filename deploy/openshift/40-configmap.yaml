@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-mcp-config
+  namespace: keycloak-mcp
+  labels:
+    app.kubernetes.io/name: keycloak-operations-mcp
+data:
+  application.properties: |
+    quarkus.http.host=0.0.0.0
+    quarkus.http.port=8081
+    quarkus.management.enabled=true
+    quarkus.management.port=9000
+    quarkus.otel.enabled=true
+    keycloak.mcp.read-only=true
+    keycloak.auth-realm=master
+    keycloak.client-id=keycloak-mcp
+    assessment.rules.path=rules
+    assessment.default-profile=rhbk-openshift-production
+    discovery.kubernetes.enabled=true
+    discovery.openshift.enabled=true

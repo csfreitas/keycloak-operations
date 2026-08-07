@@ -1,0 +1,45 @@
+# Common security rule stubs (0.1.0)
+# These rules require evidence that collectors do not yet emit in 0.1.0,
+# so they will not fire until security evidence collection lands (planned 0.2.0+).
+rules:
+  - id: KC-SEC-001
+    title: Brute-force protection enabled
+    category: security
+    severity: HIGH
+    description: >
+      Realms used in production should enable brute-force detection to slow
+      credential stuffing and password guessing attacks.
+    impact: >
+      Without brute-force protection, attackers can attempt unlimited password
+      guesses against user accounts.
+    recommendation: >
+      Enable brute-force detection in Realm settings and tune permanent lockout
+      / max login failures for your threat model.
+    references:
+      - https://www.keycloak.org/docs/latest/server_admin/#password-guess-brute-force-attacks
+    condition:
+      key: realm.bruteForceProtected
+      equals: false
+    appliesWhen:
+      evidenceRequired:
+        - realm.bruteForceProtected
+
+  - id: KC-SEC-002
+    title: SSL required for external requests
+    category: security
+    severity: MEDIUM
+    description: >
+      Production realms should require SSL for external requests so credentials
+      and tokens are never sent in cleartext.
+    impact: >
+      Allowing non-HTTPS external traffic risks credential and token interception.
+    recommendation: >
+      Set sslRequired to external or all for production realms and terminate TLS
+      at the ingress / route.
+    references: []
+    condition:
+      key: realm.sslRequired
+      equals: none
+    appliesWhen:
+      evidenceRequired:
+        - realm.sslRequired
