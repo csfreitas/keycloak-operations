@@ -6,6 +6,7 @@ AI-assisted workflow: [`development/ai-assisted-development.md`](development/ai-
 
 - Java 21+
 - Maven 3.9+
+- Node.js ≥ 20 + npm (Fleet Console in `ui/`)
 - Podman or Docker (Compose)
 - `curl` and `jq` (for setup / smoke scripts)
 
@@ -36,9 +37,23 @@ Production must use Fine-Grained Admin Permissions (FGAP) / least privilege —
 
 ```bash
 mvn clean verify
+cd ui && npm ci && npm run test:run && npm run build
 ```
 
 Unit tests do not require a running Keycloak. Integration / smoke checks do.
+
+## Fleet Operations Console (local)
+
+With backend on `:8081` and compose stack up:
+
+```bash
+cd ui
+npm ci
+npm run dev
+# http://localhost:3000
+```
+
+Production UI image: `ui/Dockerfile` (nginx unprivileged). OpenShift: `deploy/openshift/100-ui-deployment.yaml` (+ service/route). See [`../ui/README.md`](../ui/README.md).
 
 ## Run (Streamable HTTP)
 

@@ -21,7 +21,7 @@ class KubernetesAssessorRbacManifestTest {
         assertThat(yaml.toLowerCase()).doesNotContain("\"secrets\"");
         assertThat(yaml).contains("containerPort: 8081");
         assertThat(yaml).contains("containerPort: 9001");
-        assertThat(yaml).contains("0.6.1-SNAPSHOT");
+        assertThat(yaml).contains("0.7.0-SNAPSHOT");
         assertThat(yaml).contains("monitoring.coreos.com");
     }
 }

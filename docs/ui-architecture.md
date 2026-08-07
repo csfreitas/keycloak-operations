@@ -1,6 +1,6 @@
-# UI architecture (conceptual)
+# UI architecture
 
-The Operations Platform backend is UI-agnostic. A future console can consume:
+The Operations Platform backend is UI-agnostic. The Fleet Operations Console consumes:
 
 ```mermaid
 flowchart TB
@@ -19,17 +19,23 @@ flowchart TB
   SVC --> KC
 ```
 
-## Suggested surfaces
+## Module layout
 
-1. **Fleet dashboard** — [docs/ui/fleet-dashboard.md](ui/fleet-dashboard.md)
-2. **Target overview** — [docs/ui/target-overview.md](ui/target-overview.md)
-3. **Assessment** — [docs/ui/assessment.md](ui/assessment.md)
-4. **Infrastructure** — [docs/ui/infrastructure.md](ui/infrastructure.md)
-5. **History** — [docs/ui/history.md](ui/history.md)
-6. **Live events** — SSE `GET /api/v1/events` (server → browser; not for metric graphs)
+In-repo frontend: [`ui/`](../ui/) (React + TypeScript + Vite, Node ≥ 20).
 
-## Future project
+Production packaging: **separate nginx static image** (`ui/Dockerfile`). The Quarkus distribution does **not** embed UI assets — backend remains the security boundary; UI pods have no assessor ServiceAccount.
 
-Prefer a separate repository / module `keycloak-operations-ui` (React + TypeScript). Do not mix a Node build into this Maven module unless productization requires it.
+OpenShift manifests: `deploy/openshift/100-ui-deployment.yaml`, `110-ui-service.yaml`, `120-ui-route.yaml`.
 
-Authn/authz: see [identity-model.md](identity-model.md). REST and MCP must share `TargetAuthorizationService`.
+## Surfaces
+
+1. **Fleet dashboard** — `GET /api/v1/fleet`
+2. **Target overview** — `GET /api/v1/targets/{targetId}/overview`
+3. **Health / Assessment / Performance / Infrastructure / History** — existing `/api/v1` resources
+4. **Live events** — SSE `GET /api/v1/events` (assessment/health completed; not metric graphs)
+
+Conceptual UX notes remain under [`ui/`](ui/).
+
+## Authn/authz
+
+See [identity-model.md](identity-model.md). REST and MCP share `TargetAuthorizationService`. Default lab is OPEN_LAB; enable `%oidc` for Identity A.

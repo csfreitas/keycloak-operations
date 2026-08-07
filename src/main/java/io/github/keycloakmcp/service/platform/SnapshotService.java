@@ -20,6 +20,7 @@ import io.github.keycloakmcp.domain.common.ServerInfo;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.inventory.InfrastructureInventory;
 import io.github.keycloakmcp.domain.platform.PageResult;
+import io.github.keycloakmcp.domain.platform.SnapshotDetail;
 import io.github.keycloakmcp.domain.platform.SnapshotSummary;
 import io.github.keycloakmcp.persistence.entity.EnvironmentSnapshotEntity;
 import io.github.keycloakmcp.persistence.entity.InventorySnapshotEntity;
@@ -143,10 +144,33 @@ public class SnapshotService {
         return mapper.toSnapshotSummary(entity);
     }
 
+    public SnapshotDetail getDetail(String targetId, String snapshotId) {
+        Target target = targetResolver.require(targetId);
+        targetAuthorization.assertAllowed(target, TargetPermission.READ);
+        EnvironmentSnapshotEntity entity = snapshotRepository.findByIdForTarget(snapshotId, targetId)
+                .orElseThrow(() -> McpException.invalidArgument("snapshot not found: " + snapshotId));
+        return toDetail(entity);
+    }
+
+    public Optional<SnapshotDetail> latestDetail(String targetId) {
+        Target target = targetResolver.require(targetId);
+        targetAuthorization.assertAllowed(target, TargetPermission.READ);
+        return snapshotRepository.findLatest(targetId).map(this::toDetail);
+    }
+
     public Optional<SnapshotSummary> latest(String targetId) {
         Target target = targetResolver.require(targetId);
         targetAuthorization.assertAllowed(target, TargetPermission.READ);
         return snapshotRepository.findLatest(targetId).map(mapper::toSnapshotSummary);
+    }
+
+    private SnapshotDetail toDetail(EnvironmentSnapshotEntity entity) {
+        return new SnapshotDetail(
+                entity.id,
+                entity.targetId,
+                entity.snapshotHash,
+                entity.createdAt,
+                entity.summary == null ? Map.of() : Map.copyOf(entity.summary));
     }
 
     public Optional<EnvironmentSnapshotEntity> findEntity(String targetId, String snapshotId) {

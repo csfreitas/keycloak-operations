@@ -1,0 +1,118 @@
+/* =========================================================
+   Design tokens — Keycloak Ops Console
+   ========================================================= */
+
+:root {
+  /* --- Color palette --- */
+  --color-bg-base: #0f1117;
+  --color-bg-surface: #161b22;
+  --color-bg-raised: #1c2230;
+  --color-bg-overlay: #222b3a;
+  --color-bg-hover: #2a3447;
+
+  --color-border: #2d3748;
+  --color-border-subtle: #1e2d3d;
+  --color-border-strong: #4a5568;
+
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-link: #60a5fa;
+  --color-text-link-hover: #93c5fd;
+
+  /* --- Status colors --- */
+  --color-healthy: #22c55e;
+  --color-healthy-bg: rgba(34, 197, 94, 0.12);
+  --color-healthy-border: rgba(34, 197, 94, 0.3);
+
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-warning-border: rgba(245, 158, 11, 0.3);
+
+  --color-critical: #ef4444;
+  --color-critical-bg: rgba(239, 68, 68, 0.12);
+  --color-critical-border: rgba(239, 68, 68, 0.3);
+
+  --color-unknown: #6b7280;
+  --color-unknown-bg: rgba(107, 114, 128, 0.12);
+  --color-unknown-border: rgba(107, 114, 128, 0.3);
+
+  --color-info: #3b82f6;
+  --color-info-bg: rgba(59, 130, 246, 0.12);
+  --color-info-border: rgba(59, 130, 246, 0.3);
+
+  /* --- Severity --- */
+  --color-severity-critical: #ef4444;
+  --color-severity-high: #f97316;
+  --color-severity-medium: #f59e0b;
+  --color-severity-low: #22c55e;
+  --color-severity-info: #6b7280;
+
+  /* --- Environment markers --- */
+  --color-env-prd: #ef4444;
+  --color-env-prd-bg: rgba(239, 68, 68, 0.08);
+  --color-env-stg: #f97316;
+  --color-env-stg-bg: rgba(249, 115, 22, 0.08);
+  --color-env-dev: #3b82f6;
+  --color-env-dev-bg: rgba(59, 130, 246, 0.08);
+  --color-env-test: #8b5cf6;
+  --color-env-test-bg: rgba(139, 92, 246, 0.08);
+
+  /* --- Brand accent --- */
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-accent-muted: rgba(59, 130, 246, 0.15);
+
+  /* --- Typography --- */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, 'SF Mono', monospace;
+
+  --text-xs: 0.6875rem;   /* 11px */
+  --text-sm: 0.75rem;     /* 12px */
+  --text-base: 0.8125rem; /* 13px */
+  --text-md: 0.875rem;    /* 14px */
+  --text-lg: 1rem;        /* 16px */
+  --text-xl: 1.125rem;    /* 18px */
+  --text-2xl: 1.25rem;    /* 20px */
+  --text-3xl: 1.5rem;     /* 24px */
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --line-tight: 1.25;
+  --line-normal: 1.5;
+
+  /* --- Spacing --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* --- Radius --- */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  /* --- Shadows --- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.6);
+
+  /* --- Layout --- */
+  --sidebar-width: 220px;
+  --topbar-height: 52px;
+  --content-max-width: 1400px;
+
+  /* --- Transitions --- */
+  --transition-fast: 120ms ease;
+  --transition-normal: 200ms ease;
+}

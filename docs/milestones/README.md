@@ -11,7 +11,8 @@ Product delivery slices. Status from Git / `pom.xml` / code — not chat history
 | [0.5](0.5-health-assessment.md) | Health & Assessment | COMPLETED |
 | [0.6](0.6-prometheus-metrics.md) | Prometheus Metrics | COMPLETED |
 | [0.6.1](0.6.1-metrics-hardening.md) | Metrics Hardening | COMPLETED |
-| [0.7](0.7-web-ui.md) | Web UI | PLANNED *(next)* |
+| [0.7](0.7-web-ui.md) | Web UI | COMPLETED |
+| 0.8 | Snapshots / drift (depth) | PLANNED *(next)* |
 
 Milestones list **requirement IDs**, scope, and acceptance — not Agent prompts.  
 Workflow: [`../../AGENTS.md`](../../AGENTS.md) · HEAD snapshot: [`../project-state.md`](../project-state.md)
@@ -25,4 +26,5 @@ Workflow: [`../../AGENTS.md`](../../AGENTS.md) · HEAD snapshot: [`../project-st
 | `a5a8d08` | Track `target` Java package |
 | `a0ffe9b` | 0.5 |
 | `59461d1` | 0.6 |
-| *(local / upcoming)* | 0.6.1 hardening |
+| `089f6ea` | 0.6.1 hardening |
+| *(local / upcoming)* | 0.7 Web UI |

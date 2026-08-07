@@ -4,7 +4,6 @@ import java.util.List;
 
 import io.github.keycloakmcp.domain.platform.TargetOverview;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
-import io.github.keycloakmcp.service.platform.FleetService;
 import io.github.keycloakmcp.service.platform.TargetOverviewService;
 import io.github.keycloakmcp.target.Target;
 import io.github.keycloakmcp.target.TargetAuthorizationService;

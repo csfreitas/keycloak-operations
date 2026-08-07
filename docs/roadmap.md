@@ -11,9 +11,9 @@ Delivery index only. Specs: [`milestones/`](milestones/). Requirements: [`requir
 | ✅ | 0.5 Health & Assessment | [0.5](milestones/0.5-health-assessment.md) |
 | ✅ | 0.6 Metrics & Performance | [0.6](milestones/0.6-prometheus-metrics.md) |
 | ✅ | 0.6.1 Metrics Hardening | [0.6.1](milestones/0.6.1-metrics-hardening.md) |
-| 📋 | **0.7 Web UI** *(next)* | [0.7](milestones/0.7-web-ui.md) |
-| 📋 | 0.8 Snapshots / drift (depth) | — |
+| ✅ | **0.7 Web UI** | [0.7](milestones/0.7-web-ui.md) |
+| 📋 | **0.8 Snapshots / drift (depth)** *(next)* | — |
 | 📋 | 0.9 Schedules / alerts | — |
 | 📋 | 1.0 Production-ready platform | — |
 
-Current artifact: **`0.6.1-SNAPSHOT`**.
+Current artifact: **`0.7.0-SNAPSHOT`**.

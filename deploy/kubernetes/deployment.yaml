@@ -125,7 +125,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: mcp
-          image: quay.io/keycloakmcp/keycloak-operations-mcp:0.6.1-SNAPSHOT
+          image: quay.io/keycloakmcp/keycloak-operations-mcp:0.7.0-SNAPSHOT
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

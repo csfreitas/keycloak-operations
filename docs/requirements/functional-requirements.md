@@ -132,11 +132,11 @@ MCP tools and REST controllers **MUST** share application services (no duplicate
 
 Tool and API invocations **SHOULD** be auditable with sanitized payloads.
 
-## Web UI (planned — milestone 0.7)
+## Web UI (milestone 0.7)
 
 ### FR-UI-001
 
-A future Web UI **MUST** consume only backend REST/SSE; the browser **MUST NOT** call Keycloak Admin, OpenShift/Kubernetes, Prometheus, or PostgreSQL directly.
+The Web UI **MUST** consume only backend REST/SSE; the browser **MUST NOT** call Keycloak Admin, OpenShift/Kubernetes, Prometheus, or PostgreSQL directly.
 
 ### FR-UI-002
 
