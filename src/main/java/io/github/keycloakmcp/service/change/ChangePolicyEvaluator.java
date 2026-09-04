@@ -58,6 +58,21 @@ public class ChangePolicyEvaluator {
         return evaluate(env, ChangeOperationType.UPDATE, risk, false);
     }
 
+    public PolicyResult evaluateClientSecurity(
+            TargetEnvironment environment,
+            ChangeRisk risk,
+            boolean denyInProduction) {
+        TargetEnvironment env = environment == null ? TargetEnvironment.UNKNOWN : environment;
+        if (env == TargetEnvironment.PRD && denyInProduction) {
+            return new PolicyResult(
+                    ChangePolicyDecision.DENY,
+                    "Production policy denies enabling implicit flow or Direct Access Grants, "
+                            + "weakening PKCE, and changing a client to public",
+                    true);
+        }
+        return evaluate(env, ChangeOperationType.UPDATE, risk, false);
+    }
+
     private PolicyResult evaluateDev(ChangeRisk risk) {
         if (risk == ChangeRisk.LOW) {
             return new PolicyResult(

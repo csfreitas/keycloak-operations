@@ -29,6 +29,8 @@ class ToolAuthorizationChangeTest {
                 .doesNotThrowAnyException();
         assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_plan_update_client_urls"))
                 .doesNotThrowAnyException();
+        assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_plan_update_client_security"))
+                .doesNotThrowAnyException();
         assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_get_change"))
                 .doesNotThrowAnyException();
         assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_approve_change"))

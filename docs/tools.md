@@ -39,6 +39,7 @@ by design (SSRF protection).
 | `keycloak_get_findings` | yes | filters / page | Persisted findings (compact) |
 | `keycloak_plan_client_update` | yes | semantic allowlisted fields | Plan milestone 0.8 client configuration update |
 | `keycloak_plan_update_client_urls` | yes | realm, client, typed URI/origin sets | Plan typed redirect URI/Web Origin replacement |
+| `keycloak_plan_update_client_security` | yes | realm, client, typed security/flow settings | Plan PKCE, OAuth/OIDC flow, service-account, and client-authentication changes |
 | `keycloak_get_change` | no | `changeId` | Get a change lifecycle record |
 | `keycloak_list_changes` | optional filter | status/page | List change lifecycle records |
 | `keycloak_approve_change` | no | `changeId`, actor | Approve an exact plan fingerprint |

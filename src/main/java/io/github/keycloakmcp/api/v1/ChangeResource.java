@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.github.keycloakmcp.domain.change.ChangeRecord;
+import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
@@ -100,6 +101,12 @@ public class ChangeResource {
     @Path("/plan/client-urls")
     public ChangeRecord planClientUrls(ClientUrlChangeRequest request) {
         return sensitiveDataFilter.redact(changeManagementService.planClientUrlUpdate(request));
+    }
+
+    @POST
+    @Path("/plan/client-security")
+    public ChangeRecord planClientSecurity(ClientSecurityChangeRequest request) {
+        return sensitiveDataFilter.redact(changeManagementService.planClientSecurityUpdate(request));
     }
 
     private static String stringVal(Object value) {

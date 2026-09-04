@@ -63,6 +63,31 @@ public class ChangeRiskClassifier {
         return highest;
     }
 
+    /** Transition-aware classification for client authentication and OAuth/OIDC flow settings. */
+    public ChangeRisk classifyClientSecurity(List<ChangeOperation> operations) {
+        ChangeRisk highest = ChangeRisk.MEDIUM;
+        for (ChangeOperation operation : operations) {
+            ChangeRisk transitionRisk = switch (operation.property()) {
+                case ClientSecuritySettingsChangeSupport.PKCE ->
+                    ClientSecuritySettingsChangeSupport.PKCE_S256.equals(operation.before())
+                                    && ClientSecuritySettingsChangeSupport.PKCE_NONE.equals(operation.after())
+                            ? ChangeRisk.HIGH
+                            : ChangeRisk.MEDIUM;
+                case ClientSecuritySettingsChangeSupport.IMPLICIT_FLOW,
+                        ClientSecuritySettingsChangeSupport.DIRECT_ACCESS_GRANTS,
+                        ClientSecuritySettingsChangeSupport.SERVICE_ACCOUNTS ->
+                    becameEnabled(operation) ? ChangeRisk.HIGH : ChangeRisk.MEDIUM;
+                case ClientSecuritySettingsChangeSupport.PUBLIC_CLIENT -> ChangeRisk.HIGH;
+                case ClientSecuritySettingsChangeSupport.STANDARD_FLOW -> ChangeRisk.MEDIUM;
+                default -> ChangeRisk.HIGH;
+            };
+            if (transitionRisk.ordinal() > highest.ordinal()) {
+                highest = transitionRisk;
+            }
+        }
+        return highest;
+    }
+
     private static ChangeRisk classifyAddedClientUrl(String property, String value) {
         if ("*".equals(value)) {
             return ChangeRisk.CRITICAL;
@@ -90,5 +115,9 @@ public class ChangeRiskClassifier {
             return Set.of();
         }
         return collection.stream().map(String::valueOf).collect(java.util.stream.Collectors.toSet());
+    }
+
+    private static boolean becameEnabled(ChangeOperation operation) {
+        return !Boolean.TRUE.equals(operation.before()) && Boolean.TRUE.equals(operation.after());
     }
 }

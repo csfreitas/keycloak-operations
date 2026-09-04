@@ -13,7 +13,7 @@ Product delivery slices. Status from Git / `pom.xml` / code — not chat history
 | [0.6.1](0.6.1-metrics-hardening.md) | Metrics Hardening | COMPLETED |
 | [0.7](0.7-web-ui.md) | Web UI | COMPLETED |
 | [0.8](0.8-controlled-administration.md) | Controlled Administration & Change Management | COMPLETED |
-| [0.8.1](0.8.1-realm-client-administration.md) | Realm & Client Administration | IN PROGRESS *(Slice 1 implemented; live IT not verified)* |
+| [0.8.1](0.8.1-realm-client-administration.md) | Realm & Client Administration | IN PROGRESS *(Slices 1–2 implemented; Community 26.7.1 verified)* |
 | [0.8.2](0.8.2-fleet-reporting-target-onboarding.md) | Fleet Reporting & Target Onboarding | PLANNED *(report foundation implemented early)* |
 | 0.8.3 | Platform Authorization & Governance | PLANNED |
 | 0.8.4 | Users, Groups & Roles | PLANNED |

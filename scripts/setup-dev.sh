@@ -164,10 +164,11 @@ for role in "${OPTIONAL_ROLES[@]}"; do
     || log "WARN: optional role ${TARGET_RM_CLIENT_ID}/${role} not assigned"
 done
 
-# DEV convenience: manage-realm on demo so local exploration is not blocked by missing views
-log "Assigning DEV-ONLY ${TARGET_RM_CLIENT_ID}/manage-realm (prefer FGAP / least privilege in production)..."
-assign_client_role "${AUTH_REALM}" "${TARGET_RM_ID}" "manage-realm" \
-  || log "WARN: manage-realm not assigned; read roles may still be enough for 0.1.0 tools"
+# Target-scoped client writes require manage-clients. Do not grant manage-realm:
+# it is broader than the typed client operations exposed by the platform.
+log "Assigning DEV-ONLY ${TARGET_RM_CLIENT_ID}/manage-clients..."
+assign_client_role "${AUTH_REALM}" "${TARGET_RM_ID}" "manage-clients" \
+  || die "manage-clients is required for controlled client-write validation"
 
 # Verify client_credentials
 log "Verifying client_credentials for ${MCP_CLIENT_ID}..."
@@ -212,11 +213,11 @@ Demo realm: ${TARGET_REALM}
 Demo users: alice/alice (users), bob/bob (administrators)
 Demo clients: portal-web (public), backend-api / backend-api-secret (confidential)
 
-WARNING: This script grants broad admin privileges for local development only.
-Production deployments MUST use Fine-Grained Admin Permissions (FGAP) or
-least-privilege view/query roles — never the master realm admin role for MCP
-service accounts. Note: /admin/serverinfo systemInfo (product version) is only
-visible to master admins; without it, capability detection still works from
-feature flags.
+WARNING: This script grants target-scoped manage-clients for local development.
+Production deployments MUST use Fine-Grained Admin Permissions (FGAP) and the
+smallest permissions required by the enabled operations. Never grant the master
+realm admin role to production service accounts. Note: /admin/serverinfo
+systemInfo (product version) is only visible to master admins; without it,
+capability detection still works from feature flags.
 
 EOF

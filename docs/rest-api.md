@@ -49,6 +49,7 @@ MCP tools and REST share the same application services. Change planning uses sem
 | GET | `/changes/{changeId}` | Change detail (diff, risk, approval, verification) |
 | POST | `/changes/plan/client-update` | Plan allowlisted client config update |
 | POST | `/changes/plan/client-urls` | Plan typed redirect URI and/or Web Origin set replacement |
+| POST | `/changes/plan/client-security` | Plan typed client security and OAuth/OIDC flow settings |
 | POST | `/changes/{changeId}/approve` | Approve (bound to plan fingerprint) |
 | POST | `/changes/{changeId}/reject` | Reject |
 | POST | `/changes/{changeId}/apply` | Apply approved plan (`mcp.read-only=false`) |
@@ -78,6 +79,10 @@ The report endpoint invokes the same `OperationsReportService` as MCP tool `keyc
 ### Client URL planning
 
 `POST /changes/plan/client-urls` accepts `targetId`, `realm`, `clientId`, optional complete desired sets `redirectUris` and `webOrigins`, plus optional `actor` and `idempotencyKey`. At least one set must be present. An omitted set remains unchanged; an empty set removes all of its values. Validation, normalization, diff, risk, policy, fingerprinting, and persistence are performed by the backend.
+
+### Client security and flow planning
+
+`POST /changes/plan/client-security` accepts `targetId`, `realm`, `clientId`, optional `pkceCodeChallengeMethod`, `standardFlowEnabled`, `implicitFlowEnabled`, `directAccessGrantsEnabled`, `serviceAccountsEnabled`, and `publicClient`, plus optional `actor` and `idempotencyKey`. At least one setting must be present. Omitted settings remain unchanged. PKCE accepts `S256` or `NONE`; service accounts require an effective confidential client. Risk and production policy are derived from the effective transition by the backend.
 
 ## CORS
 

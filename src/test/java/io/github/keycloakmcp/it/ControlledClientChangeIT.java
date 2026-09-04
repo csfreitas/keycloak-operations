@@ -22,6 +22,7 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import io.github.keycloakmcp.adapter.keycloak.KeycloakClientFactory;
 import io.github.keycloakmcp.domain.change.ChangeRecord;
 import io.github.keycloakmcp.domain.change.ChangeStatus;
+import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.ErrorCode;
 import io.github.keycloakmcp.domain.error.McpException;
@@ -88,6 +89,9 @@ class ControlledClientChangeIT {
         client.setPublicClient(true);
         client.setProtocol("openid-connect");
         client.setStandardFlowEnabled(true);
+        client.setImplicitFlowEnabled(false);
+        client.setDirectAccessGrantsEnabled(false);
+        client.setServiceAccountsEnabled(false);
         client.setRedirectUris(new ArrayList<>(ORIGINAL_REDIRECTS));
         client.setWebOrigins(new ArrayList<>(ORIGINAL_ORIGINS));
         try (Response response = clients().create(client)) {
@@ -156,6 +160,29 @@ class ControlledClientChangeIT {
         assertClientUrls(ORIGINAL_REDIRECTS, ORIGINAL_ORIGINS);
     }
 
+    @Test
+    void planApproveApplyReadBackAndRestoreClientSecuritySettings() {
+        ChangeRecord planned = planSecurity(
+                "S256", false, true, true, true, false, "security-apply");
+        assertTargetIsolation(planned);
+        assertNoCredentialLeakage(planned);
+
+        ChangeRecord applied = approveWhenRequiredAndApply(planned);
+        assertThat(applied.status()).isEqualTo(ChangeStatus.VERIFIED);
+        assertThat(applied.verificationStatus()).isEqualTo("VERIFIED");
+        assertClientSecurity("S256", false, true, true, true, false);
+
+        ChangeRecord restorePlan = planSecurity(
+                "NONE", true, false, false, false, true, "security-restore");
+        assertTargetIsolation(restorePlan);
+        assertNoCredentialLeakage(restorePlan);
+        ChangeRecord restored = approveWhenRequiredAndApply(restorePlan);
+
+        assertThat(restored.status()).isEqualTo(ChangeStatus.VERIFIED);
+        assertClientSecurity("NONE", true, false, false, false, true);
+        assertClientUrls(ORIGINAL_REDIRECTS, ORIGINAL_ORIGINS);
+    }
+
     private ChangeRecord plan(List<String> redirects, List<String> origins, String operation) {
         return changeManagementService.planClientUrlUpdate(new ClientUrlChangeRequest(
                 TARGET_ID,
@@ -163,6 +190,28 @@ class ControlledClientChangeIT {
                 clientId,
                 redirects,
                 origins,
+                "disposable-it-planner",
+                "disposable-it-" + operation + "-" + UUID.randomUUID()));
+    }
+
+    private ChangeRecord planSecurity(
+            String pkce,
+            Boolean standard,
+            Boolean implicit,
+            Boolean direct,
+            Boolean serviceAccounts,
+            Boolean publicClient,
+            String operation) {
+        return changeManagementService.planClientSecurityUpdate(new ClientSecurityChangeRequest(
+                TARGET_ID,
+                realm,
+                clientId,
+                pkce,
+                standard,
+                implicit,
+                direct,
+                serviceAccounts,
+                publicClient,
                 "disposable-it-planner",
                 "disposable-it-" + operation + "-" + UUID.randomUUID()));
     }
@@ -209,6 +258,29 @@ class ControlledClientChangeIT {
         ClientRepresentation actual = readClient();
         assertThat(actual.getRedirectUris()).containsExactlyElementsOf(redirects);
         assertThat(actual.getWebOrigins()).containsExactlyElementsOf(origins);
+    }
+
+    private void assertClientSecurity(
+            String pkce,
+            boolean standard,
+            boolean implicit,
+            boolean direct,
+            boolean serviceAccounts,
+            boolean publicClient) {
+        ClientRepresentation actual = readClient();
+        String observedPkce = actual.getAttributes() == null
+                ? null
+                : actual.getAttributes().get("pkce.code.challenge.method");
+        if ("NONE".equals(pkce)) {
+            assertThat(observedPkce).isNull();
+        } else {
+            assertThat(observedPkce).isEqualTo(pkce);
+        }
+        assertThat(actual.isStandardFlowEnabled()).isEqualTo(standard);
+        assertThat(actual.isImplicitFlowEnabled()).isEqualTo(implicit);
+        assertThat(actual.isDirectAccessGrantsEnabled()).isEqualTo(direct);
+        assertThat(actual.isServiceAccountsEnabled()).isEqualTo(serviceAccounts);
+        assertThat(actual.isPublicClient()).isEqualTo(publicClient);
     }
 
     private ClientRepresentation readClient() {
