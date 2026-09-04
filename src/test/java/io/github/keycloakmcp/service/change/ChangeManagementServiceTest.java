@@ -22,6 +22,7 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapter;
 import io.github.keycloakmcp.domain.change.ChangeStatus;
 import io.github.keycloakmcp.domain.change.ChangeRisk;
+import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.ErrorCode;
 import io.github.keycloakmcp.domain.error.McpException;
@@ -300,12 +301,80 @@ class ChangeManagementServiceTest {
         assertThat(failed.resultMessage()).doesNotContain("sensitive adapter detail");
     }
 
+    @Test
+    void planApproveApplyVerifyClientSecuritySettings() {
+        var planned = changeManagementService.planClientSecurityUpdate(securityRequest(
+                TARGET_A, "S256", true, null, null, null, null));
+
+        assertThat(planned.status()).isEqualTo(ChangeStatus.WAITING_APPROVAL);
+        assertThat(planned.risk()).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(planned.desiredState())
+                .containsEntry("pkceCodeChallengeMethod", "S256")
+                .containsEntry("standardFlowEnabled", true);
+
+        changeManagementService.approve(planned.changeId(), "approver");
+        var applied = changeManagementService.apply(planned.changeId(), "applier");
+
+        assertThat(applied.status()).isEqualTo(ChangeStatus.VERIFIED);
+        assertThat(liveClient.get().getAttributes())
+                .containsEntry("pkce.code.challenge.method", "S256");
+        assertThat(liveClient.get().isStandardFlowEnabled()).isTrue();
+        assertThat(liveClient.get().getRedirectUris()).containsExactly("https://old.example/callback");
+        assertThat(liveClient.get().getSecret()).isNull();
+    }
+
+    @Test
+    void unsafeClientSecurityWeakeningDeniedByProductionPolicy() {
+        assertThatThrownBy(() -> changeManagementService.planClientSecurityUpdate(securityRequest(
+                        TARGET_B, null, null, true, null, null, null)))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.POLICY_DENIED));
+        verify(adminApi, never()).updateClient(any(), any(), any());
+    }
+
+    @Test
+    void staleClientSecurityBaselineRequiresReplan() {
+        var planned = changeManagementService.planClientSecurityUpdate(securityRequest(
+                TARGET_A, null, true, null, null, null, null));
+        changeManagementService.approve(planned.changeId(), "approver");
+        ClientRepresentation changed = copy(liveClient.get());
+        changed.setStandardFlowEnabled(true);
+        liveClient.set(changed);
+
+        assertThatThrownBy(() -> changeManagementService.apply(planned.changeId(), "applier"))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.CHANGE_CONFLICT));
+        assertThat(changeManagementService.getChange(planned.changeId()).status()).isEqualTo(ChangeStatus.FAILED);
+    }
+
     private static ClientUrlChangeRequest urlRequest(
             String targetId,
             List<String> redirectUris,
             List<String> webOrigins) {
         return new ClientUrlChangeRequest(
                 targetId, REALM, CLIENT, redirectUris, webOrigins, "planner", null);
+    }
+
+    private static ClientSecurityChangeRequest securityRequest(
+            String targetId,
+            String pkce,
+            Boolean standard,
+            Boolean implicit,
+            Boolean direct,
+            Boolean serviceAccounts,
+            Boolean publicClient) {
+        return new ClientSecurityChangeRequest(
+                targetId,
+                REALM,
+                CLIENT,
+                pkce,
+                standard,
+                implicit,
+                direct,
+                serviceAccounts,
+                publicClient,
+                "planner",
+                null);
     }
 
     private static ClientRepresentation sampleClient(String name, String description) {
@@ -318,6 +387,11 @@ class ChangeManagementServiceTest {
         rep.setRedirectUris(new java.util.ArrayList<>(List.of("https://old.example/callback")));
         rep.setWebOrigins(new java.util.ArrayList<>(List.of("https://old.example")));
         rep.setRootUrl("https://preserved.example");
+        rep.setPublicClient(false);
+        rep.setServiceAccountsEnabled(false);
+        rep.setStandardFlowEnabled(false);
+        rep.setImplicitFlowEnabled(false);
+        rep.setDirectAccessGrantsEnabled(false);
         rep.setSecret("server-side-secret");
         return rep;
     }
@@ -336,6 +410,11 @@ class ChangeManagementServiceTest {
                 ? null
                 : new java.util.ArrayList<>(source.getWebOrigins()));
         copy.setRootUrl(source.getRootUrl());
+        copy.setPublicClient(source.isPublicClient());
+        copy.setServiceAccountsEnabled(source.isServiceAccountsEnabled());
+        copy.setStandardFlowEnabled(source.isStandardFlowEnabled());
+        copy.setImplicitFlowEnabled(source.isImplicitFlowEnabled());
+        copy.setDirectAccessGrantsEnabled(source.isDirectAccessGrantsEnabled());
         copy.setSecret(source.getSecret());
         return copy;
     }

@@ -133,4 +133,19 @@ The typed `ClientUrlChangeRequest` replaces complete desired sets for `redirectU
 
 Apply reads a fresh trusted `ClientRepresentation`, verifies the relevant baseline only, changes the allowlisted URL fields, clears secret material defensively, updates through `StableAdminApiAdapter`, and reads back normalized values for verification. Risk classification is transition-aware: exact values are at least MEDIUM, while path wildcards, non-loopback HTTP, and the Web Origin `+` sentinel are HIGH. Unsafe additions are denied by default in production.
 
+## Typed client security and flows (0.8.1 Slice 2)
+
+`ClientSecurityChangeRequest` exposes only PKCE, Authorization Code flow,
+Implicit flow, Direct Access Grants, service accounts, and public/confidential
+client semantics. `ClientSecuritySettingsChangeSupport` normalizes PKCE to
+`S256` or `NONE`, validates effective service-account/client-authentication
+combinations, and owns property-level diff, apply, and read-back verification.
+
+Risk is based on the transition, not the Java value type. Enabling legacy or
+credential-bearing grant paths, weakening PKCE, and changing client
+authentication semantics are HIGH-risk. Production policy denies the unsafe
+weakening subset by default. Apply starts from a fresh trusted representation,
+mutates only requested allowlisted fields, clears secret material, preserves
+unrelated configuration, and uses the existing fingerprint-bound lifecycle.
+
 Broader realm/client/user/flow/IdP administration remains incremental after **0.8.1**. Fleet reporting/onboarding and platform authorization are prioritized before expanding all administration domains.

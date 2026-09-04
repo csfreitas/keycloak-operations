@@ -126,7 +126,9 @@ public class ClientConfigChangeSupport {
                         representation.setAttributes(attrs);
                     }
                     if (after == null || after.isBlank()) {
-                        attrs.remove(PKCE_ATTR);
+                        // The admin-client serializer omits null map values. An explicit
+                        // empty value reaches Keycloak and removes the persisted attribute.
+                        attrs.put(PKCE_ATTR, "");
                     } else {
                         attrs.put(PKCE_ATTR, after);
                     }

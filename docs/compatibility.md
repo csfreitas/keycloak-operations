@@ -6,7 +6,7 @@ Honest matrix for the current **0.8.0-SNAPSHOT** working tree. Do not treat unte
 
 | Target | Version | Status | Notes |
 |--------|---------|--------|-------|
-| Keycloak Community | 26.7.x | **TESTED on 26.7.1** | Disposable Admin REST version check, controlled client URL apply/read-back/restore, stale-plan rejection, MCP smoke, health, assessment, and operations report |
+| Keycloak Community | 26.7.x | **TESTED on 26.7.1** | Disposable Admin REST version check; controlled client URL and security/flow apply/read-back/restore; stale-plan rejection; MCP smoke, health, assessment, and operations report |
 | Keycloak Community | 26.6.x | **Design-compatible, NOT VERIFIED** | Same stable Admin API family; not the default compose image |
 | Red Hat build of Keycloak (RHBK) | 26.6.x (26.6.5 latest noted) | **Design-compatible, not auto-tested** | Images on `registry.redhat.io` require authenticated pull |
 | Java | 21 | Required | |

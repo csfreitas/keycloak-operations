@@ -119,4 +119,28 @@ class ChangePolicyAndRiskTest {
         assertThat(policyEvaluator.evaluateClientUrls(TargetEnvironment.HML, ChangeRisk.HIGH, true).decision())
                 .isEqualTo(ChangePolicyDecision.APPROVAL_REQUIRED);
     }
+
+    @Test
+    void classifiesClientSecurityTransitionsAndDeniesUnsafeProductionWeakening() {
+        List<ChangeOperation> enablePkce = List.of(new ChangeOperation(
+                "pkceCodeChallengeMethod", ChangeOperationType.UPDATE, "NONE", "S256"));
+        List<ChangeOperation> disablePkce = List.of(new ChangeOperation(
+                "pkceCodeChallengeMethod", ChangeOperationType.UPDATE, "S256", "NONE"));
+        List<ChangeOperation> enableImplicit = List.of(new ChangeOperation(
+                "implicitFlowEnabled", ChangeOperationType.UPDATE, false, true));
+        List<ChangeOperation> disableDirect = List.of(new ChangeOperation(
+                "directAccessGrantsEnabled", ChangeOperationType.UPDATE, true, false));
+        List<ChangeOperation> becomePublic = List.of(new ChangeOperation(
+                "publicClient", ChangeOperationType.UPDATE, false, true));
+
+        assertThat(riskClassifier.classifyClientSecurity(enablePkce)).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(riskClassifier.classifyClientSecurity(disablePkce)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientSecurity(enableImplicit)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientSecurity(disableDirect)).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(riskClassifier.classifyClientSecurity(becomePublic)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(policyEvaluator.evaluateClientSecurity(TargetEnvironment.PRD, ChangeRisk.HIGH, true).decision())
+                .isEqualTo(ChangePolicyDecision.DENY);
+        assertThat(policyEvaluator.evaluateClientSecurity(TargetEnvironment.HML, ChangeRisk.HIGH, true).decision())
+                .isEqualTo(ChangePolicyDecision.APPROVAL_REQUIRED);
+    }
 }

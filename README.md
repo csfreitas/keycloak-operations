@@ -25,7 +25,7 @@ Operators ask natural-language and console questions about realms, HA posture, m
 - Semantic Prometheus / OpenShift Monitoring metrics (no raw PromQL from clients)
 - PostgreSQL persistence (Flyway) for operational history — **not** a TSDB
 - **Fleet Operations Console** (`ui/`) — fleet, overview, health, assessment, performance, infrastructure, history
-- Controlled administration — plan, review, approve, apply, verify, and audit
+- Controlled administration — typed client URL and security/flow changes with plan, review, approve, apply, verify, and audit
 
 Status detail: [`docs/project-state.md`](docs/project-state.md).
 

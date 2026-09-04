@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shared REST `POST /api/v1/targets/{targetId}/operations-reports` and MCP `keycloak_generate_operations_report` surfaces
 - AI-assisted operations architecture with deterministic backend decision boundaries and evidence provenance
 - Typed client redirect URI and Web Origin planning through shared MCP and REST application services
+- Typed client security and flow planning for PKCE, Authorization Code, Implicit, Direct Access Grants, service accounts, and public/confidential semantics
 - Deterministic URI validation, normalized set diffs, transition-aware risk/policy, stale-plan checks, apply, and read-back verification
 - Structured change-operation persistence and fingerprinting with compatibility for existing 0.8 scalar records
 - Real community Keycloak 26.7.1 CI smoke path covering PostgreSQL, Prometheus, MCP reads, health, environment discovery, and operations-report generation
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Report sections degrade explicitly without returning raw provider exception details; structured and Markdown output are redacted
 - Production defaults deny path-wildcard redirects, non-loopback HTTP additions, and the Web Origin `+` sentinel
+- Production defaults deny enabling Implicit flow or Direct Access Grants, weakening PKCE, and switching a client to public
 - Client updates preserve unrelated configuration and clear secret material before outbound Admin REST writes
 
 ## [0.6.1-SNAPSHOT] — 2026-08-07

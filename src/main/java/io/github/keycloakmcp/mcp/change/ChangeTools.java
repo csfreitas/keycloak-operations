@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import io.github.keycloakmcp.audit.AuditService;
 import io.github.keycloakmcp.domain.change.ChangeRecord;
+import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.PageResult;
@@ -80,6 +81,42 @@ public class ChangeTools {
                         clientId,
                         redirectUris,
                         webOrigins,
+                        actor,
+                        idempotencyKey)));
+    }
+
+    @Tool(
+            name = "keycloak_plan_update_client_security",
+            description = "Plan typed client authentication and OAuth/OIDC flow changes. "
+                    + "Null settings remain unchanged; PKCE accepts S256 or NONE. Does not apply the change.")
+    public ChangeRecord keycloakPlanUpdateClientSecurity(
+            @ToolArg(description = TARGET_ID_HINT) String targetId,
+            @ToolArg(description = "Realm name") String realm,
+            @ToolArg(description = "OAuth/OIDC clientId") String clientId,
+            @ToolArg(description = "PKCE mode: S256 or NONE", required = false) String pkceCodeChallengeMethod,
+            @ToolArg(description = "Enable Authorization Code flow", required = false) Boolean standardFlowEnabled,
+            @ToolArg(description = "Enable legacy Implicit flow", required = false) Boolean implicitFlowEnabled,
+            @ToolArg(description = "Enable Direct Access Grants", required = false) Boolean directAccessGrantsEnabled,
+            @ToolArg(description = "Enable service accounts", required = false) Boolean serviceAccountsEnabled,
+            @ToolArg(
+                    description = "Use a public client without client authentication; false means confidential",
+                    required = false) Boolean publicClient,
+            @ToolArg(description = "Optional actor identity for audit metadata", required = false) String actor,
+            @ToolArg(description = "Optional idempotency key", required = false) String idempotencyKey) {
+        return invoke(
+                "keycloak_plan_update_client_security",
+                targetId,
+                realm,
+                () -> changeManagementService.planClientSecurityUpdate(new ClientSecurityChangeRequest(
+                        targetId,
+                        realm,
+                        clientId,
+                        pkceCodeChallengeMethod,
+                        standardFlowEnabled,
+                        implicitFlowEnabled,
+                        directAccessGrantsEnabled,
+                        serviceAccountsEnabled,
+                        publicClient,
                         actor,
                         idempotencyKey)));
     }

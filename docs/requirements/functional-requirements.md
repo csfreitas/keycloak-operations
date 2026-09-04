@@ -228,7 +228,15 @@ The platform **MUST** deterministically classify and evaluate policy for redirec
 
 ### FR-CLIENT-005
 
-Later delivery slices of 0.8.1 **MAY** add typed client security/flow settings, create, enable, and disable operations only after each property has explicit validation, diff, risk, policy, apply, verification, compatibility, and test behavior. Their presence in a complete Keycloak representation alone is not sufficient to expose them.
+The platform **MUST** support a typed client security and flow request for PKCE, Authorization Code flow, Implicit flow, Direct Access Grants, service accounts, and public/confidential client semantics. Omitted fields **MUST** remain unchanged; arbitrary attributes and complete `ClientRepresentation` payloads **MUST NOT** be accepted.
+
+### FR-CLIENT-006
+
+Client security and flow changes **MUST** validate effective combinations before planning. PKCE **MUST** accept only the supported `S256` and explicit `NONE` modes. Service accounts **MUST NOT** be enabled for an effective public client.
+
+### FR-CLIENT-007
+
+Risk and policy for client security and flow settings **MUST** be transition-aware. Enabling Implicit flow, Direct Access Grants, or service accounts; weakening PKCE; and changing public/confidential client-authentication semantics **MUST NOT** be classified as generic Boolean changes. Unsafe weakening transitions **MUST** be denied by default in production.
 
 ### FR-REALM-001
 
