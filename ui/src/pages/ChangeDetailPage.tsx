@@ -148,8 +148,8 @@ export function ChangeDetailPage() {
               </tr>
             </thead>
             <tbody>
-              {change.diff.map((d) => (
-                <tr key={d.property + d.kind}>
+              {change.diff.map((d, index) => (
+                <tr key={`${d.property}:${d.kind}:${d.before ?? ''}:${d.after ?? ''}:${index}`}>
                   <td className="font-mono text-xs">{d.property}</td>
                   <td><StatusBadge status={d.kind} size="sm" /></td>
                   <td className="font-mono text-xs">{d.before ?? '—'}</td>
