@@ -12,13 +12,14 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapter;
 import io.github.keycloakmcp.audit.AuditService;
 import io.github.keycloakmcp.domain.change.ChangeOperation;
+import io.github.keycloakmcp.domain.change.ChangeOperationType;
 import io.github.keycloakmcp.domain.change.ChangePolicyDecision;
 import io.github.keycloakmcp.domain.change.ChangeRecord;
 import io.github.keycloakmcp.domain.change.ChangeResourceType;
 import io.github.keycloakmcp.domain.change.ChangeRisk;
 import io.github.keycloakmcp.domain.change.ChangeStatus;
 import io.github.keycloakmcp.domain.change.ChangeVerificationResult;
-import io.github.keycloakmcp.domain.change.ChangeOperationType;
+import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.AuditSource;
 import io.github.keycloakmcp.domain.platform.PageResult;
@@ -43,6 +44,7 @@ public class ChangeManagementService {
     private final TargetAuthorizationService targetAuthorization;
     private final StableAdminApiAdapter adminApi;
     private final ClientConfigChangeSupport clientConfigChangeSupport;
+    private final ClientUrlSettingsChangeSupport clientUrlSettingsChangeSupport;
     private final ChangeRiskClassifier riskClassifier;
     private final ChangePolicyEvaluator policyEvaluator;
     private final ChangePlanFingerprinter fingerprinter;
@@ -57,6 +59,7 @@ public class ChangeManagementService {
             TargetAuthorizationService targetAuthorization,
             StableAdminApiAdapter adminApi,
             ClientConfigChangeSupport clientConfigChangeSupport,
+            ClientUrlSettingsChangeSupport clientUrlSettingsChangeSupport,
             ChangeRiskClassifier riskClassifier,
             ChangePolicyEvaluator policyEvaluator,
             ChangePlanFingerprinter fingerprinter,
@@ -68,6 +71,7 @@ public class ChangeManagementService {
         this.targetAuthorization = targetAuthorization;
         this.adminApi = adminApi;
         this.clientConfigChangeSupport = clientConfigChangeSupport;
+        this.clientUrlSettingsChangeSupport = clientUrlSettingsChangeSupport;
         this.riskClassifier = riskClassifier;
         this.policyEvaluator = policyEvaluator;
         this.fingerprinter = fingerprinter;
@@ -167,6 +171,96 @@ public class ChangeManagementService {
         }
     }
 
+    @Transactional
+    public ChangeRecord planClientUrlUpdate(ClientUrlChangeRequest request) {
+        if (request == null) {
+            throw McpException.invalidArgument("client URL change request must not be null");
+        }
+        long start = System.currentTimeMillis();
+        boolean success = false;
+        try {
+            Target target = resolve(request.targetId(), TargetPermission.PLAN);
+            if (request.idempotencyKey() != null && !request.idempotencyKey().isBlank()) {
+                Optional<ChangeRecordEntity> existing = changeRepository.findByIdempotency(
+                        target.id().value(), request.idempotencyKey().trim());
+                if (existing.isPresent()) {
+                    success = true;
+                    return mapper.toDomain(existing.get());
+                }
+            }
+
+            ClientRepresentation current = adminApi.findClientByClientId(
+                    target, request.realm(), request.clientId());
+            var planned = clientUrlSettingsChangeSupport.plan(current, request);
+            ChangeRisk risk = riskClassifier.classifyClientUrls(planned.operations());
+            PolicyResult policy = policyEvaluator.evaluateClientUrls(
+                    target.environment(),
+                    risk,
+                    clientUrlSettingsChangeSupport.denyInProduction(planned.operations()));
+            if (policy.decision() == ChangePolicyDecision.DENY) {
+                throw McpException.policyDenied(policy.reason());
+            }
+
+            String planFingerprint = fingerprinter.fingerprintPlan(
+                    target.id().value(),
+                    request.realm(),
+                    ChangeResourceType.CLIENT.name(),
+                    request.clientId(),
+                    ChangeOperationType.UPDATE.name(),
+                    planned.operations());
+            String baselineFingerprint = fingerprinter.fingerprintBaseline(planned.baselineState());
+
+            Instant now = Instant.now();
+            ChangeRecordEntity entity = new ChangeRecordEntity();
+            entity.id = UUID.randomUUID().toString();
+            entity.targetId = target.id().value();
+            entity.environment = target.environment().name();
+            entity.resourceType = ChangeResourceType.CLIENT.name();
+            entity.resourceId = request.clientId();
+            entity.realm = request.realm();
+            entity.operation = ChangeOperationType.UPDATE.name();
+            entity.risk = risk.name();
+            entity.policyDecision = policy.decision().name();
+            entity.policyReason = policy.reason();
+            entity.requiresApproval = policy.requiresApproval();
+            entity.status = policy.requiresApproval()
+                    ? ChangeStatus.WAITING_APPROVAL.name()
+                    : ChangeStatus.APPROVED.name();
+            entity.planFingerprint = planFingerprint;
+            entity.baselineFingerprint = baselineFingerprint;
+            if (!policy.requiresApproval()) {
+                entity.approvalFingerprint = planFingerprint;
+                entity.approvedBy = "POLICY_AUTO";
+                entity.approvedAt = now;
+            }
+            entity.desiredState = planned.desiredState();
+            entity.baselineState = planned.baselineState();
+            entity.diffJson = mapper.fromDiff(planned.diff());
+            entity.operationsJson = mapper.fromOperations(planned.operations());
+            entity.actor = request.actor();
+            entity.idempotencyKey = request.idempotencyKey() == null || request.idempotencyKey().isBlank()
+                    ? null
+                    : request.idempotencyKey().trim();
+            entity.createdAt = now;
+            entity.updatedAt = now;
+            changeRepository.persist(entity);
+
+            auditChange("change.plan.client_urls", entity, true, Map.of(
+                    "risk", risk.name(),
+                    "policy", policy.decision().name(),
+                    "planFingerprint", planFingerprint));
+            success = true;
+            return mapper.toDomain(entity);
+        } finally {
+            auditService.logToolInvocation(
+                    "ChangeManagementService.planClientUrlUpdate",
+                    request.targetId(),
+                    request.realm(),
+                    System.currentTimeMillis() - start,
+                    success);
+        }
+    }
+
     public ChangeRecord getChange(String changeId) {
         ChangeRecordEntity entity = requireEntity(changeId);
         // READ on the owning target
@@ -236,7 +330,7 @@ public class ChangeManagementService {
         return mapper.toDomain(entity);
     }
 
-    @Transactional
+    @Transactional(dontRollbackOn = McpException.class)
     public ChangeRecord apply(String changeId, String actor) {
         long start = System.currentTimeMillis();
         boolean success = false;
@@ -278,7 +372,11 @@ public class ChangeManagementService {
 
             ClientRepresentation current =
                     adminApi.findClientByClientId(target, entity.realm, entity.resourceId);
-            Map<String, Object> liveBaseline = clientConfigChangeSupport.extractBaseline(current);
+            List<ChangeOperation> operations = mapper.toDomain(entity).operations();
+            boolean clientUrlChange = clientUrlSettingsChangeSupport.supports(operations);
+            Map<String, Object> liveBaseline = clientUrlChange
+                    ? clientUrlSettingsChangeSupport.extractBaseline(current, entity.baselineState.keySet())
+                    : clientConfigChangeSupport.extractBaseline(current);
             String liveBaselineFingerprint = fingerprinter.fingerprintBaseline(liveBaseline);
             if (entity.baselineFingerprint != null
                     && !entity.baselineFingerprint.equals(liveBaselineFingerprint)) {
@@ -290,8 +388,11 @@ public class ChangeManagementService {
                         "REPLAN_REQUIRED: resource changed since plan was created for change " + changeId);
             }
 
-            List<ChangeOperation> operations = mapper.toDomain(entity).operations();
-            clientConfigChangeSupport.applyToRepresentation(current, operations);
+            if (clientUrlChange) {
+                clientUrlSettingsChangeSupport.applyToRepresentation(current, operations);
+            } else {
+                clientConfigChangeSupport.applyToRepresentation(current, operations);
+            }
             // Never send secret fields back even if present on the representation.
             current.setSecret(null);
             adminApi.updateClient(target, entity.realm, current);
@@ -315,6 +416,22 @@ public class ChangeManagementService {
                 throw McpException.verificationFailed(verification.message());
             }
             return mapper.toDomain(entity);
+        } catch (McpException e) {
+            if (ChangeStatus.APPLYING.name().equals(entity.status)) {
+                entity.status = ChangeStatus.FAILED.name();
+                entity.resultMessage = e.getCode() + ": " + e.getMessage();
+                entity.updatedAt = Instant.now();
+                auditChange("change.apply.failed", entity, false, Map.of("errorCode", e.getCode().name()));
+            }
+            throw e;
+        } catch (RuntimeException e) {
+            if (ChangeStatus.APPLYING.name().equals(entity.status)) {
+                entity.status = ChangeStatus.FAILED.name();
+                entity.resultMessage = "INTERNAL_ERROR: apply failed";
+                entity.updatedAt = Instant.now();
+                auditChange("change.apply.failed", entity, false, Map.of("errorCode", "INTERNAL_ERROR"));
+            }
+            throw McpException.internal("Change apply failed", e);
         } finally {
             auditService.logToolInvocation(
                     "ChangeManagementService.apply",
@@ -352,7 +469,10 @@ public class ChangeManagementService {
     private ChangeVerificationResult verifyEntity(ChangeRecordEntity entity, Target target) {
         ClientRepresentation actual =
                 adminApi.findClientByClientId(target, entity.realm, entity.resourceId);
-        var mismatches = clientConfigChangeSupport.compareDesired(actual, entity.desiredState);
+        List<ChangeOperation> operations = mapper.toDomain(entity).operations();
+        var mismatches = clientUrlSettingsChangeSupport.supports(operations)
+                ? clientUrlSettingsChangeSupport.compareDesired(actual, entity.desiredState)
+                : clientConfigChangeSupport.compareDesired(actual, entity.desiredState);
         ChangeVerificationResult result = mismatches.isEmpty()
                 ? ChangeVerificationResult.verified("Desired state confirmed by read-back")
                 : ChangeVerificationResult.failed("Desired state mismatch after read-back", mismatches);

@@ -1,10 +1,12 @@
 package io.github.keycloakmcp.mcp.change;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import io.github.keycloakmcp.audit.AuditService;
 import io.github.keycloakmcp.domain.change.ChangeRecord;
+import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.observability.McpMetrics;
@@ -50,6 +52,36 @@ public class ChangeTools {
                 realm,
                 () -> changeManagementService.planClientUpdate(
                         targetId, realm, clientId, desiredState, actor, idempotencyKey));
+    }
+
+    @Tool(
+            name = "keycloak_plan_update_client_urls",
+            description = "Plan replacement of a client's complete redirect URI and/or Web Origin sets. "
+                    + "Null means unchanged; an empty list removes all values. Does not apply the change.")
+    public ChangeRecord keycloakPlanUpdateClientUrls(
+            @ToolArg(description = TARGET_ID_HINT) String targetId,
+            @ToolArg(description = "Realm name") String realm,
+            @ToolArg(description = "OAuth/OIDC clientId") String clientId,
+            @ToolArg(
+                    description = "Complete desired redirect URI set; omit to leave unchanged",
+                    required = false) List<String> redirectUris,
+            @ToolArg(
+                    description = "Complete desired Web Origin set; omit to leave unchanged",
+                    required = false) List<String> webOrigins,
+            @ToolArg(description = "Optional actor identity for audit metadata", required = false) String actor,
+            @ToolArg(description = "Optional idempotency key", required = false) String idempotencyKey) {
+        return invoke(
+                "keycloak_plan_update_client_urls",
+                targetId,
+                realm,
+                () -> changeManagementService.planClientUrlUpdate(new ClientUrlChangeRequest(
+                        targetId,
+                        realm,
+                        clientId,
+                        redirectUris,
+                        webOrigins,
+                        actor,
+                        idempotencyKey)));
     }
 
     @Tool(name = "keycloak_get_change", description = "Get a change lifecycle record by changeId")

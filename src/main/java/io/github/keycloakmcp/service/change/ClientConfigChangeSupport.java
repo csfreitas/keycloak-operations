@@ -112,9 +112,10 @@ public class ClientConfigChangeSupport {
 
     public void applyToRepresentation(ClientRepresentation representation, List<ChangeOperation> operations) {
         for (ChangeOperation op : operations) {
+            String after = asString(op.after());
             switch (op.property()) {
-                case "name" -> representation.setName(op.after());
-                case "description" -> representation.setDescription(op.after());
+                case "name" -> representation.setName(after);
+                case "description" -> representation.setDescription(after);
                 case "pkceCodeChallengeMethod" -> {
                     Map<String, String> attrs = representation.getAttributes();
                     if (attrs == null) {
@@ -124,10 +125,10 @@ public class ClientConfigChangeSupport {
                         attrs = new LinkedHashMap<>(attrs);
                         representation.setAttributes(attrs);
                     }
-                    if (op.after() == null || op.after().isBlank()) {
+                    if (after == null || after.isBlank()) {
                         attrs.remove(PKCE_ATTR);
                     } else {
-                        attrs.put(PKCE_ATTR, op.after());
+                        attrs.put(PKCE_ATTR, after);
                     }
                 }
                 default -> throw McpException.writeNotSupported("Unsupported client property: " + op.property());
@@ -181,6 +182,10 @@ public class ClientConfigChangeSupport {
             return null;
         }
         return representation.getAttributes().get(PKCE_ATTR);
+    }
+
+    private static String asString(Object value) {
+        return value == null ? null : String.valueOf(value);
     }
 
     public record PlannedClientChange(

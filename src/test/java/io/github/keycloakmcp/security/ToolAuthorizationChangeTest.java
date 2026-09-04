@@ -27,6 +27,8 @@ class ToolAuthorizationChangeTest {
     void allowsPlanToolsInReadOnlyMode() {
         assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_plan_client_update"))
                 .doesNotThrowAnyException();
+        assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_plan_update_client_urls"))
+                .doesNotThrowAnyException();
         assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_get_change"))
                 .doesNotThrowAnyException();
         assertThatCode(() -> toolAuthorization.assertReadOnlyOperation("keycloak_approve_change"))

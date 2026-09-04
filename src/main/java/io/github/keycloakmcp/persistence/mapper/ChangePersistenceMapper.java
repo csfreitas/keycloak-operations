@@ -107,7 +107,7 @@ public class ChangePersistenceMapper {
         return out;
     }
 
-    private List<ChangeOperation> toOperations(List<Map<String, Object>> json) {
+    List<ChangeOperation> toOperations(List<Map<String, Object>> json) {
         if (json == null || json.isEmpty()) {
             return List.of();
         }
@@ -116,8 +116,8 @@ public class ChangePersistenceMapper {
             out.add(new ChangeOperation(
                     String.valueOf(map.get("property")),
                     ChangeOperationType.valueOf(String.valueOf(map.get("operationType"))),
-                    map.get("before") == null ? null : String.valueOf(map.get("before")),
-                    map.get("after") == null ? null : String.valueOf(map.get("after"))));
+                    map.get("before"),
+                    map.get("after")));
         }
         return out;
     }
