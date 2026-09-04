@@ -55,9 +55,9 @@ MCP + REST shared services; multi-target registry; Keycloak Admin reads + contro
 
 ## Known limitations
 
-- Opt-in ITs skipped without `RUN_*_IT` + live stack (`ControlledClientChangeIT` placeholder)
+- Opt-in ITs remain skipped without `RUN_*_IT` and an explicitly provisioned live stack
 - Client flow/lifecycle and realm administration remain incomplete in 0.8.1; broad administration remains deferred behind fleet reporting/onboarding and authorization work
-- Web Origin `+` behavior and controlled URL writes are not verified against a live Keycloak/RHBK target
+- Exact client redirect URI/Web Origin writes are verified against disposable Community Keycloak 26.7.1; Web Origin `+` behavior and RHBK writes remain `NOT VERIFIED`
 - Destructive ops, password/secret workflows out of scope
 - SSE is in-process (not multi-replica fan-out)
 - Identity A OIDC disabled by default (OPEN_LAB)
@@ -80,21 +80,22 @@ cd ui && npm run test:run && npm run build
 
 The table above is the accepted 0.8 baseline. Current 0.8.1 working-tree validation must be reported separately until the full backend, UI, and opt-in integration commands have been executed in a suitable environment.
 
-Current working-tree report validation in the cloud workspace:
+Current working-tree validation:
 
 | Check | Result |
 |---|---|
 | Operations report unit/delegation tests | **7 passed** |
 | UI Vitest | **51 passed** |
 | UI production build | **SUCCESS** |
-| Backend diagnostic package with Java 17 override | **SUCCESS**; not the Java 21 baseline |
-| Full `mvn clean verify` | **BLOCKED**; Docker/PostgreSQL Dev Services unavailable in this workspace |
-| Live Keycloak/RHBK report execution | **NOT VERIFIED** |
+| Full Java 21 `mvn clean verify` | **181 passed**, 0 failed; **6 opt-in ITs skipped** without flags |
+| Community Keycloak 26.7.1 opt-in ITs | **3 passed**: version detection, controlled URL apply/read-back/restore, stale-plan rejection |
+| Disposable stack | PostgreSQL, Keycloak 26.7.1, and Prometheus **HEALTHY** |
+| MCP smoke / Operations Report | **PASS**; report `PARTIAL`, health `UNKNOWN`, assessment `PARTIAL`, metrics `AVAILABLE` for the intentionally infrastructure-free lab target |
+| RHBK | **NOT VERIFIED** |
 
-The community CI workflow now defines a real read-only smoke path for Keycloak
-26.7.1, PostgreSQL, Prometheus, MCP, and operations-report generation. It remains
-`NOT VERIFIED` until that workflow or the equivalent local procedure completes
-against the current working tree.
+The community CI workflow runs on pushes to `main` and pull requests. It performs
+the real opt-in Community Keycloak 26.7.1 integration tests before the read-only
+MCP and operations-report smoke path.
 
 Local validation handoff:
 [`development/local-validation-0.8.1-operations-report.md`](development/local-validation-0.8.1-operations-report.md).

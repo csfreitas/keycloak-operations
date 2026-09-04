@@ -6,7 +6,7 @@ Honest matrix for the current **0.8.0-SNAPSHOT** working tree. Do not treat unte
 
 | Target | Version | Status | Notes |
 |--------|---------|--------|-------|
-| Keycloak Community | 26.7.x | **Automated smoke path implemented; current changes NOT VERIFIED live** | Container `quay.io/keycloak/keycloak:26.7.1` via `dev/compose.yaml` |
+| Keycloak Community | 26.7.x | **TESTED on 26.7.1** | Disposable Admin REST version check, controlled client URL apply/read-back/restore, stale-plan rejection, MCP smoke, health, assessment, and operations report |
 | Keycloak Community | 26.6.x | **Design-compatible, NOT VERIFIED** | Same stable Admin API family; not the default compose image |
 | Red Hat build of Keycloak (RHBK) | 26.6.x (26.6.5 latest noted) | **Design-compatible, not auto-tested** | Images on `registry.redhat.io` require authenticated pull |
 | Java | 21 | Required | |
@@ -20,10 +20,10 @@ Honest matrix for the current **0.8.0-SNAPSHOT** working tree. Do not treat unte
 
 ## What “tested” means here
 
-- **Automated smoke path implemented:** developers and CI can run compose + setup
-  + package + smoke against community Keycloak 26.7.1 without registry
-  credentials. The current working tree becomes `TESTED` only after that path
-  completes and the exact commit/result is recorded.
+- **Tested:** the disposable compose + setup path and opt-in integration tests
+  completed against Community Keycloak 26.7.1, followed by the packaged MCP
+  smoke and operations-report generation. This does not extend the claim to
+  Keycloak 26.6, RHBK, OpenShift, Kubernetes, or Web Origin `+` semantics.
 - **Not auto-tested:** no CI job in this repository pulls RHBK from
   `registry.redhat.io`. Manual validation with a subscribed registry is welcome
   but not claimed as done by default releases.
