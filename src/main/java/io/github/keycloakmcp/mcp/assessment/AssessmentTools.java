@@ -18,11 +18,13 @@ import io.github.keycloakmcp.domain.platform.AssessmentRunSummary;
 import io.github.keycloakmcp.domain.platform.HealthCheckSummary;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.TriggerType;
+import io.github.keycloakmcp.domain.report.OperationsReport;
 import io.github.keycloakmcp.observability.McpMetrics;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.security.ToolAuthorization;
 import io.github.keycloakmcp.service.platform.AssessmentHistoryService;
 import io.github.keycloakmcp.service.platform.HealthCheckService;
+import io.github.keycloakmcp.service.platform.OperationsReportService;
 import io.github.keycloakmcp.target.TargetAuthorizationService;
 import io.github.keycloakmcp.target.TargetPermission;
 import io.github.keycloakmcp.target.TargetResolver;
@@ -48,6 +50,9 @@ public class AssessmentTools {
 
     @Inject
     HealthCheckService healthCheckService;
+
+    @Inject
+    OperationsReportService operationsReportService;
 
     @Inject
     ProfileRegistry profileRegistry;
@@ -112,6 +117,26 @@ public class AssessmentTools {
             HealthCheckSummary summary = healthCheckService.run(targetId, TriggerType.MCP);
             return sensitiveDataFilter.redact(compactHealth(summary));
         });
+    }
+
+    @Tool(
+            name = "keycloak_generate_operations_report",
+            description = "Generate a sanitized point-in-time Keycloak/RHBK operations report for one target. "
+                    + "Combines platform inventory, health, deterministic assessment, actionable findings, "
+                    + "and semantic performance metrics when configured.")
+    public Map<String, Object> keycloakGenerateOperationsReport(
+            @ToolArg(description = TARGET_ID_HINT) String targetId,
+            @ToolArg(
+                    description = "Assessment profile name. Blank uses the configured default.",
+                    defaultValue = "")
+                    String profile,
+            @ToolArg(
+                    description = "Optional bounded semantic metrics window such as 15m or 1h.",
+                    defaultValue = "")
+                    String metricsWindow) {
+        return invoke("keycloak_generate_operations_report", targetId, () -> sensitiveDataFilter.redact(
+                compactOperationsReport(operationsReportService.generate(
+                        targetId, blankToNull(profile), blankToNull(metricsWindow), TriggerType.MCP))));
     }
 
     @Tool(
@@ -273,6 +298,34 @@ public class AssessmentTools {
         out.put("triggerType", summary.triggerType() == null ? null : summary.triggerType().name());
         out.put("startedAt", summary.startedAt());
         out.put("completedAt", summary.completedAt());
+        return out;
+    }
+
+    private Map<String, Object> compactOperationsReport(OperationsReport report) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("schemaVersion", report.schemaVersion());
+        out.put("reportId", report.reportId());
+        out.put("targetId", report.targetId());
+        out.put("targetDisplayName", report.targetDisplayName());
+        out.put("productType", report.productType());
+        out.put("environment", report.environment());
+        out.put("configuredInfrastructureType", report.configuredInfrastructureType());
+        out.put("generatedAt", report.generatedAt());
+        out.put("reportCompleteness", report.status());
+        out.put("sections", report.sections());
+        out.put("healthStatus", report.healthCheck() == null ? null : report.healthCheck().overallStatus());
+        if (report.assessment() != null) {
+            Map<String, Object> assessment = new LinkedHashMap<>();
+            assessment.put("assessmentId", report.assessment().assessmentId());
+            assessment.put("profile", report.assessment().profile());
+            assessment.put("status", report.assessment().status());
+            assessment.put("overallScore", report.assessment().overallScore());
+            assessment.put("evidenceCompleteness", report.assessment().evidenceCompleteness());
+            assessment.put("confidence", report.assessment().confidence());
+            assessment.put("findingCount", report.assessment().findings().size());
+            out.put("assessment", assessment);
+        }
+        out.put("markdown", report.markdown());
         return out;
     }
 

@@ -14,6 +14,7 @@ const NAV_TABS: NavTab[] = [
   { path: '', label: 'Overview', end: true },
   { path: 'health', label: 'Health' },
   { path: 'assessment', label: 'Assessment' },
+  { path: 'report', label: 'Report' },
   { path: 'performance', label: 'Performance' },
   { path: 'infrastructure', label: 'Infrastructure' },
   { path: 'history', label: 'History' },

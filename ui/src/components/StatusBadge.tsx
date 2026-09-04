@@ -18,6 +18,8 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   PENDING: { label: 'Pending', className: 'badge badge--unknown' },
   RUNNING: { label: 'Running', className: 'badge badge--info' },
   ERROR: { label: 'Error', className: 'badge badge--critical' },
+  COMPLETE: { label: 'Complete', className: 'badge badge--healthy' },
+  SKIPPED: { label: 'Skipped', className: 'badge badge--unknown' },
 };
 
 export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
