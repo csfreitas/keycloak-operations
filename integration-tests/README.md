@@ -33,7 +33,26 @@ Quarkus tests use a disposable PostgreSQL container named
 `io.github.keycloak-operations.test-resource=postgresql`, is never reused, and
 is removed when the test process finishes normally. This keeps Podman Desktop
 entries attributable to this repository and prevents completed runs from
-accumulating stopped database containers.
+accumulating stopped database containers. On macOS, the Maven test forks also
+use the Podman CLI with exact resource names and explicit cleanup because Podman
+Desktop can leave the Testcontainers Ryuk sidecar running, and its JVM fallback
+can prune unrelated volumes. Linux CI and macOS hosts without Podman keep the
+standard Testcontainers lifecycle. The test database uses `tmpfs`, so neither
+path creates anonymous data volumes.
+
+The local Compose project is named `keycloak-operations`. PostgreSQL and
+Prometheus data use clearly named, reusable volumes instead of anonymous ones:
+`keycloak-operations-postgres-data` and
+`keycloak-operations-prometheus-data`. A normal shutdown preserves them; a
+disposable validation reset removes them:
+
+```bash
+# Preserve reusable local data
+podman compose -f dev/compose.yaml down --remove-orphans
+
+# Full disposable reset (used by validation/CI)
+podman compose -f dev/compose.yaml down -v --remove-orphans
+```
 
 ```bash
 # From repository root

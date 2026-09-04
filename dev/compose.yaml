@@ -1,13 +1,20 @@
+name: keycloak-operations
+
 services:
   postgres:
     image: postgres:16
-    container_name: keycloak-mcp-postgres
+    container_name: keycloak-operations-postgres
+    labels:
+      io.github.keycloak-operations.component: postgres
+      io.github.keycloak-operations.environment: local-development
     environment:
       POSTGRES_DB: kcops
       POSTGRES_USER: kcops
       POSTGRES_PASSWORD: kcops
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U kcops -d kcops"]
       interval: 5s
@@ -17,7 +24,10 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.7.1
-    container_name: keycloak-mcp-demo-a
+    container_name: keycloak-operations-keycloak-a
+    labels:
+      io.github.keycloak-operations.component: keycloak-a
+      io.github.keycloak-operations.environment: local-development
     command:
       - start-dev
       - --import-realm
@@ -47,7 +57,10 @@ services:
   keycloak-b:
     profiles: ["multi-target"]
     image: quay.io/keycloak/keycloak:26.7.1
-    container_name: keycloak-mcp-demo-b
+    container_name: keycloak-operations-keycloak-b
+    labels:
+      io.github.keycloak-operations.component: keycloak-b
+      io.github.keycloak-operations.environment: local-development
     command:
       - start-dev
       - --import-realm
@@ -74,7 +87,10 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.55.1
-    container_name: keycloak-mcp-prometheus
+    container_name: keycloak-operations-prometheus
+    labels:
+      io.github.keycloak-operations.component: prometheus
+      io.github.keycloak-operations.environment: local-development
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
@@ -83,6 +99,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:Z
+      - prometheus-data:/prometheus
     depends_on:
       keycloak:
         condition: service_started
@@ -92,3 +109,17 @@ services:
       timeout: 5s
       retries: 20
       start_period: 15s
+
+volumes:
+  postgres-data:
+    name: keycloak-operations-postgres-data
+    labels:
+      io.github.keycloak-operations.component: postgres-data
+      io.github.keycloak-operations.environment: local-development
+      io.github.keycloak-operations.reusable: "true"
+  prometheus-data:
+    name: keycloak-operations-prometheus-data
+    labels:
+      io.github.keycloak-operations.component: prometheus-data
+      io.github.keycloak-operations.environment: local-development
+      io.github.keycloak-operations.reusable: "true"
