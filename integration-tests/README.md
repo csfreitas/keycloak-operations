@@ -28,6 +28,13 @@ Therefore:
 
 ## Running community Keycloak integration checks locally
 
+Quarkus tests use a disposable PostgreSQL container named
+`keycloak-operations-test-postgres-<run-id>`. It carries the project label
+`io.github.keycloak-operations.test-resource=postgresql`, is never reused, and
+is removed when the test process finishes normally. This keeps Podman Desktop
+entries attributable to this repository and prevents completed runs from
+accumulating stopped database containers.
+
 ```bash
 # From repository root
 podman compose -f dev/compose.yaml up -d
