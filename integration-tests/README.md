@@ -5,10 +5,10 @@ This directory is reserved for container-based integration tests of
 
 ## Compatibility matrix
 
-| Target | Image | Auth required | Status in 0.1.0 |
+| Target | Image | Auth required | Current status |
 |--------|-------|---------------|-----------------|
-| Keycloak Community 26.7.x | `quay.io/keycloak/keycloak:26.7.1` | No (public Quay) | **Primary local / CI path** via `dev/compose.yaml` |
-| Keycloak Community 26.6.x | `quay.io/keycloak/keycloak:26.6.x` | No | Planned automated IT (same Admin API) |
+| Keycloak Community 26.7.x | `quay.io/keycloak/keycloak:26.7.1` | No (public Quay) | **Automated read-only MCP smoke path** via `dev/compose.yaml` and CI |
+| Keycloak Community 26.6.x | `quay.io/keycloak/keycloak:26.6.x` | No | **NOT VERIFIED** by the automated smoke job |
 | RHBK 26.6.x (e.g. 26.6.5) | `registry.redhat.io/rhbk/keycloak-rhel9:26.6` (exact tag may vary) | **Yes** — Red Hat registry credentials | **Not auto-tested** |
 
 ## Why RHBK is not auto-tested
@@ -42,14 +42,17 @@ mvn quarkus:dev
 ./scripts/smoke-mcp.sh
 ```
 
-## Planned IT layout (0.2.0+)
+## Scope of the automated community smoke test
 
-```
-integration-tests/
-  src/test/java/io/github/keycloakmcp/
-    KeycloakCommunityIT.java   # Testcontainers + quay.io/keycloak
-    RhbkIT.java                # enabled only when RHBK_IMAGE + registry auth present
-```
+The `community-keycloak-integration` CI job starts PostgreSQL, Keycloak 26.7.1,
+and Prometheus, configures a disposable service account, starts the packaged
+application, and runs `scripts/smoke-mcp.sh`. The smoke covers target discovery,
+representative Admin REST reads, health, environment discovery, and generation
+of the operations report through MCP.
+
+It does **not** verify controlled writes, Keycloak 26.6, RHBK, OpenShift, or
+Kubernetes. The JUnit classes named `*IT` remain opt-in placeholders until they
+perform real assertions and must not be cited as compatibility evidence.
 
 Enable RHBK tests explicitly, for example:
 
