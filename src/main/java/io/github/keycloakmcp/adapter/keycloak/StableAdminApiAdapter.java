@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.WebApplicationException;
 
 @ApplicationScoped
@@ -93,6 +94,42 @@ public class StableAdminApiAdapter {
             } catch (NotFoundException e) {
                 throw McpException.clientNotFound(clientId);
             }
+        });
+    }
+
+    public boolean clientExists(Target target, String realm, String clientId) {
+        requireNonBlank(realm, "realm");
+        requireNonBlank(clientId, "clientId");
+        return execute(target, "clientExists", realm, () -> {
+            ensureRealmExists(target, realm);
+            List<ClientRepresentation> matches = realmResource(target, realm).clients().findByClientId(clientId);
+            return matches != null && !matches.isEmpty();
+        });
+    }
+
+    /** Controlled, secret-free client creation used only by Change Management apply. */
+    public void createClient(Target target, String realm, ClientRepresentation representation) {
+        requireNonBlank(realm, "realm");
+        Objects.requireNonNull(representation, "representation");
+        requireNonBlank(representation.getClientId(), "representation.clientId");
+        if (representation.getSecret() != null) {
+            throw McpException.invalidArgument("client secret must not be supplied during creation");
+        }
+        execute(target, "createClient", realm, () -> {
+            ensureRealmExists(target, realm);
+            try (Response response = realmResource(target, realm).clients().create(representation)) {
+                int status = response.getStatus();
+                if (status == Response.Status.CONFLICT.getStatusCode()) {
+                    throw McpException.changeConflict(
+                            "client already exists: " + representation.getClientId());
+                }
+                if (status < 200 || status >= 300) {
+                    throw McpException.keycloakUnavailable(
+                            "Keycloak Admin API request failed for createClient (HTTP " + status + ")",
+                            new IllegalStateException("unexpected create response"));
+                }
+            }
+            return Boolean.TRUE;
         });
     }
 

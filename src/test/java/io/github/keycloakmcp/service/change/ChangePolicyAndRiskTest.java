@@ -143,4 +143,24 @@ class ChangePolicyAndRiskTest {
         assertThat(policyEvaluator.evaluateClientSecurity(TargetEnvironment.HML, ChangeRisk.HIGH, true).decision())
                 .isEqualTo(ChangePolicyDecision.APPROVAL_REQUIRED);
     }
+
+    @Test
+    void classifiesClientLifecycleTransitions() {
+        List<ChangeOperation> create = List.of(new ChangeOperation(
+                "clientId", ChangeOperationType.CREATE, null, "new-client"));
+        List<ChangeOperation> enable = List.of(new ChangeOperation(
+                "enabled", ChangeOperationType.UPDATE, false, true));
+        List<ChangeOperation> disable = List.of(new ChangeOperation(
+                "enabled", ChangeOperationType.UPDATE, true, false));
+
+        assertThat(riskClassifier.classifyClientCreate(create)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientEnabled(enable)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientEnabled(disable)).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(policyEvaluator.evaluate(
+                        TargetEnvironment.DEV, ChangeOperationType.CREATE, ChangeRisk.HIGH, false)
+                .decision()).isEqualTo(ChangePolicyDecision.APPROVAL_REQUIRED);
+        assertThat(policyEvaluator.evaluateClientCreate(
+                        TargetEnvironment.PRD, ChangeRisk.HIGH, true)
+                .decision()).isEqualTo(ChangePolicyDecision.DENY);
+    }
 }

@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import io.github.keycloakmcp.audit.AuditService;
 import io.github.keycloakmcp.domain.change.ChangeRecord;
+import io.github.keycloakmcp.domain.change.ClientCreateChangeRequest;
+import io.github.keycloakmcp.domain.change.ClientEnabledChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.McpException;
@@ -119,6 +121,63 @@ public class ChangeTools {
                         publicClient,
                         actor,
                         idempotencyKey)));
+    }
+
+    @Tool(
+            name = "keycloak_plan_create_client",
+            description = "Plan creation of a typed, secret-free OpenID Connect client. "
+                    + "The client is disabled by default. Does not apply the change.")
+    public ChangeRecord keycloakPlanCreateClient(
+            @ToolArg(description = TARGET_ID_HINT) String targetId,
+            @ToolArg(description = "Realm name") String realm,
+            @ToolArg(description = "New OAuth/OIDC clientId") String clientId,
+            @ToolArg(description = "Optional display name", required = false) String name,
+            @ToolArg(description = "Optional description", required = false) String description,
+            @ToolArg(description = "Create enabled; defaults to false", required = false) Boolean enabled,
+            @ToolArg(description = "Public client; defaults to true", required = false) Boolean publicClient,
+            @ToolArg(description = "Enable Authorization Code flow; defaults to true", required = false)
+                    Boolean standardFlowEnabled,
+            @ToolArg(description = "Enable Direct Access Grants; defaults to false", required = false)
+                    Boolean directAccessGrantsEnabled,
+            @ToolArg(description = "Enable service accounts; requires publicClient=false", required = false)
+                    Boolean serviceAccountsEnabled,
+            @ToolArg(description = "Optional actor identity for audit metadata", required = false) String actor,
+            @ToolArg(description = "Optional idempotency key", required = false) String idempotencyKey) {
+        return invoke(
+                "keycloak_plan_create_client",
+                targetId,
+                realm,
+                () -> changeManagementService.planClientCreate(new ClientCreateChangeRequest(
+                        targetId,
+                        realm,
+                        clientId,
+                        name,
+                        description,
+                        enabled,
+                        publicClient,
+                        standardFlowEnabled,
+                        directAccessGrantsEnabled,
+                        serviceAccountsEnabled,
+                        actor,
+                        idempotencyKey)));
+    }
+
+    @Tool(
+            name = "keycloak_plan_set_client_enabled",
+            description = "Plan enabling or disabling an existing client. Does not apply the change.")
+    public ChangeRecord keycloakPlanSetClientEnabled(
+            @ToolArg(description = TARGET_ID_HINT) String targetId,
+            @ToolArg(description = "Realm name") String realm,
+            @ToolArg(description = "OAuth/OIDC clientId") String clientId,
+            @ToolArg(description = "Desired enabled state") boolean enabled,
+            @ToolArg(description = "Optional actor identity for audit metadata", required = false) String actor,
+            @ToolArg(description = "Optional idempotency key", required = false) String idempotencyKey) {
+        return invoke(
+                "keycloak_plan_set_client_enabled",
+                targetId,
+                realm,
+                () -> changeManagementService.planClientEnabledUpdate(new ClientEnabledChangeRequest(
+                        targetId, realm, clientId, enabled, actor, idempotencyKey)));
     }
 
     @Tool(name = "keycloak_get_change", description = "Get a change lifecycle record by changeId")

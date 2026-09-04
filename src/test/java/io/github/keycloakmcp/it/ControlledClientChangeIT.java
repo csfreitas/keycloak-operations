@@ -22,6 +22,8 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import io.github.keycloakmcp.adapter.keycloak.KeycloakClientFactory;
 import io.github.keycloakmcp.domain.change.ChangeRecord;
 import io.github.keycloakmcp.domain.change.ChangeStatus;
+import io.github.keycloakmcp.domain.change.ClientCreateChangeRequest;
+import io.github.keycloakmcp.domain.change.ClientEnabledChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.ErrorCode;
@@ -181,6 +183,55 @@ class ControlledClientChangeIT {
         assertThat(restored.status()).isEqualTo(ChangeStatus.VERIFIED);
         assertClientSecurity("NONE", true, false, false, false, true);
         assertClientUrls(ORIGINAL_REDIRECTS, ORIGINAL_ORIGINS);
+    }
+
+    @Test
+    void planApproveCreateDisableByDefaultEnableAndDisableClient() {
+        clients().get(clientUuid).remove();
+        assertThat(clients().findByClientId(clientId)).isEmpty();
+
+        ChangeRecord createPlan = changeManagementService.planClientCreate(new ClientCreateChangeRequest(
+                TARGET_ID,
+                realm,
+                clientId,
+                "Disposable Slice 3 fixture",
+                "Created through controlled lifecycle",
+                null,
+                null,
+                null,
+                null,
+                null,
+                "disposable-it-planner",
+                "disposable-it-create-" + UUID.randomUUID()));
+        assertNoCredentialLeakage(createPlan);
+        ChangeRecord created = approveWhenRequiredAndApply(createPlan);
+
+        assertThat(created.status()).isEqualTo(ChangeStatus.VERIFIED);
+        clientUuid = clients().findByClientId(clientId).getFirst().getId();
+        assertThat(readClient().isEnabled()).isFalse();
+        assertThat(readClient().getSecret()).isNull();
+
+        ChangeRecord enablePlan = changeManagementService.planClientEnabledUpdate(
+                new ClientEnabledChangeRequest(
+                        TARGET_ID,
+                        realm,
+                        clientId,
+                        true,
+                        "disposable-it-planner",
+                        "disposable-it-enable-" + UUID.randomUUID()));
+        assertThat(approveWhenRequiredAndApply(enablePlan).status()).isEqualTo(ChangeStatus.VERIFIED);
+        assertThat(readClient().isEnabled()).isTrue();
+
+        ChangeRecord disablePlan = changeManagementService.planClientEnabledUpdate(
+                new ClientEnabledChangeRequest(
+                        TARGET_ID,
+                        realm,
+                        clientId,
+                        false,
+                        "disposable-it-planner",
+                        "disposable-it-disable-" + UUID.randomUUID()));
+        assertThat(approveWhenRequiredAndApply(disablePlan).status()).isEqualTo(ChangeStatus.VERIFIED);
+        assertThat(readClient().isEnabled()).isFalse();
     }
 
     private ChangeRecord plan(List<String> redirects, List<String> origins, String operation) {

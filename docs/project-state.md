@@ -40,7 +40,7 @@ Historical milestone commits (immutable):
 | | |
 |--|--|
 | Latest completed | **0.8** Controlled Administration & Change Management |
-| Current (IN PROGRESS) | **0.8.1** Realm & Client Administration — Slices 1–2 |
+| Current (IN PROGRESS) | **0.8.1** Realm & Client Administration — Slices 1–3 |
 | Index | [milestones/README.md](milestones/README.md) |
 
 ## What already works
@@ -53,12 +53,15 @@ MCP + REST shared services; multi-target registry; Keycloak Admin reads + contro
 
 **0.8.1 Slice 2:** typed PKCE, Authorization Code, Implicit, Direct Access Grants, service-account, and public/confidential client settings; effective-combination validation; transition-aware risk and production denial; stale-plan protection; secret-cleared apply; read-back verification; shared REST `POST /changes/plan/client-security` and MCP `keycloak_plan_update_client_security` surfaces.
 
+**0.8.1 Slice 3:** typed, secret-free OpenID Connect client creation plus client enable/disable; disabled-by-default creation; duplicate and stale-plan protection; transition-aware risk; shared REST `POST /changes/plan/client-create` and `POST /changes/plan/client-enabled` plus MCP `keycloak_plan_create_client` and `keycloak_plan_set_client_enabled` surfaces.
+
 **Operations report foundation (working tree):** shared `OperationsReportService` combines sanitized snapshots, health, deterministic assessments/findings, and optional semantic metrics. REST `POST /targets/{targetId}/operations-reports` returns the complete structured report and Markdown; MCP `keycloak_generate_operations_report` returns a compact agent-oriented envelope and Markdown. Section completeness is explicit and independent from target health. See [operations-reporting.md](architecture/operations-reporting.md) and [ADR 0008](adr/0008-ai-assists-backend-decides.md).
 
 ## Known limitations
 
 - Opt-in ITs remain skipped without `RUN_*_IT` and an explicitly provisioned live stack
-- Client lifecycle and realm administration remain incomplete in 0.8.1; broad administration remains deferred behind fleet reporting/onboarding and authorization work
+- Realm administration remains incomplete in 0.8.1; broad administration remains deferred behind fleet reporting/onboarding and authorization work
+- Slice 3 client create/enable/disable writes are verified against disposable Community Keycloak 26.7.1; RHBK writes remain `NOT VERIFIED`
 - Slice 2 client security/flow writes are verified against disposable Community Keycloak 26.7.1; RHBK writes remain `NOT VERIFIED`
 - Exact client redirect URI/Web Origin writes are verified against disposable Community Keycloak 26.7.1; Web Origin `+` behavior and RHBK writes remain `NOT VERIFIED`
 - Destructive ops, password/secret workflows out of scope
@@ -90,9 +93,9 @@ Current working-tree validation:
 | Operations report unit/delegation tests | **7 passed** |
 | UI Vitest | **51 passed** |
 | UI production build | **SUCCESS** |
-| Full Java 21 `mvn clean verify` | **192 passed**, 0 failed; **7 opt-in ITs skipped** without flags |
-| Community Keycloak 26.7.1 controlled-write opt-in IT | **3 passed**: URL apply/read-back/restore, stale-plan rejection, and Slice 2 security/flow apply/read-back/restore |
-| Disposable stack | PostgreSQL, Keycloak 26.7.1, and Prometheus were **HEALTHY** during validation and were removed afterward |
+| Full Java 21 `mvn clean verify` | **205 passed**, 0 failed; **8 opt-in ITs skipped** without flags |
+| Community Keycloak 26.7.1 controlled-write opt-in IT | **4 passed**: URL apply/read-back/restore, stale-plan rejection, Slice 2 security/flow apply/read-back/restore, and Slice 3 create/enable/disable/read-back/fixture cleanup |
+| Disposable stack | PostgreSQL and Keycloak 26.7.1 were **HEALTHY** during Slice 3 validation; all containers and volumes were removed afterward |
 | MCP smoke / Operations Report | **PASS**; report `PARTIAL`, health `UNKNOWN`, assessment `PARTIAL`, metrics `AVAILABLE` for the intentionally infrastructure-free lab target |
 | RHBK | **NOT VERIFIED** |
 

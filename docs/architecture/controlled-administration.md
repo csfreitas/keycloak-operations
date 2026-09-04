@@ -148,4 +148,21 @@ weakening subset by default. Apply starts from a fresh trusted representation,
 mutates only requested allowlisted fields, clears secret material, preserves
 unrelated configuration, and uses the existing fingerprint-bound lifecycle.
 
+## Typed client lifecycle (0.8.1 Slice 3)
+
+`ClientCreateChangeRequest` exposes only `clientId`, display metadata, enabled state,
+public/confidential semantics, Authorization Code flow, Direct Access Grants, and
+service accounts. The protocol is fixed to `openid-connect`; Implicit flow, arbitrary
+attributes, complete representations, supplied secrets, delete, and secret rotation
+are not part of creation. Conservative defaults create a disabled public client with
+Authorization Code enabled and credential-bearing grants disabled.
+
+Creation is HIGH risk and always requires approval under the current policy. Planning
+verifies absence, fingerprints an `exists=false` baseline, and apply rejects a client
+that appeared after planning. `ClientEnabledChangeRequest` treats enable as HIGH risk
+and disable as MEDIUM. Both paths use the existing target authorization, fingerprint,
+approval, audit, idempotency, stale-plan, secret-clearing, and read-back controls.
+Production also denies creation with Direct Access Grants already enabled, preventing
+the creation path from bypassing the Slice 2 weakening policy.
+
 Broader realm/client/user/flow/IdP administration remains incremental after **0.8.1**. Fleet reporting/onboarding and platform authorization are prioritized before expanding all administration domains.

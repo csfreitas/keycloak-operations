@@ -22,6 +22,9 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapter;
 import io.github.keycloakmcp.domain.change.ChangeStatus;
 import io.github.keycloakmcp.domain.change.ChangeRisk;
+import io.github.keycloakmcp.domain.change.ChangeOperationType;
+import io.github.keycloakmcp.domain.change.ClientCreateChangeRequest;
+import io.github.keycloakmcp.domain.change.ClientEnabledChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.ErrorCode;
@@ -42,6 +45,7 @@ class ChangeManagementServiceTest {
     private static final String TARGET_B = "lab-keycloak-b";
     private static final String REALM = "master";
     private static final String CLIENT = "account";
+    private static final String NEW_CLIENT = "slice3-client";
 
     @Inject
     ChangeManagementService changeManagementService;
@@ -53,10 +57,12 @@ class ChangeManagementServiceTest {
     StableAdminApiAdapter adminApi;
 
     private final AtomicReference<ClientRepresentation> liveClient = new AtomicReference<>();
+    private final AtomicReference<ClientRepresentation> createdClient = new AtomicReference<>();
 
     @BeforeEach
     void setUp() {
         liveClient.set(sampleClient("Account", "Account console"));
+        createdClient.set(null);
         when(adminApi.findClientByClientId(any(), eq(REALM), eq(CLIENT)))
                 .thenAnswer(inv -> copy(liveClient.get()));
         doAnswer(inv -> {
@@ -65,6 +71,17 @@ class ChangeManagementServiceTest {
             liveClient.set(copy(updated));
             return null;
         }).when(adminApi).updateClient(any(), eq(REALM), any());
+        when(adminApi.clientExists(any(), eq(REALM), eq(NEW_CLIENT)))
+                .thenAnswer(inv -> createdClient.get() != null);
+        when(adminApi.findClientByClientId(any(), eq(REALM), eq(NEW_CLIENT)))
+                .thenAnswer(inv -> copy(createdClient.get()));
+        doAnswer(inv -> {
+            ClientRepresentation created = copy(inv.getArgument(2));
+            assertThat(created.getSecret()).isNull();
+            created.setId("created-client-uuid");
+            createdClient.set(created);
+            return null;
+        }).when(adminApi).createClient(any(), eq(REALM), any());
     }
 
     @Test
@@ -347,6 +364,82 @@ class ChangeManagementServiceTest {
         assertThat(changeManagementService.getChange(planned.changeId()).status()).isEqualTo(ChangeStatus.FAILED);
     }
 
+    @Test
+    void planApproveCreateAndVerifySecretFreeClient() {
+        var planned = changeManagementService.planClientCreate(new ClientCreateChangeRequest(
+                TARGET_A,
+                REALM,
+                NEW_CLIENT,
+                "Slice 3",
+                "Lifecycle client",
+                null,
+                null,
+                null,
+                null,
+                null,
+                "planner",
+                null));
+
+        assertThat(planned.operation()).isEqualTo(ChangeOperationType.CREATE);
+        assertThat(planned.risk()).isEqualTo(ChangeRisk.HIGH);
+        assertThat(planned.status()).isEqualTo(ChangeStatus.WAITING_APPROVAL);
+        assertThat(planned.desiredState()).containsEntry("enabled", false).doesNotContainKey("secret");
+
+        changeManagementService.approve(planned.changeId(), "approver");
+        var applied = changeManagementService.apply(planned.changeId(), "applier");
+
+        assertThat(applied.status()).isEqualTo(ChangeStatus.VERIFIED);
+        assertThat(createdClient.get().getClientId()).isEqualTo(NEW_CLIENT);
+        assertThat(createdClient.get().getSecret()).isNull();
+    }
+
+    @Test
+    void createPlanRejectsExistingClient() {
+        createdClient.set(sampleClient("Existing", "Existing"));
+        assertThatThrownBy(() -> changeManagementService.planClientCreate(new ClientCreateChangeRequest(
+                        TARGET_A, REALM, NEW_CLIENT, null, null, null, null, null, null, null, "planner", null)))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.CHANGE_CONFLICT));
+        verify(adminApi, never()).createClient(any(), any(), any());
+    }
+
+    @Test
+    void productionRejectsCreateWithDirectAccessGrants() {
+        assertThatThrownBy(() -> changeManagementService.planClientCreate(new ClientCreateChangeRequest(
+                        TARGET_B,
+                        REALM,
+                        NEW_CLIENT,
+                        "Unsafe",
+                        null,
+                        false,
+                        true,
+                        true,
+                        true,
+                        false,
+                        "planner",
+                        null)))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.POLICY_DENIED));
+        verify(adminApi, never()).createClient(any(), any(), any());
+    }
+
+    @Test
+    void planApproveDisableAndVerifyExistingClient() {
+        ClientRepresentation enabled = copy(liveClient.get());
+        enabled.setEnabled(true);
+        liveClient.set(enabled);
+        var planned = changeManagementService.planClientEnabledUpdate(new ClientEnabledChangeRequest(
+                TARGET_A, REALM, CLIENT, false, "planner", null));
+
+        assertThat(planned.risk()).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(planned.status()).isEqualTo(ChangeStatus.WAITING_APPROVAL);
+        changeManagementService.approve(planned.changeId(), "approver");
+
+        assertThat(changeManagementService.apply(planned.changeId(), "applier").status())
+                .isEqualTo(ChangeStatus.VERIFIED);
+        assertThat(liveClient.get().isEnabled()).isFalse();
+    }
+
     private static ClientUrlChangeRequest urlRequest(
             String targetId,
             List<String> redirectUris,
@@ -387,6 +480,7 @@ class ChangeManagementServiceTest {
         rep.setRedirectUris(new java.util.ArrayList<>(List.of("https://old.example/callback")));
         rep.setWebOrigins(new java.util.ArrayList<>(List.of("https://old.example")));
         rep.setRootUrl("https://preserved.example");
+        rep.setEnabled(false);
         rep.setPublicClient(false);
         rep.setServiceAccountsEnabled(false);
         rep.setStandardFlowEnabled(false);
@@ -410,6 +504,7 @@ class ChangeManagementServiceTest {
                 ? null
                 : new java.util.ArrayList<>(source.getWebOrigins()));
         copy.setRootUrl(source.getRootUrl());
+        copy.setEnabled(source.isEnabled());
         copy.setPublicClient(source.isPublicClient());
         copy.setServiceAccountsEnabled(source.isServiceAccountsEnabled());
         copy.setStandardFlowEnabled(source.isStandardFlowEnabled());

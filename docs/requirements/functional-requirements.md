@@ -238,6 +238,15 @@ Client security and flow changes **MUST** validate effective combinations before
 
 Risk and policy for client security and flow settings **MUST** be transition-aware. Enabling Implicit flow, Direct Access Grants, or service accounts; weakening PKCE; and changing public/confidential client-authentication semantics **MUST NOT** be classified as generic Boolean changes. Unsafe weakening transitions **MUST** be denied by default in production.
 
+### FR-CLIENT-008
+
+Client creation **MUST** use a typed allowlist, reject duplicate `clientId` values, default to a disabled public OpenID Connect client, and use the controlled plan/approve/apply/verify lifecycle. Requests, persistence, responses, fingerprints, and audit data **MUST NOT** accept or expose client secrets.
+Creating a client with Direct Access Grants enabled **MUST** be denied by default in production.
+
+### FR-CLIENT-009
+
+Enabling or disabling an existing client **MUST** be a typed transition with deterministic risk, approval policy, stale-baseline protection, secret-cleared update, and read-back verification. Enabling **MUST** be classified at least HIGH and disabling at least MEDIUM.
+
 ### FR-REALM-001
 
 Realm administration **MUST** expose only explicitly supported, non-sensitive, typed properties. Realm create/update/enable/disable operations **MUST** use the controlled change lifecycle and **MUST NOT** accept arbitrary realm attributes or a complete caller-supplied `RealmRepresentation`.

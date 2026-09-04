@@ -19,6 +19,8 @@ import io.github.keycloakmcp.domain.change.ChangeResourceType;
 import io.github.keycloakmcp.domain.change.ChangeRisk;
 import io.github.keycloakmcp.domain.change.ChangeStatus;
 import io.github.keycloakmcp.domain.change.ChangeVerificationResult;
+import io.github.keycloakmcp.domain.change.ClientCreateChangeRequest;
+import io.github.keycloakmcp.domain.change.ClientEnabledChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.McpException;
@@ -47,6 +49,7 @@ public class ChangeManagementService {
     private final ClientConfigChangeSupport clientConfigChangeSupport;
     private final ClientUrlSettingsChangeSupport clientUrlSettingsChangeSupport;
     private final ClientSecuritySettingsChangeSupport clientSecuritySettingsChangeSupport;
+    private final ClientLifecycleChangeSupport clientLifecycleChangeSupport;
     private final ChangeRiskClassifier riskClassifier;
     private final ChangePolicyEvaluator policyEvaluator;
     private final ChangePlanFingerprinter fingerprinter;
@@ -63,6 +66,7 @@ public class ChangeManagementService {
             ClientConfigChangeSupport clientConfigChangeSupport,
             ClientUrlSettingsChangeSupport clientUrlSettingsChangeSupport,
             ClientSecuritySettingsChangeSupport clientSecuritySettingsChangeSupport,
+            ClientLifecycleChangeSupport clientLifecycleChangeSupport,
             ChangeRiskClassifier riskClassifier,
             ChangePolicyEvaluator policyEvaluator,
             ChangePlanFingerprinter fingerprinter,
@@ -76,6 +80,7 @@ public class ChangeManagementService {
         this.clientConfigChangeSupport = clientConfigChangeSupport;
         this.clientUrlSettingsChangeSupport = clientUrlSettingsChangeSupport;
         this.clientSecuritySettingsChangeSupport = clientSecuritySettingsChangeSupport;
+        this.clientLifecycleChangeSupport = clientLifecycleChangeSupport;
         this.riskClassifier = riskClassifier;
         this.policyEvaluator = policyEvaluator;
         this.fingerprinter = fingerprinter;
@@ -355,6 +360,107 @@ public class ChangeManagementService {
         }
     }
 
+    @Transactional
+    public ChangeRecord planClientCreate(ClientCreateChangeRequest request) {
+        if (request == null) {
+            throw McpException.invalidArgument("client create request must not be null");
+        }
+        long start = System.currentTimeMillis();
+        boolean success = false;
+        try {
+            Target target = resolve(request.targetId(), TargetPermission.PLAN);
+            Optional<ChangeRecordEntity> existing = findIdempotent(target, request.idempotencyKey());
+            if (existing.isPresent()) {
+                success = true;
+                return mapper.toDomain(existing.get());
+            }
+            var planned = clientLifecycleChangeSupport.planCreate(request);
+            if (adminApi.clientExists(target, request.realm(), request.clientId().trim())) {
+                throw McpException.changeConflict("client already exists: " + request.clientId().trim());
+            }
+            ChangeRisk risk = riskClassifier.classifyClientCreate(planned.operations());
+            PolicyResult policy = policyEvaluator.evaluateClientCreate(
+                    target.environment(),
+                    risk,
+                    clientLifecycleChangeSupport.denyCreateInProduction(planned.operations()));
+            ChangeRecordEntity entity = persistPlan(
+                    target,
+                    request.realm(),
+                    request.clientId().trim(),
+                    ChangeOperationType.CREATE,
+                    planned.baselineState(),
+                    planned.desiredState(),
+                    planned.operations(),
+                    planned.diff(),
+                    risk,
+                    policy,
+                    request.actor(),
+                    request.idempotencyKey());
+            auditChange("change.plan.client_create", entity, true, Map.of(
+                    "risk", risk.name(),
+                    "policy", policy.decision().name(),
+                    "planFingerprint", entity.planFingerprint));
+            success = true;
+            return mapper.toDomain(entity);
+        } finally {
+            auditService.logToolInvocation(
+                    "ChangeManagementService.planClientCreate",
+                    request.targetId(),
+                    request.realm(),
+                    System.currentTimeMillis() - start,
+                    success);
+        }
+    }
+
+    @Transactional
+    public ChangeRecord planClientEnabledUpdate(ClientEnabledChangeRequest request) {
+        if (request == null) {
+            throw McpException.invalidArgument("client enabled change request must not be null");
+        }
+        long start = System.currentTimeMillis();
+        boolean success = false;
+        try {
+            Target target = resolve(request.targetId(), TargetPermission.PLAN);
+            Optional<ChangeRecordEntity> existing = findIdempotent(target, request.idempotencyKey());
+            if (existing.isPresent()) {
+                success = true;
+                return mapper.toDomain(existing.get());
+            }
+            ClientRepresentation current = adminApi.findClientByClientId(
+                    target, request.realm(), request.clientId());
+            var planned = clientLifecycleChangeSupport.planEnabled(current, request);
+            ChangeRisk risk = riskClassifier.classifyClientEnabled(planned.operations());
+            PolicyResult policy = policyEvaluator.evaluate(
+                    target.environment(), ChangeOperationType.UPDATE, risk, false);
+            ChangeRecordEntity entity = persistPlan(
+                    target,
+                    request.realm(),
+                    request.clientId(),
+                    ChangeOperationType.UPDATE,
+                    planned.baselineState(),
+                    planned.desiredState(),
+                    planned.operations(),
+                    planned.diff(),
+                    risk,
+                    policy,
+                    request.actor(),
+                    request.idempotencyKey());
+            auditChange("change.plan.client_enabled", entity, true, Map.of(
+                    "risk", risk.name(),
+                    "policy", policy.decision().name(),
+                    "planFingerprint", entity.planFingerprint));
+            success = true;
+            return mapper.toDomain(entity);
+        } finally {
+            auditService.logToolInvocation(
+                    "ChangeManagementService.planClientEnabledUpdate",
+                    request.targetId(),
+                    request.realm(),
+                    System.currentTimeMillis() - start,
+                    success);
+        }
+    }
+
     public ChangeRecord getChange(String changeId) {
         ChangeRecordEntity entity = requireEntity(changeId);
         // READ on the owning target
@@ -464,12 +570,19 @@ public class ChangeManagementService {
                 throw McpException.writeNotSupported("resource type not supported in 0.8: " + entity.resourceType);
             }
 
+            List<ChangeOperation> operations = mapper.toDomain(entity).operations();
+            if (ChangeOperationType.CREATE.name().equals(entity.operation)) {
+                applyClientCreate(entity, target);
+                success = ChangeStatus.VERIFIED.name().equals(entity.status);
+                return mapper.toDomain(entity);
+            }
+
             ClientRepresentation current =
                     adminApi.findClientByClientId(target, entity.realm, entity.resourceId);
-            List<ChangeOperation> operations = mapper.toDomain(entity).operations();
             boolean clientUrlChange = clientUrlSettingsChangeSupport.supports(operations);
             boolean clientSecurityChange = clientSecuritySettingsChangeSupport.supports(
                     operations, entity.baselineState);
+            boolean clientEnabledChange = clientLifecycleChangeSupport.supportsEnabledUpdate(operations);
             Map<String, Object> liveBaseline;
             if (clientUrlChange) {
                 liveBaseline = clientUrlSettingsChangeSupport.extractBaseline(
@@ -477,6 +590,8 @@ public class ChangeManagementService {
             } else if (clientSecurityChange) {
                 liveBaseline = clientSecuritySettingsChangeSupport.extractBaseline(
                         current, entity.baselineState.keySet());
+            } else if (clientEnabledChange) {
+                liveBaseline = clientLifecycleChangeSupport.extractEnabledBaseline(current);
             } else {
                 liveBaseline = clientConfigChangeSupport.extractBaseline(current);
             }
@@ -495,6 +610,8 @@ public class ChangeManagementService {
                 clientUrlSettingsChangeSupport.applyToRepresentation(current, operations);
             } else if (clientSecurityChange) {
                 clientSecuritySettingsChangeSupport.applyToRepresentation(current, operations);
+            } else if (clientEnabledChange) {
+                clientLifecycleChangeSupport.applyEnabled(current, operations);
             } else {
                 clientConfigChangeSupport.applyToRepresentation(current, operations);
             }
@@ -576,10 +693,14 @@ public class ChangeManagementService {
                 adminApi.findClientByClientId(target, entity.realm, entity.resourceId);
         List<ChangeOperation> operations = mapper.toDomain(entity).operations();
         List<io.github.keycloakmcp.domain.change.ChangeDiffEntry> mismatches;
-        if (clientUrlSettingsChangeSupport.supports(operations)) {
+        if (ChangeOperationType.CREATE.name().equals(entity.operation)) {
+            mismatches = clientLifecycleChangeSupport.compareCreateDesired(actual, entity.desiredState);
+        } else if (clientUrlSettingsChangeSupport.supports(operations)) {
             mismatches = clientUrlSettingsChangeSupport.compareDesired(actual, entity.desiredState);
         } else if (clientSecuritySettingsChangeSupport.supports(operations, entity.baselineState)) {
             mismatches = clientSecuritySettingsChangeSupport.compareDesired(actual, entity.desiredState);
+        } else if (clientLifecycleChangeSupport.supportsEnabledUpdate(operations)) {
+            mismatches = clientLifecycleChangeSupport.compareEnabledDesired(actual, entity.desiredState);
         } else {
             mismatches = clientConfigChangeSupport.compareDesired(actual, entity.desiredState);
         }
@@ -596,6 +717,100 @@ public class ChangeManagementService {
         entity.verificationMessage = result.message();
         entity.verificationJson = mapper.fromDiff(result.mismatches());
         return result;
+    }
+
+    private void applyClientCreate(ChangeRecordEntity entity, Target target) {
+        if (adminApi.clientExists(target, entity.realm, entity.resourceId)) {
+            entity.status = ChangeStatus.FAILED.name();
+            entity.resultMessage = "REPLAN_REQUIRED: client now exists";
+            entity.updatedAt = Instant.now();
+            auditChange("change.apply.conflict", entity, false, Map.of("reason", "REPLAN_REQUIRED"));
+            throw McpException.changeConflict(
+                    "REPLAN_REQUIRED: client exists since plan was created for change " + entity.id);
+        }
+        String liveBaselineFingerprint = fingerprinter.fingerprintBaseline(Map.of("exists", false));
+        if (!liveBaselineFingerprint.equals(entity.baselineFingerprint)) {
+            throw McpException.changeConflict("REPLAN_REQUIRED: client creation baseline changed");
+        }
+        ClientRepresentation representation =
+                clientLifecycleChangeSupport.toCreateRepresentation(entity.desiredState);
+        representation.setSecret(null);
+        adminApi.createClient(target, entity.realm, representation);
+        entity.appliedAt = Instant.now();
+        entity.status = ChangeStatus.APPLIED.name();
+        entity.updatedAt = Instant.now();
+        ChangeVerificationResult verification = verifyEntity(entity, target);
+        entity.status = verification.verified() ? ChangeStatus.VERIFIED.name() : ChangeStatus.FAILED.name();
+        entity.resultMessage = verification.message();
+        auditChange("change.apply.client_create", entity, verification.verified(), Map.of(
+                "verification", entity.verificationStatus == null ? "" : entity.verificationStatus));
+        if (!verification.verified()) {
+            throw McpException.verificationFailed(verification.message());
+        }
+    }
+
+    private Optional<ChangeRecordEntity> findIdempotent(Target target, String idempotencyKey) {
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            return Optional.empty();
+        }
+        return changeRepository.findByIdempotency(target.id().value(), idempotencyKey.trim());
+    }
+
+    private ChangeRecordEntity persistPlan(
+            Target target,
+            String realm,
+            String resourceId,
+            ChangeOperationType operation,
+            Map<String, Object> baseline,
+            Map<String, Object> desired,
+            List<ChangeOperation> operations,
+            List<io.github.keycloakmcp.domain.change.ChangeDiffEntry> diff,
+            ChangeRisk risk,
+            PolicyResult policy,
+            String actor,
+            String idempotencyKey) {
+        if (policy.decision() == ChangePolicyDecision.DENY) {
+            throw McpException.policyDenied(policy.reason());
+        }
+        String planFingerprint = fingerprinter.fingerprintPlan(
+                target.id().value(), realm, ChangeResourceType.CLIENT.name(), resourceId,
+                operation.name(), operations);
+        String baselineFingerprint = fingerprinter.fingerprintBaseline(baseline);
+        Instant now = Instant.now();
+        ChangeRecordEntity entity = new ChangeRecordEntity();
+        entity.id = UUID.randomUUID().toString();
+        entity.targetId = target.id().value();
+        entity.environment = target.environment().name();
+        entity.resourceType = ChangeResourceType.CLIENT.name();
+        entity.resourceId = resourceId;
+        entity.realm = realm;
+        entity.operation = operation.name();
+        entity.risk = risk.name();
+        entity.policyDecision = policy.decision().name();
+        entity.policyReason = policy.reason();
+        entity.requiresApproval = policy.requiresApproval();
+        entity.status = policy.requiresApproval()
+                ? ChangeStatus.WAITING_APPROVAL.name()
+                : ChangeStatus.APPROVED.name();
+        entity.planFingerprint = planFingerprint;
+        entity.baselineFingerprint = baselineFingerprint;
+        if (!policy.requiresApproval()) {
+            entity.approvalFingerprint = planFingerprint;
+            entity.approvedBy = "POLICY_AUTO";
+            entity.approvedAt = now;
+        }
+        entity.desiredState = desired;
+        entity.baselineState = baseline;
+        entity.diffJson = mapper.fromDiff(diff);
+        entity.operationsJson = mapper.fromOperations(operations);
+        entity.actor = actor;
+        entity.idempotencyKey = idempotencyKey == null || idempotencyKey.isBlank()
+                ? null
+                : idempotencyKey.trim();
+        entity.createdAt = now;
+        entity.updatedAt = now;
+        changeRepository.persist(entity);
+        return entity;
     }
 
     private ChangeRecordEntity requireEntity(String changeId) {
