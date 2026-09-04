@@ -20,7 +20,18 @@ public record AssessmentRunSummary(
         Integer evidenceCompleteness,
         String confidence,
         Map<String, Integer> categoryScores,
-        Map<String, Integer> findingCounts) {
+        Map<String, Integer> findingCounts,
+        Boolean scoreAvailable,
+        String evaluationRevision) {
+
+    /** Old callers/rows have no trustworthy evaluation marker; do not infer availability. */
+    public AssessmentRunSummary(String id, String targetId, String profile, int score,
+            String status, TriggerType triggerType, Instant startedAt, Instant completedAt,
+            Instant createdAt, Integer evidenceCompleteness, String confidence,
+            Map<String, Integer> categoryScores, Map<String, Integer> findingCounts) {
+        this(id, targetId, profile, score, status, triggerType, startedAt, completedAt, createdAt,
+                evidenceCompleteness, confidence, categoryScores, findingCounts, null, null);
+    }
 
     /** Backward-compatible constructor. */
     public AssessmentRunSummary(

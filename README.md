@@ -1,6 +1,6 @@
 # Keycloak / RHBK Operations
 
-Backend + Web UI for **administration**, **diagnostics**, **health**, **assessment**, and **semantic metrics** of [Keycloak](https://www.keycloak.org/) and [Red Hat build of Keycloak (RHBK)](https://docs.redhat.com/en/documentation/red_hat_build_of_keycloak) environments.
+Backend + Web UI for evidence-based **diagnostics**, **health**, **assessment**, **semantic metrics**, and controlled administration of [Keycloak](https://www.keycloak.org/) and [Red Hat build of Keycloak (RHBK)](https://docs.redhat.com/en/documentation/red_hat_build_of_keycloak) environments.
 
 | | |
 |---|---|
@@ -70,6 +70,8 @@ cd ui && npm ci && npm run test:run && npm run build
 
 More: [`docs/development.md`](docs/development.md), [`ui/README.md`](ui/README.md).
 
+Packaged applications fail closed by default. Explicit loopback-only lab: `QUARKUS_PROFILE=local-lab`; authenticated REST/MCP/SSE: `oidc` profile with audience validation and exact role/target permissions. See [identity model](docs/identity-model.md). A read-only demo does not validate production write safety.
+
 ## Documentation
 
 | Path | Purpose |
@@ -86,8 +88,7 @@ More: [`docs/development.md`](docs/development.md), [`ui/README.md`](ui/README.m
 
 ## Roadmap
 
-0.1–0.8 ✅ → **0.8.1 Realm & Client Administration** → **0.8.2 Fleet Reporting & Target Onboarding** → 0.9 schedules/alerts → 1.0.
-Details: [`docs/roadmap.md`](docs/roadmap.md).
+Current priority: **trust hardening → local read-only workflow → verified RHBK/OpenShift → trustworthy reports → January 2027 presentation**. Business/IAM indicators, anomalies and isolated custom-SPI assurance have explicit subsequent gates. Broad administration is deferred. Dates, acceptance, dependencies and implementation status: [complete roadmap](docs/roadmap.md), [demo readiness](docs/milestones/2027-01-demo-readiness.md).
 
 ## Status
 

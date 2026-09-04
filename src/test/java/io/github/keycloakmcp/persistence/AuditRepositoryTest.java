@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,5 +44,27 @@ class AuditRepositoryTest {
         assertThat(auditRepository.list(Optional.of(targetId), Optional.of("MCP"), 0, 20).total())
                 .isGreaterThanOrEqualTo(1);
         assertThat(auditRepository.findByTraceId(entity.traceId)).isPresent();
+    }
+
+    @Test
+    @Transactional
+    void authorizedTargetsConstrainBothPageAndTotalAndExcludeGlobalRecords() {
+        String ownTarget = "audit-own-" + UUID.randomUUID();
+        String otherTarget = "audit-other-" + UUID.randomUUID();
+        for (String target : new String[] { ownTarget, otherTarget, null }) {
+            AuditEventEntity event = new AuditEventEntity();
+            event.id = UUID.randomUUID().toString();
+            event.traceId = UUID.randomUUID().toString();
+            event.source = "MCP";
+            event.targetId = target;
+            event.operation = "scope.test";
+            event.status = "SUCCESS";
+            event.createdAt = Instant.now();
+            auditRepository.persist(event);
+        }
+        var scoped = auditRepository.listForTargets(Set.of(ownTarget), Optional.empty(), 0, 1);
+        assertThat(scoped.total()).isEqualTo(1);
+        assertThat(scoped.items()).hasSize(1).allMatch(event -> ownTarget.equals(event.targetId));
+        assertThat(auditRepository.listForTargets(Set.of(), Optional.empty(), 0, 20).total()).isZero();
     }
 }

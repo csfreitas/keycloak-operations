@@ -99,6 +99,25 @@ public final class DeclarativeRule implements Rule {
         return severity;
     }
 
+    /** Evaluate resource rules independently; global evidence remains available in each scope. */
+    public List<EvidenceContext> evaluationContexts(EvidenceContext context) {
+        if (subjectTypeHint != SubjectType.REALM && subjectTypeHint != SubjectType.CLIENT) {
+            return List.of(context);
+        }
+        List<EvidenceContext> scoped = context.forSubjects(subjectTypeHint);
+        if (scoped.isEmpty()) {
+            // Retain NOT_EVALUATED for absent collections and compatibility with old unscoped evidence.
+            return List.of(context);
+        }
+        boolean masterOnly = ConditionEvaluator.referencedKeys(condition).stream()
+                .anyMatch(key -> key.startsWith("realm.master."));
+        List<EvidenceContext> selected = scoped.stream().filter(c -> masterOnly
+                ? c.subject().map(s -> "master".equalsIgnoreCase(s.id())).orElse(false)
+                : !Boolean.FALSE.equals(c.get("realm.assessmentIncluded").orElse(true))).toList();
+        return masterOnly && selected.isEmpty()
+                ? List.of(context.forSubject(EvidenceSubject.realm("master"))) : selected;
+    }
+
     public Applicability applicability(EvidenceContext context) {
         if (context == null) {
             return Applicability.SKIPPED;
@@ -199,7 +218,7 @@ public final class DeclarativeRule implements Rule {
     private Finding openFinding(EvidenceContext context) {
         Map<String, Object> ev = new LinkedHashMap<>();
         for (String key : ConditionEvaluator.referencedKeys(condition)) {
-            context.find(key).ifPresent(e -> ev.put(key, e.value()));
+            context.find(key).filter(e -> e.value() != null).ifPresent(e -> ev.put(key, e.value()));
         }
         ev.put("pack", packId);
         if (supportLevel != null) {
@@ -258,6 +277,9 @@ public final class DeclarativeRule implements Rule {
     }
 
     private EvidenceSubject resolveSubject(EvidenceContext context) {
+        if (context.subject().isPresent()) {
+            return context.subject().get();
+        }
         if (subjectTypeHint == SubjectType.REALM) {
             return context.findString("realm.name")
                     .map(EvidenceSubject::realm)

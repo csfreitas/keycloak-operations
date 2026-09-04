@@ -2,7 +2,9 @@
 
 ## Purpose
 
-An operations report gives a human or AI agent one sanitized, point-in-time view of a registered Keycloak/RHBK target. It composes existing application services; it is not a second assessment engine and it does not infer missing facts.
+An operations report gives a human or AI agent sanitized observations of a registered Keycloak/RHBK target over a collection window. It composes existing services; it is not an atomic snapshot, second assessment engine or source of inferred missing facts.
+
+Schema 1.1 adds explicit start/end, `INDEPENDENT_SECTION_COLLECTIONS` mode, bundled-rule-catalog SHA-256 and `retainedEvidenceReplayAvailable=false`. The hash identifies packaged rule resources, not runtime overrides or retained evidence. Snapshot/health/assessment IDs remain references, not proof of complete replay. Unavailable assessment scores are labeled INCONCLUSIVE in Markdown and nullable in the MCP envelope; the structured legacy numeric field remains with a computed `scoreAvailable` flag. See [trustworthy reporting](trustworthy-reporting.md) for the complete target design and [IAM/business observability](iam-business-observability.md) for planned indicators.
 
 ```mermaid
 flowchart TB

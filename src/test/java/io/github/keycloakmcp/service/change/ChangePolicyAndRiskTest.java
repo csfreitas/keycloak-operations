@@ -20,6 +20,18 @@ class ChangePolicyAndRiskTest {
     private final ChangePlanFingerprinter fingerprinter = new ChangePlanFingerprinter();
 
     @Test
+    void safetyContextHashSeparatesNullEmptyAndDelimiterValues() {
+        Map<String, Object> withNull = new java.util.HashMap<>();
+        withNull.put("name", null);
+        assertThat(fingerprinter.fingerprintContext(withNull))
+                .isNotEqualTo(fingerprinter.fingerprintContext(Map.of("name", "")));
+        assertThat(fingerprinter.fingerprintContext(Map.of("a", "x|b=y")))
+                .isNotEqualTo(fingerprinter.fingerprintContext(Map.of("a", "x", "b", "y")));
+        assertThat(fingerprinter.fingerprintContext(Map.of("a", "x", "b", "y")))
+                .isEqualTo(fingerprinter.fingerprintContext(Map.of("b", "y", "a", "x")));
+    }
+
+    @Test
     void classifiesNameAsLowAndPkceAsMedium() {
         assertThat(riskClassifier.classifyProperty("name")).isEqualTo(ChangeRisk.LOW);
         assertThat(riskClassifier.classifyProperty("pkceCodeChallengeMethod")).isEqualTo(ChangeRisk.MEDIUM);

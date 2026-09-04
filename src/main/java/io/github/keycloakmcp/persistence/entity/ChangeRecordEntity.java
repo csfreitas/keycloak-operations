@@ -63,6 +63,15 @@ public class ChangeRecordEntity extends PanacheEntityBase {
     @Column(name = "approval_fingerprint", length = 128)
     public String approvalFingerprint;
 
+    @Column(name = "policy_revision", length = 128)
+    public String policyRevision;
+
+    @Column(name = "target_context_fingerprint", length = 128)
+    public String targetContextFingerprint;
+
+    @Column(name = "integrity_fingerprint", length = 128)
+    public String integrityFingerprint;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "desired_state", columnDefinition = "jsonb", nullable = false)
     public Map<String, Object> desiredState;
@@ -79,16 +88,16 @@ public class ChangeRecordEntity extends PanacheEntityBase {
     @Column(name = "operations_json", columnDefinition = "jsonb", nullable = false)
     public List<Map<String, Object>> operationsJson;
 
-    @Column(name = "actor")
+    @Column(name = "actor", columnDefinition = "text")
     public String actor;
 
-    @Column(name = "approved_by")
+    @Column(name = "approved_by", columnDefinition = "text")
     public String approvedBy;
 
     @Column(name = "approved_at")
     public Instant approvedAt;
 
-    @Column(name = "rejected_by")
+    @Column(name = "rejected_by", columnDefinition = "text")
     public String rejectedBy;
 
     @Column(name = "rejected_at")

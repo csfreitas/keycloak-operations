@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { generateOperationsReport } from '../api/reports';
 import type { OperationsReport, TargetOverview } from '../api/types';
 import { ErrorState } from '../components/ErrorState';
 import { StatusBadge } from '../components/StatusBadge';
+import { AssessmentScore } from '../components/AssessmentScore';
 
 interface OutletCtx {
   targetId: string;
@@ -14,19 +15,33 @@ export function OperationsReportPage() {
   const { targetId } = useOutletContext<OutletCtx>();
   const [profile, setProfile] = useState('');
   const [metricsWindow, setMetricsWindow] = useState('15m');
-  const [report, setReport] = useState<OperationsReport | null>(null);
+  const [storedReport, setReport] = useState<OperationsReport | null>(null);
+  const report = storedReport?.targetId === targetId ? storedReport : null;
+  const generation = useRef(0);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    generation.current += 1;
+    setReport(null);
+    setGenerating(false);
+    setError(null);
+    return () => { generation.current += 1; };
+  }, [targetId]);
+
   const generate = () => {
+    const requestGeneration = ++generation.current;
     setGenerating(true);
     setError(null);
     generateOperationsReport(targetId, profile, metricsWindow)
       .then((next) => {
+        if (requestGeneration !== generation.current) return;
+        if (next.targetId !== targetId) throw new Error('Report target does not match the selected target');
         setReport(next);
         setGenerating(false);
       })
       .catch((err: unknown) => {
+        if (requestGeneration !== generation.current) return;
         setError((err as Error).message);
         setGenerating(false);
       });
@@ -48,7 +63,7 @@ export function OperationsReportPage() {
         <div>
           <h2 className="page-header__title">Operations Report</h2>
           <p className="page-header__subtitle">
-            Point-in-time platform, health, assessment, findings, and performance evidence
+            Platform, health, assessment and performance observations collected over a time window
           </p>
         </div>
         <div className="page-header__actions">
@@ -116,13 +131,22 @@ export function OperationsReportPage() {
             <div className="card">
               <div className="card__header"><h3 className="card__title">Target state</h3></div>
               <p className="text-sm">Health: <strong>{report.healthCheck?.overallStatus ?? 'Unavailable'}</strong></p>
-              <p className="text-sm">Assessment score: <strong>{report.assessment?.overallScore ?? 'Unavailable'}</strong></p>
+              <div className="text-sm">Assessment: <AssessmentScore
+                score={(report.assessment?.rulesEvaluated ?? 0) > 0 ? report.assessment?.overallScore ?? null : null}
+                status={report.assessment?.status ?? null}
+                completeness={report.assessment?.evidenceCompleteness ?? null}
+                scoreAvailable={report.assessment?.scoreAvailable}
+              /></div>
               <p className="text-sm">Infrastructure: <strong>{report.configuredInfrastructureType}</strong></p>
             </div>
           </div>
 
           <div className="card" style={{ marginBottom: 'var(--space-6)' }}>
             <div className="card__header"><h3 className="card__title">Collection sections</h3></div>
+            {report.provenance && <p className="text-xs text-muted">
+              Collection window: {report.provenance.collectionStartedAt} — {report.provenance.collectionCompletedAt}.
+              Independent observations, not an atomic snapshot.
+            </p>}
             <div className="table-wrapper">
               <table>
                 <thead><tr><th>Section</th><th>Status</th><th>Message</th></tr></thead>

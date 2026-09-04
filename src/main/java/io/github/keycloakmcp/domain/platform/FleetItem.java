@@ -26,5 +26,16 @@ public record FleetItem(
         boolean metricsConfigured,
         Instant latestHealthAt,
         Instant latestAssessmentAt,
-        Map<String, String> tags) {
+        Map<String, String> tags,
+        Boolean scoreAvailable) {
+
+    public FleetItem(String targetId, String displayName, String productType, String environment,
+            boolean enabled, String productVersion, String runtime, HealthStatus healthStatus,
+            Integer latestAssessmentScore, String latestAssessmentStatus, Integer evidenceCompleteness,
+            Integer criticalFindings, Integer highFindings, boolean metricsConfigured,
+            Instant latestHealthAt, Instant latestAssessmentAt, Map<String, String> tags) {
+        this(targetId, displayName, productType, environment, enabled, productVersion, runtime,
+                healthStatus, latestAssessmentScore, latestAssessmentStatus, evidenceCompleteness,
+                criticalFindings, highFindings, metricsConfigured, latestHealthAt, latestAssessmentAt, tags, null);
+    }
 }

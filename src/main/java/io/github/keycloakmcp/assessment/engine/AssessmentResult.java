@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Assessment outcome. {@code id} is null until persisted by the platform layer.
  */
@@ -30,6 +32,13 @@ public record AssessmentResult(
     /** Backward-compatible accessor used by older call sites. */
     public int score() {
         return overallScore;
+    }
+
+    /** The legacy numeric score is not a posture conclusion when evidence is incomplete. */
+    @JsonProperty(value = "scoreAvailable", access = JsonProperty.Access.READ_ONLY)
+    public boolean scoreAvailable() {
+        return status == AssessmentStatus.COMPLETE && evidenceCompleteness == 100 && rulesEvaluated > 0
+                && rulesNotEvaluated == 0 && (missingEvidence == null || missingEvidence.isEmpty());
     }
 
     public AssessmentResult withId(String id) {

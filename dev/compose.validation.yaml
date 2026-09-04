@@ -1,0 +1,50 @@
+# Disposable validation only. No named/anonymous data volumes; no public ports.
+name: keycloak-operations-validation
+services:
+  postgres:
+    image: postgres:16
+    container_name: kcops-validation-postgres
+    labels: {io.github.keycloak-operations.purpose: validation}
+    environment: {POSTGRES_DB: kcops, POSTGRES_USER: kcops, POSTGRES_PASSWORD: kcops}
+    ports: ["127.0.0.1:5432:5432"]
+    tmpfs: ["/var/lib/postgresql/data:rw"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kcops -d kcops"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.1
+    container_name: kcops-validation-keycloak
+    labels: {io.github.keycloak-operations.purpose: validation}
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_HTTP_METRICS_HISTOGRAMS_ENABLED: "true"
+      KC_EVENT_METRICS_USER_ENABLED: "true"
+    ports: ["127.0.0.1:8080:8080", "127.0.0.1:9000:9000"]
+    volumes: ["./keycloak/import:/opt/keycloak/data/import:ro,Z"]
+  rhbk:
+    profiles: ["rhbk"]
+    image: registry.redhat.io/rhbk/keycloak-rhel9:26.6
+    container_name: kcops-validation-rhbk
+    labels: {io.github.keycloak-operations.purpose: validation}
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+    ports: ["127.0.0.1:8280:8080", "127.0.0.1:9020:9000"]
+    volumes: ["./keycloak/import:/opt/keycloak/data/import:ro,Z"]
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: kcops-validation-prometheus
+    labels: {io.github.keycloak-operations.purpose: validation}
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus"]
+    ports: ["127.0.0.1:9090:9090"]
+    volumes: ["./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro,Z"]
+    tmpfs: ["/prometheus:rw,mode=1777"]

@@ -12,6 +12,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ChangePolicyEvaluator {
 
+    /** Bump whenever validation, transition risk, or execution policy semantics change. */
+    public static final String REVISION = "2026-09-trust-foundation-v1";
+
     public record PolicyResult(ChangePolicyDecision decision, String reason, boolean requiresApproval) {
     }
 

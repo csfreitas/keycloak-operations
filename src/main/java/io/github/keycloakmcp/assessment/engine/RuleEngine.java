@@ -3,7 +3,6 @@ package io.github.keycloakmcp.assessment.engine;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -38,49 +37,56 @@ public class RuleEngine {
             if (rule == null) {
                 continue;
             }
-            if (rule instanceof DeclarativeRule declarative) {
-                DeclarativeRule.Applicability applicability = declarative.applicability(context);
-                if (applicability == DeclarativeRule.Applicability.SKIPPED) {
+            List<EvidenceContext> contexts = rule instanceof DeclarativeRule declarative
+                    ? declarative.evaluationContexts(context) : List.of(context);
+            if (contexts.isEmpty()) {
+                skipped++;
+            }
+            for (EvidenceContext scopedContext : contexts) {
+                if (rule instanceof DeclarativeRule declarative) {
+                    DeclarativeRule.Applicability applicability = declarative.applicability(scopedContext);
+                    if (applicability == DeclarativeRule.Applicability.SKIPPED) {
+                        skipped++;
+                        continue;
+                    }
+                    if (applicability == DeclarativeRule.Applicability.NOT_EVALUABLE) {
+                        notEvaluated++;
+                        List<String> keys = declarative.missingEvidenceKeys(scopedContext);
+                        missing.addAll(keys);
+                        String missingKey = keys.isEmpty() ? "required-evidence" : keys.get(0);
+                        all.add(declarative.notEvaluated(scopedContext, missingKey));
+                        continue;
+                    }
+                    evaluated++;
+                    Optional<Finding> finding = declarative.evaluate(scopedContext);
+                    if (finding.isEmpty()) {
+                        continue;
+                    }
+                    Finding f = finding.get();
+                    all.add(f);
+                    if (f.status() == FindingStatus.OPEN || f.status() == FindingStatus.FAIL) {
+                        matched++;
+                    } else if (f.status() == FindingStatus.NOT_EVALUATED) {
+                        evaluated--;
+                        notEvaluated++;
+                        Object m = f.evidence() == null ? null : f.evidence().get("missingEvidence");
+                        if (m != null) {
+                            missing.add(String.valueOf(m));
+                        }
+                    }
+                    continue;
+                }
+
+                if (!rule.applies(scopedContext)) {
                     skipped++;
                     continue;
                 }
-                if (applicability == DeclarativeRule.Applicability.NOT_EVALUABLE) {
-                    notEvaluated++;
-                    List<String> keys = declarative.missingEvidenceKeys(context);
-                    missing.addAll(keys);
-                    String missingKey = keys.isEmpty() ? "required-evidence" : keys.get(0);
-                    all.add(declarative.notEvaluated(context, missingKey));
-                    continue;
-                }
                 evaluated++;
-                Optional<Finding> finding = declarative.evaluate(context);
-                if (finding.isEmpty()) {
-                    continue;
-                }
-                Finding f = finding.get();
-                all.add(f);
-                if (f.status() == FindingStatus.OPEN || f.status() == FindingStatus.FAIL) {
+                Optional<Finding> finding = rule.evaluate(scopedContext);
+                if (finding.isPresent()) {
+                    all.add(finding.get());
                     matched++;
-                } else if (f.status() == FindingStatus.NOT_EVALUATED) {
-                    evaluated--;
-                    notEvaluated++;
-                    Object m = f.evidence() == null ? null : f.evidence().get("missingEvidence");
-                    if (m != null) {
-                        missing.add(String.valueOf(m));
-                    }
                 }
-                continue;
-            }
-
-            if (!rule.applies(context)) {
-                skipped++;
-                continue;
-            }
-            evaluated++;
-            Optional<Finding> finding = rule.evaluate(context);
-            if (finding.isPresent()) {
-                all.add(finding.get());
-                matched++;
             }
         }
         return new RuleEvaluationResult(

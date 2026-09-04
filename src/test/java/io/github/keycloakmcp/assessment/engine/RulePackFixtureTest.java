@@ -104,8 +104,8 @@ class RulePackFixtureTest {
                 ev("realm.bruteForceProtected", false),
                 ev("realm.sslRequired", "none"),
                 ev("keycloak.clients.wildcardRedirectUri", 2),
-                ev("keycloak.clients.wildcardWebOrigin", 1),
-                ev("keycloak.clients.implicitFlowCount", 1),
+                ev("keycloak.clients.wildcardWebOrigins", 1),
+                ev("keycloak.clients.implicitFlowEnabled", 1),
                 ev("keycloak.clients.publicWithoutPkceS256", 3),
                 ev("keycloak.management.publiclyExposed", true)));
 

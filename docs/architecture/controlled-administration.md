@@ -7,6 +7,12 @@ Related: [ADR 0007](../adr/0007-plan-approve-apply-change-model.md),
 [milestone 0.8.1](../milestones/0.8.1-realm-client-administration.md),
 [security](security.md), [persistence](persistence.md).
 
+## H1 safety update
+
+Identity is derived from the authenticated caller (or explicit `local-lab` marker), never actor/approver request text. Approval/rejection require separate `APPROVE`. Lists require an authorized `targetId`. Metadata-only legacy updates no longer accept PKCE; typed security settings own that semantic change. V8 adds policy/target-context/plan-integrity fingerprints; old pending plans remain readable/rejectable but need replanning before approval/apply, with a new idempotency key. Reusing an existing key for different normalized intent is rejected. Approval/apply revalidate integrity and current policy; same-plan lifecycle operations hold a DB row lock.
+
+Remaining before production writes: durable attempt/reconciliation after remote success or uncertain timeout, coordination across different plans for one resource, expiry and genuinely human-only approval. MCP still exposes approval to separately authorized principals; it is not proof of human presence. The presentation uses read-only credentials and does not depend on writes. See [roadmap](../roadmap.md).
+
 ## Principle
 
 AI and REST callers never receive unrestricted write access.
@@ -72,6 +78,7 @@ Target-scoped permissions:
 | READ | Read target configuration |
 | ASSESS | Run assessments / health |
 | PLAN | Create plans and diffs |
+| APPROVE | Approve/reject a plan using trusted identity |
 | WRITE | Apply approved non-admin changes |
 | ADMIN | High-impact administrative applies (future) |
 
@@ -95,7 +102,7 @@ Defaults (configurable):
 - **Baseline fingerprint** — hash of observed current state at plan time.
 - Approval stores the approved fingerprint; apply refuses mismatches (`APPROVAL_INVALID`).
 - Before apply, re-read resource; baseline drift → `CHANGE_CONFLICT` / `REPLAN_REQUIRED`.
-- Legacy scalar plans retain the 0.8 fingerprint algorithm; structured collection plans use canonical typed values so upgrading does not invalidate pending scalar plans.
+- Legacy scalar operation fingerprints remain readable for history; structured collection plans use canonical typed values. V8 safety-context requirements deliberately prevent approval/application of pre-context pending plans: create a fresh plan with a new idempotency key. Historical readability is not execution compatibility.
 
 ## Verification
 
@@ -124,7 +131,7 @@ Secrets are never stored; values pass `SensitiveDataFilter` before persist.
 ## Proof-of-concept mutation (0.8)
 
 Controlled non-sensitive **client configuration update** (allowlisted properties such as
-display name / description / PKCE challenge method). Demonstrates the full lifecycle
+display name / description; PKCE moved exclusively to typed security operations). Demonstrates the full lifecycle
 without delete, password, or secret workflows.
 
 ## Typed client URL sets (0.8.1 Slice 1)

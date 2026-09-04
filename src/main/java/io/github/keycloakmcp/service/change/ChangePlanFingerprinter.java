@@ -19,6 +19,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ChangePlanFingerprinter {
 
+    /** Typed, length-delimited canonical hash; unlike legacy hashes, null is not empty. */
+    public String fingerprintContext(Map<String, Object> context) {
+        return sha256("context-v1:" + canonical(context));
+    }
+
     public String fingerprintPlan(
             String targetId,
             String realm,

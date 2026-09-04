@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Bootstrap local Keycloak for keycloak-operations-mcp development.
-# DEV ONLY: assigns realm-admin on mcp-demo for convenience.
+# DEV ONLY: client-write and master-admin grants are explicit development flags.
 # Production must use FGAP / least privilege — NOT realm-admin.
 set -euo pipefail
 
@@ -164,11 +164,13 @@ for role in "${OPTIONAL_ROLES[@]}"; do
     || log "WARN: optional role ${TARGET_RM_CLIENT_ID}/${role} not assigned"
 done
 
-# Target-scoped client writes require manage-clients. Do not grant manage-realm:
-# it is broader than the typed client operations exposed by the platform.
-log "Assigning DEV-ONLY ${TARGET_RM_CLIENT_ID}/manage-clients..."
-assign_client_role "${AUTH_REALM}" "${TARGET_RM_ID}" "manage-clients" \
-  || die "manage-clients is required for controlled client-write validation"
+# Do not elevate a read-only fixture. Existing privileged clients must not be reused
+# for a least-privilege claim; create a fresh fixture instead.
+if [[ "${MCP_GRANT_CLIENT_WRITES:-true}" == "true" ]]; then
+  log "Assigning DEV-ONLY ${TARGET_RM_CLIENT_ID}/manage-clients..."
+  assign_client_role "${AUTH_REALM}" "${TARGET_RM_ID}" "manage-clients" \
+    || die "manage-clients is required for controlled client-write validation"
+fi
 
 # Verify client_credentials
 log "Verifying client_credentials for ${MCP_CLIENT_ID}..."

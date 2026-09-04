@@ -4,6 +4,7 @@ public enum TargetPermission {
     READ,
     ASSESS,
     PLAN,
+    APPROVE,
     WRITE,
     ADMIN
 }

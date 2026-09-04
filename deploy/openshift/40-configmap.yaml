@@ -10,11 +10,30 @@ data:
     quarkus.http.host=0.0.0.0
     quarkus.http.port=8081
     quarkus.management.enabled=true
+    quarkus.management.host=0.0.0.0
     quarkus.management.port=9001
+    platform.authorization.mode=authenticated
+    quarkus.http.auth.permission.platform.policy=authenticated
+    quarkus.mcp.server.traffic-logging.enabled=false
     quarkus.otel.enabled=true
     mcp.read-only=true
-    keycloak.auth-realm=master
-    keycloak.client-id=keycloak-mcp
+    # Explicit assessor grant: provision this Identity A role only for intended callers.
+    platform.authorization.grants.ops-assessor.targets=presentation-rhbk
+    platform.authorization.grants.ops-assessor.permissions=READ,ASSESS
+    # Do not discover inherited localhost demo targets from a cluster deployment.
+    mcp.targets.lab-keycloak-a.enabled=false
+    mcp.targets.lab-keycloak-b.enabled=false
+    mcp.targets.presentation-rhbk.display-name=Presentation RHBK
+    mcp.targets.presentation-rhbk.type=RHBK
+    mcp.targets.presentation-rhbk.environment=TEST
+    mcp.targets.presentation-rhbk.enabled=true
+    mcp.targets.presentation-rhbk.keycloak.url=${KEYCLOAK_URL}
+    mcp.targets.presentation-rhbk.keycloak.auth-realm=${KEYCLOAK_AUTH_REALM}
+    mcp.targets.presentation-rhbk.keycloak.client-id=${KEYCLOAK_CLIENT_ID}
+    mcp.targets.presentation-rhbk.keycloak.credential-ref=presentation-rhbk
+    mcp.credentials.presentation-rhbk.client-secret=${KEYCLOAK_CLIENT_SECRET}
+    mcp.targets.presentation-rhbk.infrastructure.type=OPENSHIFT
+    mcp.targets.presentation-rhbk.infrastructure.namespace=${RHBK_NAMESPACE}
     assessment.rules.path=rules
     assessment.default-profile=rhbk-openshift-production
     discovery.kubernetes.enabled=true

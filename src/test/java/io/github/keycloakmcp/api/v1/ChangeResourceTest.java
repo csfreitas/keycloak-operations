@@ -16,6 +16,7 @@ class ChangeResourceTest {
     @Test
     void listChangesReturnsPage() {
         given()
+                .queryParam("targetId", "lab-keycloak-a")
                 .when().get("/api/v1/changes")
                 .then()
                 .statusCode(200)
@@ -23,6 +24,12 @@ class ChangeResourceTest {
                 .body("items", notNullValue())
                 .body("page", equalTo(0))
                 .body("total", greaterThanOrEqualTo(0));
+    }
+
+    @Test
+    void listChangesRequiresAnExplicitTarget() {
+        given().when().get("/api/v1/changes")
+                .then().statusCode(400).body("code", equalTo("INVALID_ARGUMENT"));
     }
 
     @Test

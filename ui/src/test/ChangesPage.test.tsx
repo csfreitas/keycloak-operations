@@ -8,6 +8,7 @@ vi.mock('../api/changes');
 
 describe('ChangesPage', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     vi.mocked(changesApi.fetchChanges).mockResolvedValue({
       items: [
         {
@@ -45,7 +46,7 @@ describe('ChangesPage', () => {
 
   it('renders pending changes table', async () => {
     render(
-      <MemoryRouter initialEntries={['/changes']}>
+      <MemoryRouter initialEntries={['/changes?targetId=lab-keycloak-a']}>
         <Routes>
           <Route path="/changes" element={<ChangesPage />} />
         </Routes>
@@ -57,5 +58,11 @@ describe('ChangesPage', () => {
     });
     expect(screen.getByText('lab-keycloak-a')).toBeInTheDocument();
     expect(screen.getByText(/CLIENT/)).toBeInTheDocument();
+  });
+
+  it('never requests unscoped changes', async () => {
+    render(<MemoryRouter initialEntries={['/changes']}><ChangesPage /></MemoryRouter>);
+    expect(await screen.findByText('Select a target')).toBeInTheDocument();
+    expect(changesApi.fetchChanges).not.toHaveBeenCalled();
   });
 });

@@ -38,15 +38,9 @@ public class TargetResource {
 
     @GET
     public List<?> list() {
+        targetAuthorization.assertSession();
         return sensitiveDataFilter.redact(targetRegistry.list().stream()
-                .filter(t -> {
-                    try {
-                        targetAuthorization.assertAllowed(t, TargetPermission.READ);
-                        return true;
-                    } catch (RuntimeException e) {
-                        return false;
-                    }
-                })
+                .filter(t -> targetAuthorization.isAllowed(t, TargetPermission.READ))
                 .map(this::toStatus)
                 .toList());
     }

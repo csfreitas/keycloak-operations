@@ -29,6 +29,17 @@ spec:
         - protocol: TCP
           port: 9001
   egress:
+    # Adapt these exact selectors to the provisioned database; no database is created by this template.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: REPLACE_WITH_POSTGRES_NAMESPACE
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: REPLACE_WITH_POSTGRES_APP_LABEL
+      ports:
+        - protocol: TCP
+          port: 5432
     # DNS
     - to:
         - namespaceSelector:

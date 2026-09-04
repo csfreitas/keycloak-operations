@@ -41,13 +41,13 @@ public class ChangeTools {
     @Tool(
             name = "keycloak_plan_client_update",
             description = "Plan a controlled non-sensitive client configuration update "
-                    + "(name, description, pkceCodeChallengeMethod). Does not apply the change.")
+                    + "(name, description). Use the typed client-security tool for PKCE. Does not apply the change.")
     public ChangeRecord keycloakPlanClientUpdate(
             @ToolArg(description = TARGET_ID_HINT) String targetId,
             @ToolArg(description = "Realm name") String realm,
             @ToolArg(description = "OAuth/OIDC clientId") String clientId,
             @ToolArg(description = "Desired non-sensitive properties as a map") Map<String, Object> desiredState,
-            @ToolArg(description = "Optional actor identity", required = false) String actor,
+            @ToolArg(description = "Deprecated compatibility field; authenticated identity is used", required = false) String actor,
             @ToolArg(description = "Optional idempotency key", required = false) String idempotencyKey) {
         return invoke(
                 "keycloak_plan_client_update",
@@ -185,9 +185,9 @@ public class ChangeTools {
         return invoke("keycloak_get_change", null, null, () -> changeManagementService.getChange(changeId));
     }
 
-    @Tool(name = "keycloak_list_changes", description = "List change lifecycle records")
+    @Tool(name = "keycloak_list_changes", description = "List change lifecycle records for one authorized target")
     public PageResult<ChangeRecord> keycloakListChanges(
-            @ToolArg(description = TARGET_ID_HINT, required = false) String targetId,
+            @ToolArg(description = TARGET_ID_HINT) String targetId,
             @ToolArg(description = "Optional status filter", required = false) String status,
             @ToolArg(description = "Page number", required = false) Integer page,
             @ToolArg(description = "Page size", required = false) Integer size) {
@@ -202,10 +202,10 @@ public class ChangeTools {
                         size == null ? 20 : size));
     }
 
-    @Tool(name = "keycloak_approve_change", description = "Approve a planned change (bound to plan fingerprint)")
+    @Tool(name = "keycloak_approve_change", description = "Approve a planned change (requires separate APPROVE permission; bound to plan integrity)")
     public ChangeRecord keycloakApproveChange(
             @ToolArg(description = "Change identifier") String changeId,
-            @ToolArg(description = "Approver identity", required = false) String approver) {
+            @ToolArg(description = "Deprecated compatibility field; authenticated identity is used", required = false) String approver) {
         return invoke(
                 "keycloak_approve_change",
                 null,
@@ -216,7 +216,7 @@ public class ChangeTools {
     @Tool(name = "keycloak_reject_change", description = "Reject a planned change")
     public ChangeRecord keycloakRejectChange(
             @ToolArg(description = "Change identifier") String changeId,
-            @ToolArg(description = "Rejector identity", required = false) String rejector,
+            @ToolArg(description = "Deprecated compatibility field; authenticated identity is used", required = false) String rejector,
             @ToolArg(description = "Rejection reason", required = false) String reason) {
         return invoke(
                 "keycloak_reject_change",
@@ -230,7 +230,7 @@ public class ChangeTools {
             description = "Apply an approved change plan (requires mcp.read-only=false and WRITE permission)")
     public ChangeRecord keycloakApplyChange(
             @ToolArg(description = "Change identifier") String changeId,
-            @ToolArg(description = "Actor identity", required = false) String actor) {
+            @ToolArg(description = "Deprecated compatibility field; authenticated identity is used", required = false) String actor) {
         return invoke(
                 "keycloak_apply_change",
                 null,
@@ -256,7 +256,7 @@ public class ChangeTools {
         } catch (ToolCallException e) {
             throw e;
         } catch (Exception e) {
-            throw new ToolCallException("INTERNAL_ERROR: " + e.getMessage());
+            throw new ToolCallException("INTERNAL_ERROR: change operation failed");
         } finally {
             long duration = System.currentTimeMillis() - start;
             metrics.recordToolInvocation(toolName, duration, success);

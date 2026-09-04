@@ -2,6 +2,10 @@
 
 Product delivery slices. Status from Git / `pom.xml` / code — not chat history.
 
+## Current delivery priority
+
+The [complete roadmap](../roadmap.md) and [January demo specification](2027-01-demo-readiness.md) govern delivery order: **H1 trust hardening → D1 local read-only workflow → D2 real RHBK/OpenShift → D3 trustworthy documents → D4/D5 readiness**. Essential authorization is brought forward from 0.8.3. Remaining 0.8.1 realm Slice 4 and broad administration are deferred to P2, not silently declared complete. IAM/business reporting, alerts and isolated SPI assurance are specified as separate tracks. Historical milestone numbers below remain references, not a mandate to continue CRUD before these gates.
+
 | Milestone | Description | Status |
 |-----------|-------------|--------|
 | [0.1](0.1-keycloak-admin-readonly.md) | Keycloak Admin Read-only | COMPLETED |
@@ -13,9 +17,9 @@ Product delivery slices. Status from Git / `pom.xml` / code — not chat history
 | [0.6.1](0.6.1-metrics-hardening.md) | Metrics Hardening | COMPLETED |
 | [0.7](0.7-web-ui.md) | Web UI | COMPLETED |
 | [0.8](0.8-controlled-administration.md) | Controlled Administration & Change Management | COMPLETED |
-| [0.8.1](0.8.1-realm-client-administration.md) | Realm & Client Administration | IN PROGRESS *(Slices 1–3 implemented; Community 26.7.1 verified)* |
+| [0.8.1](0.8.1-realm-client-administration.md) | Realm & Client Administration | IN PROGRESS *(Slices 1–3 implemented; remaining realm slice deferred to P2)* |
 | [0.8.2](0.8.2-fleet-reporting-target-onboarding.md) | Fleet Reporting & Target Onboarding | PLANNED *(report foundation implemented early)* |
-| 0.8.3 | Platform Authorization & Governance | PLANNED |
+| 0.8.3 | Platform Authorization & Governance | CORE CONTROLS IMPLEMENTED IN H1; full governance remains planned |
 | 0.8.4 | Users, Groups & Roles | PLANNED |
 | 0.8.5 | Authentication Flows & Client Scopes | PLANNED |
 | 0.8.6 | Identity Providers & Advanced Realm Configuration | PLANNED |

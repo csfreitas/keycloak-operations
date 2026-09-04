@@ -85,10 +85,18 @@ public class SnapshotService {
 
         try {
             ServerInfo info = serverInfoService.getServerInfo(targetId);
-            summary.put("serverProduct", info.product() == null ? null : info.product().name());
-            summary.put("serverVersion", info.version());
+            if (info != null && info.product() != null) {
+                summary.put("serverProduct", info.product().name());
+            }
+            if (info == null) {
+                summary.put("serverInfoError", "SERVER_METADATA_UNAVAILABLE");
+            } else if (info.version() == null || info.version().isBlank()) {
+                summary.put("serverInfoError", "SERVER_VERSION_NOT_OBSERVED");
+            } else {
+                summary.put("serverVersion", info.version());
+            }
         } catch (RuntimeException e) {
-            summary.put("serverInfoError", e.getMessage());
+            summary.put("serverInfoError", "SERVER_METADATA_UNAVAILABLE");
         }
 
         Map<String, Object> inventorySummary = new LinkedHashMap<>();
@@ -100,7 +108,7 @@ public class SnapshotService {
             summary.put("runtimeStateHash", sha256(normalizeJson(runtimeSlice(inventorySummary))));
         } catch (RuntimeException e) {
             inventorySummary = Map.of(
-                    "collectionError", e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage());
+                    "collectionError", "INFRASTRUCTURE_EVIDENCE_UNAVAILABLE");
             summary.put("inventory", inventorySummary);
         }
 
@@ -170,7 +178,8 @@ public class SnapshotService {
                 entity.targetId,
                 entity.snapshotHash,
                 entity.createdAt,
-                entity.summary == null ? Map.of() : Map.copyOf(entity.summary));
+                entity.summary == null ? Map.of()
+                        : java.util.Collections.unmodifiableMap(new LinkedHashMap<>(entity.summary)));
     }
 
     public Optional<EnvironmentSnapshotEntity> findEntity(String targetId, String snapshotId) {

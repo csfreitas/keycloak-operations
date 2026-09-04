@@ -1,6 +1,7 @@
 package io.github.keycloakmcp.assessment.engine;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,19 +9,28 @@ public final class EvidenceContext {
 
     private final List<Evidence> evidence;
     private final String targetId;
+    private final EvidenceSubject subject;
 
     public EvidenceContext(List<Evidence> evidence) {
-        this.evidence = evidence == null ? List.of() : List.copyOf(evidence);
-        this.targetId = this.evidence.stream()
+        this(evidence == null ? "-" : evidence.stream()
                 .map(Evidence::targetId)
-                .filter(id -> id != null && !id.isBlank())
+                .filter(id -> id != null && !id.isBlank() && !"-".equals(id))
                 .findFirst()
-                .orElse("-");
+                .orElse("-"), evidence, null);
     }
 
     public EvidenceContext(String targetId, List<Evidence> evidence) {
+        this(targetId, evidence, null);
+    }
+
+    private EvidenceContext(String targetId, List<Evidence> evidence, EvidenceSubject subject) {
         this.evidence = evidence == null ? List.of() : List.copyOf(evidence);
         this.targetId = targetId == null || targetId.isBlank() ? "-" : targetId;
+        this.subject = subject;
+        if (this.evidence.stream().map(Evidence::targetId)
+                .anyMatch(id -> id != null && !id.isBlank() && !"-".equals(id) && !this.targetId.equals(id))) {
+            throw new IllegalArgumentException("Evidence must belong to the assessed target");
+        }
     }
 
     public String targetId() {
@@ -35,7 +45,37 @@ public final class EvidenceContext {
         if (key == null) {
             return Optional.empty();
         }
-        return evidence.stream().filter(e -> key.equals(e.key())).findFirst();
+        if (subject != null) {
+            Optional<Evidence> scoped = evidence.stream()
+                    .filter(e -> key.equals(e.key()) && subject.equals(e.subject())).findFirst();
+            if (scoped.isPresent()) {
+                return scoped;
+            }
+            if (key.startsWith("realm.") || key.startsWith("client.")) {
+                // Old target aggregates must not stand in for a missing resource property.
+                return Optional.empty();
+            }
+        }
+        // Never select an arbitrary realm/client when evaluating a target-level rule.
+        return evidence.stream().filter(e -> key.equals(e.key())
+                && (e.subject() == null || e.subject().type() == SubjectType.TARGET)).findFirst();
+    }
+
+    public Optional<EvidenceSubject> subject() {
+        return Optional.ofNullable(subject);
+    }
+
+    public List<EvidenceContext> forSubjects(SubjectType type) {
+        return evidence.stream().map(Evidence::subject).filter(s -> s != null && s.type() == type)
+                .distinct().sorted(Comparator.comparing(EvidenceSubject::id))
+                .map(this::forSubject)
+                .toList();
+    }
+
+    public EvidenceContext forSubject(EvidenceSubject selected) {
+        return new EvidenceContext(targetId, evidence.stream()
+                .filter(e -> e.subject() == null || e.subject().type() == SubjectType.TARGET
+                        || selected.equals(e.subject())).toList(), selected);
     }
 
     public Optional<Object> get(String key) {
@@ -63,7 +103,7 @@ public final class EvidenceContext {
     }
 
     public boolean hasKey(String key) {
-        return find(key).isPresent();
+        return get(key).isPresent();
     }
 
     public List<Evidence> bySource(String source) {

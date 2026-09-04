@@ -9,9 +9,15 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.persistence.LockModeType;
 
 @ApplicationScoped
 public class ChangeRepository implements PanacheRepositoryBase<ChangeRecordEntity, String> {
+
+    /** Serializes lifecycle mutations of one plan; not a distributed transaction with Keycloak. */
+    public Optional<ChangeRecordEntity> findByIdForUpdate(String id) {
+        return find("id", id).withLock(LockModeType.PESSIMISTIC_WRITE).firstResultOptional();
+    }
 
     public PageResult<ChangeRecordEntity> list(
             Optional<String> targetId,

@@ -3,10 +3,10 @@ package io.github.keycloakmcp.api.v1;
 import java.util.Map;
 import java.util.Optional;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import io.quarkus.security.identity.SecurityIdentity;
+import io.github.keycloakmcp.target.TargetAuthorizationService;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -22,29 +22,28 @@ import jakarta.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class MeResource {
 
-    @ConfigProperty(name = "quarkus.oidc.enabled", defaultValue = "false")
-    boolean oidcEnabled;
-
     @Inject
     Instance<SecurityIdentity> securityIdentity;
 
     @Inject
     Instance<JsonWebToken> jwt;
 
+    @Inject
+    TargetAuthorizationService authorization;
+
     @GET
     public Map<String, Object> me() {
-        if (!oidcEnabled) {
+        if (authorization.isLocalLab()) {
             return Map.of(
                     "authenticated", true,
                     "authMode", "OPEN_LAB",
-                    "subject", "anonymous-lab",
-                    "displayName", "Lab Operator");
+                    "subject", "local-lab",
+                    "displayName", "Local lab (no authentication)");
         }
+        authorization.assertSession();
         SecurityIdentity identity = securityIdentity.isResolvable() ? securityIdentity.get() : null;
         boolean authenticated = identity != null && !identity.isAnonymous();
-        String subject = jwt.isResolvable() && jwt.get().getSubject() != null
-                ? jwt.get().getSubject()
-                : (identity == null ? null : identity.getPrincipal().getName());
+        String subject = authorization.currentActor();
         String name = Optional.ofNullable(jwt.isResolvable() ? jwt.get().getName() : null).orElse(subject);
         return Map.of(
                 "authenticated", authenticated,

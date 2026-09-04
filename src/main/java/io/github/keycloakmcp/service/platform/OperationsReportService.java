@@ -26,6 +26,7 @@ import io.github.keycloakmcp.domain.report.ReportFinding;
 import io.github.keycloakmcp.domain.report.ReportSection;
 import io.github.keycloakmcp.domain.report.ReportSectionStatus;
 import io.github.keycloakmcp.domain.report.ReportStatus;
+import io.github.keycloakmcp.domain.report.ReportProvenance;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.observability.metrics.MetricsProviderStatus;
 import io.github.keycloakmcp.target.Target;
@@ -39,7 +40,7 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class OperationsReportService {
 
-    public static final String SCHEMA_VERSION = "1.0";
+    public static final String SCHEMA_VERSION = "1.1";
 
     private final TargetResolver targetResolver;
     private final TargetAuthorizationService targetAuthorization;
@@ -102,9 +103,11 @@ public class OperationsReportService {
                 health,
                 assessment,
                 performance,
-                null);
+                null,
+                new ReportProvenance(generatedAt, Instant.now(), "INDEPENDENT_SECTION_COLLECTIONS",
+                        BundledRuleCatalogRevision.current(), false));
         String markdown = sensitiveDataFilter.redactString(renderMarkdown(draft));
-        return new OperationsReport(
+        OperationsReport completed = new OperationsReport(
                 draft.schemaVersion(),
                 draft.reportId(),
                 draft.targetId(),
@@ -119,7 +122,13 @@ public class OperationsReportService {
                 draft.healthCheck(),
                 draft.assessment(),
                 draft.performance(),
-                markdown);
+                markdown,
+                draft.provenance());
+        // Report-only recursive sanitization also covers free-text leaves, which the general
+        // key-based filter intentionally preserves in ordinary domain responses.
+        Map<String, Object> reportMap = objectMapper.convertValue(completed, Map.class);
+        return objectMapper.convertValue(
+                sanitizeReportValue(sensitiveDataFilter.redact(reportMap)), OperationsReport.class);
     }
 
     private SnapshotDetail collectSnapshot(String targetId, List<ReportSection> sections) {
@@ -127,6 +136,7 @@ public class OperationsReportService {
             SnapshotSummary summary = snapshotService.create(targetId);
             SnapshotDetail detail = snapshotService.getDetail(targetId, summary.id());
             boolean partial = containsKey(detail.summary(), "collectionError")
+                    || containsKey(detail.summary(), "serverInfoError")
                     || containsNonEmptyCollection(detail.summary(), "warnings");
             sections.add(partial
                     ? partial("platform", "Environment snapshot collected with incomplete infrastructure evidence")
@@ -260,6 +270,21 @@ public class OperationsReportService {
         out.append("- Infrastructure: ").append(markdown(report.configuredInfrastructureType())).append('\n');
         out.append("- Generated at: ").append(report.generatedAt()).append('\n');
         out.append("- Report completeness: **").append(report.status()).append("**\n\n");
+        if (report.provenance() != null) {
+            out.append("## Provenance and scope\n\n");
+            out.append("- Collection window: ").append(report.provenance().collectionStartedAt())
+                    .append(" to ").append(report.provenance().collectionCompletedAt()).append('\n');
+            out.append("- Collection mode: independent section observations, not an atomic snapshot.\n");
+            out.append("- Bundled rule catalog SHA-256: ")
+                    .append(report.provenance().bundledRuleCatalogSha256() == null
+                            ? "UNAVAILABLE" : report.provenance().bundledRuleCatalogSha256()).append('\n');
+            out.append("- Snapshot / health / assessment references: ")
+                    .append(report.environmentSnapshot() == null ? "unavailable" : markdown(report.environmentSnapshot().id()))
+                    .append(" / ").append(report.healthCheck() == null ? "unavailable" : markdown(report.healthCheck().id()))
+                    .append(" / ").append(report.assessment() == null ? "unavailable" : markdown(report.assessment().assessmentId())).append('\n');
+            out.append("- Retained-evidence replay: not yet available. Catalog hash does not include runtime overrides.\n");
+            out.append("- Completeness applies only to the declared checks and accessible sources, not all possible risks.\n\n");
+        }
 
         out.append("## Collection status\n\n");
         out.append("| Section | Status | Message |\n|---|---|---|\n");
@@ -289,18 +314,52 @@ public class OperationsReportService {
             AssessmentReport assessment = report.assessment();
             out.append("- Profile: `").append(markdown(assessment.profile())).append("`\n");
             out.append("- Status: **").append(assessment.status()).append("**\n");
-            out.append("- Score: **").append(assessment.overallScore()).append("**\n");
+            out.append("- Evaluated posture score: **")
+                    .append(assessment.scoreAvailable() ? assessment.overallScore() : "INCONCLUSIVE")
+                    .append("**\n");
+            out.append("- Checks evaluated / not evaluated: ").append(assessment.rulesEvaluated())
+                    .append(" / ").append(assessment.rulesNotEvaluated()).append('\n');
             out.append("- Evidence completeness: **").append(assessment.evidenceCompleteness()).append("%**\n");
             out.append("- Confidence: **").append(markdown(assessment.confidence())).append("**\n");
             out.append("- Actionable findings: **").append(assessment.findings().size()).append("**\n\n");
-            for (ReportFinding finding : assessment.findings()) {
+            if (!assessment.missingEvidence().isEmpty()) {
+                out.append("Missing evidence (not a pass): ")
+                        .append(markdown(String.join(", ", assessment.missingEvidence()))).append("\n\n");
+            }
+            for (ReportFinding finding : assessment.findings().stream().limit(50).toList()) {
                 out.append("### ").append(markdown(finding.id())).append(" — ")
                         .append(markdown(finding.title())).append("\n\n");
                 out.append("Severity: **").append(markdown(finding.severity())).append("**  \n");
+                out.append("Subject: ").append(markdown(finding.subjectType())).append(" / ")
+                        .append(markdown(finding.subjectId())).append(" / ")
+                        .append(markdown(finding.subjectName())).append("\n\n");
                 out.append(markdown(finding.description())).append("\n\n");
+                if (finding.impact() != null) {
+                    out.append("Impact: ").append(markdown(finding.impact())).append("\n\n");
+                }
+                String evidenceJson = prettyJson(finding.evidence());
+                out.append("Evidence (sanitized):\n\n```text\n")
+                        .append(evidenceJson.length() > 4000 ? evidenceJson.substring(0, 4000) : evidenceJson)
+                        .append("\n```\n\n");
+                if (evidenceJson.length() > 4000) {
+                    out.append("Evidence excerpt truncated; consult the structured JSON report.\n\n");
+                }
                 if (finding.recommendation() != null && !finding.recommendation().isBlank()) {
                     out.append("Recommendation: ").append(markdown(finding.recommendation())).append("\n\n");
                 }
+                if (!finding.references().isEmpty()) {
+                    out.append("References:\n\n");
+                    finding.references().stream().limit(8)
+                            .forEach(reference -> out.append("- ").append(markdown(reference)).append('\n'));
+                    if (finding.references().size() > 8) {
+                        out.append("- Additional references retained in the structured JSON report.\n");
+                    }
+                    out.append('\n');
+                }
+            }
+            if (assessment.findings().size() > 50) {
+                out.append("Finding details truncated to 50; all ").append(assessment.findings().size())
+                        .append(" actionable findings are retained in the structured JSON report.\n\n");
             }
         }
 
@@ -327,7 +386,8 @@ public class OperationsReportService {
     private String prettyJson(Object value) {
         try {
             Object sanitized = sensitiveDataFilter.redact(value);
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sanitized);
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sanitized)
+                    .replace("`", "\\u0060").replace("<", "\\u003c").replace(">", "\\u003e");
         } catch (JsonProcessingException e) {
             return "{\"serializationStatus\":\"FAILED\"}";
         }
@@ -382,7 +442,13 @@ public class OperationsReportService {
     }
 
     private static String markdown(String value) {
-        return value == null ? "" : value.replace("`", "'").replace("|", "\\|").replace('\n', ' ').replace('\r', ' ');
+        if (value == null) {
+            return "";
+        }
+        String bounded = value.length() > 4000 ? value.substring(0, 4000) + " [TRUNCATED]" : value;
+        return bounded.replace("\\", "\\\\").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                .replace("*", "\\*").replace("_", "\\_").replace("[", "\\[").replace("]", "\\]")
+                .replace("`", "'").replace("|", "\\|").replace('\n', ' ').replace('\r', ' ');
     }
 
     private SnapshotDetail safeSnapshot(SnapshotDetail detail) {
@@ -449,13 +515,16 @@ public class OperationsReportService {
             } else if (value instanceof List<?> list) {
                 safe.put(key, list.stream().map(this::sanitizeReportValue).toList());
             } else {
-                safe.put(key, value);
+                safe.put(key, sanitizeReportValue(value));
             }
         }
         return safe;
     }
 
     private Object sanitizeReportValue(Object value) {
+        if (value instanceof String text) {
+            return sensitiveDataFilter.redactString(text);
+        }
         if (value instanceof Map<?, ?> nested) {
             Map<String, Object> nestedStrings = new LinkedHashMap<>();
             nested.forEach((key, nestedValue) -> nestedStrings.put(String.valueOf(key), nestedValue));

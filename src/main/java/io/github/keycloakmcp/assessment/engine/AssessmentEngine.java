@@ -112,11 +112,14 @@ public class AssessmentEngine {
                 context.targetId(),
                 profile.name(),
                 AssessmentScope.target(context.targetId()),
-                AssessmentStatus.COMPLETE,
+                evaluation.rulesNotEvaluated() > 0 || evaluation.rulesEvaluated() == 0
+                        ? AssessmentStatus.PARTIAL : AssessmentStatus.COMPLETE,
                 score,
                 scoring.categoryScores(evaluation.findings()),
-                100,
-                AssessmentConfidence.MEDIUM,
+                evaluation.rulesEvaluated() == 0 ? 0
+                        : (int) Math.floor(evaluation.rulesEvaluated() * 100.0
+                                / (evaluation.rulesEvaluated() + evaluation.rulesNotEvaluated())),
+                evaluation.rulesEvaluated() == 0 ? AssessmentConfidence.LOW : AssessmentConfidence.MEDIUM,
                 evaluation.rulesEvaluated(),
                 evaluation.rulesMatched(),
                 evaluation.rulesSkipped(),
@@ -152,9 +155,18 @@ public class AssessmentEngine {
 
         int overallScore = scoring.score(findings);
         var categoryScores = scoring.categoryScores(findings);
-        int completeness = computeCompleteness(target, profile, collection, evaluation.rulesNotEvaluated());
+        int completeness = computeCompleteness(target, profile, collection, evaluation);
         AssessmentConfidence confidence = computeConfidence(target, profile, collection);
         AssessmentStatus status = computeStatus(profile, collection, evaluation.rulesNotEvaluated());
+        if (evaluation.rulesNotEvaluated() > 0 && confidence == AssessmentConfidence.HIGH) {
+            confidence = AssessmentConfidence.MEDIUM;
+        }
+        if (evaluation.rulesEvaluated() == 0) {
+            confidence = AssessmentConfidence.LOW;
+            if (status == AssessmentStatus.COMPLETE) {
+                status = AssessmentStatus.PARTIAL;
+            }
+        }
 
         metrics.recordAssessmentRun(findings.size());
 
@@ -190,7 +202,7 @@ public class AssessmentEngine {
             Target target,
             AssessmentProfile profile,
             EvidenceCollectionResult collection,
-            int rulesNotEvaluated) {
+            RuleEvaluationResult evaluation) {
         // Metrics are OPTIONAL unless the profile lists them in requiredEvidenceSources.
         List<String> requiredSources = profile.requiredEvidenceSources().isEmpty()
                 ? defaultRequiredSources(target)
@@ -208,8 +220,12 @@ public class AssessmentEngine {
             }
         }
         int sourceCompleteness = required == 0 ? 100 : (int) Math.round((collected * 100.0) / required);
-        int adjusted = sourceCompleteness - (rulesNotEvaluated * 2);
-        return Math.max(0, Math.min(100, adjusted));
+        int applicable = evaluation.rulesEvaluated() + evaluation.rulesNotEvaluated();
+        int ruleCompleteness = applicable == 0 ? 0
+                : (int) Math.floor(evaluation.rulesEvaluated() * 100.0 / applicable);
+        int completeness = Math.min(sourceCompleteness, ruleCompleteness);
+        // Partial sources have an unknown/uninspected denominator. Never label them complete.
+        return collection.partialSources().isEmpty() ? completeness : Math.min(99, completeness);
     }
 
     private static List<String> defaultRequiredSources(Target target) {
@@ -229,7 +245,8 @@ public class AssessmentEngine {
     private static AssessmentConfidence computeConfidence(
             Target target, AssessmentProfile profile, EvidenceCollectionResult collection) {
         boolean keycloakOk = collection.collectedSources().contains("keycloak")
-                && !collection.failedSources().contains("keycloak");
+                && !collection.failedSources().contains("keycloak")
+                && !collection.partialSources().contains("keycloak");
         if (!keycloakOk) {
             return AssessmentConfidence.LOW;
         }
@@ -261,7 +278,7 @@ public class AssessmentEngine {
         List<String> materialFailures = collection.failedSources().stream()
                 .filter(s -> !"metrics".equals(s) || profileRequiresMetrics(profile))
                 .toList();
-        if (!materialFailures.isEmpty() || rulesNotEvaluated > 0) {
+        if (!materialFailures.isEmpty() || !collection.partialSources().isEmpty() || rulesNotEvaluated > 0) {
             return AssessmentStatus.PARTIAL;
         }
         if (profileRequiresMetrics(profile) && !collection.collectedSources().contains("metrics")) {

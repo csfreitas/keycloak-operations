@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.keycloakmcp.domain.platform.OperationalEvent;
 import io.github.keycloakmcp.service.platform.OperationalEventBus;
+import io.github.keycloakmcp.target.TargetAuthorizationService;
+import io.github.keycloakmcp.target.TargetPermission;
+import io.github.keycloakmcp.target.TargetRegistry;
 import io.smallrye.mutiny.Multi;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -27,13 +30,34 @@ public class EventsResource {
     @Inject
     ObjectMapper objectMapper;
 
+    @Inject
+    TargetAuthorizationService authorization;
+
+    @Inject
+    TargetRegistry targetRegistry;
+
     @GET
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @RestStreamElementType(MediaType.APPLICATION_JSON)
     public Multi<String> events() {
+        authorization.assertSession();
+        // Resolve the grant snapshot in the request context, never from a later event publisher's identity.
+        var readableTargets = targetRegistry.list().stream()
+                .filter(t -> authorization.isAllowed(t, TargetPermission.READ))
+                .map(t -> t.id().value()).collect(java.util.stream.Collectors.toUnmodifiableSet());
         return Multi.createBy().concatenating().streams(
                 Multi.createFrom().item(toJson(OperationalEvent.of("hello", null, "connected", null))),
-                eventBus.events().map(this::toJson));
+                eventBus.events()
+                        .filter(event -> isVisible(event, readableTargets))
+                        // Reconnect periodically to authenticate again and refresh grants.
+                        .select().first(java.time.Duration.ofMinutes(5))
+                        .map(this::toJson));
+    }
+
+    static boolean isVisible(OperationalEvent event, java.util.Set<String> readableTargets) {
+        return event.targetId() != null ? readableTargets.contains(event.targetId())
+                : "heartbeat".equals(event.type()) && "heartbeat".equals(event.message())
+                        && event.relatedId() == null;
     }
 
     private String toJson(OperationalEvent event) {

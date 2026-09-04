@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -173,6 +177,158 @@ class ChangeManagementServiceTest {
         var second = changeManagementService.planClientUpdate(
                 TARGET_A, REALM, CLIENT, Map.of("description", "idem"), "a", key);
         assertThat(second.changeId()).isEqualTo(first.changeId());
+    }
+
+    @Test
+    void idempotencyKeyCannotBeReusedWithDifferentIntentOrResource() {
+        String key = "intent-" + System.nanoTime();
+        changeManagementService.planClientUpdate(
+                TARGET_A, REALM, CLIENT, Map.of("description", "original"), "a", key);
+        assertThatThrownBy(() -> changeManagementService.planClientUpdate(
+                TARGET_A, REALM, CLIENT, Map.of("description", "different"), "a", key))
+                .isInstanceOf(McpException.class).hasMessageContaining("different change request");
+        assertThatThrownBy(() -> changeManagementService.planClientUpdate(
+                TARGET_A, "another-realm", CLIENT, Map.of("description", "original"), "a", key))
+                .isInstanceOf(McpException.class).hasMessageContaining("different change request");
+        assertThatThrownBy(() -> changeManagementService.planClientUpdate(
+                TARGET_A, REALM, "other-client", Map.of("description", "original"), "a", key))
+                .isInstanceOf(McpException.class).hasMessageContaining("different change request");
+    }
+
+    @Test
+    void idempotencyUsesNormalizedUrlSets() {
+        String key = "urls-" + System.nanoTime();
+        var first = changeManagementService.planClientUrlUpdate(new ClientUrlChangeRequest(
+                TARGET_A, REALM, CLIENT, List.of("https://b.example/cb", "https://a.example/cb"), null, "a", key));
+        var retry = changeManagementService.planClientUrlUpdate(new ClientUrlChangeRequest(
+                TARGET_A, REALM, CLIENT,
+                List.of("https://a.example/cb", "https://b.example/cb", "https://a.example/cb"), null, "spoof", key));
+        assertThat(retry.changeId()).isEqualTo(first.changeId());
+        assertThatThrownBy(() -> changeManagementService.planClientUrlUpdate(new ClientUrlChangeRequest(
+                TARGET_A, REALM, CLIENT, List.of("https://c.example/cb"), null, "a", key)))
+                .isInstanceOf(McpException.class).hasMessageContaining("different change request");
+    }
+
+    @Test
+    void createIdempotencyNormalizesDefaultsAndRejectsOperationReuse() {
+        String key = "create-" + System.nanoTime();
+        var first = changeManagementService.planClientCreate(new ClientCreateChangeRequest(
+                TARGET_A, REALM, NEW_CLIENT, null, null, null, null, null, null, null, "a", key));
+        var retry = changeManagementService.planClientCreate(new ClientCreateChangeRequest(
+                TARGET_A, REALM, NEW_CLIENT, null, null, false, true, true, false, false, "b", key));
+        assertThat(retry.changeId()).isEqualTo(first.changeId());
+        assertThatThrownBy(() -> changeManagementService.planClientEnabledUpdate(new ClientEnabledChangeRequest(
+                TARGET_A, REALM, NEW_CLIENT, true, "a", key)))
+                .isInstanceOf(McpException.class).hasMessageContaining("different change request");
+    }
+
+    @Test
+    void securityIdempotencyRejectsChangingTheRequestedSetting() {
+        String key = "security-" + System.nanoTime();
+        var first = changeManagementService.planClientSecurityUpdate(new ClientSecurityChangeRequest(
+                TARGET_A, REALM, CLIENT, "S256", null, null, null, null, null, "a", key));
+        var retry = changeManagementService.planClientSecurityUpdate(new ClientSecurityChangeRequest(
+                TARGET_A, REALM, CLIENT, "S256", null, null, null, null, null, "b", key));
+        assertThat(retry.changeId()).isEqualTo(first.changeId());
+        assertThatThrownBy(() -> changeManagementService.planClientSecurityUpdate(new ClientSecurityChangeRequest(
+                TARGET_A, REALM, CLIENT, "NONE", null, null, null, null, null, "a", key)))
+                .isInstanceOf(McpException.class).hasMessageContaining("different change request");
+    }
+
+    @Test
+    void provenanceDoesNotTrustCallerSuppliedActorOrApprover() {
+        var planned = changeManagementService.planClientUpdate(
+                TARGET_B, REALM, CLIENT, Map.of("name", "Provenance"), "administrator", null);
+        assertThat(planned.actor()).isEqualTo("local-lab");
+        var approved = changeManagementService.approve(planned.changeId(), "fake-human-approver");
+        assertThat(approved.approvedBy()).isEqualTo("local-lab");
+        var applied = changeManagementService.apply(planned.changeId(), "fake-executor");
+        assertThat(applied.resultMessage()).isEqualTo("Applied by local-lab");
+    }
+
+    @Test
+    @Transactional
+    void mutatedDesiredStateCannotBeApproved() {
+        var planned = changeManagementService.planClientUpdate(
+                TARGET_B, REALM, CLIENT, Map.of("name", "Reviewed"), "a", null);
+        changeRepository.findById(planned.changeId()).desiredState = Map.of("name", "Unreviewed");
+        assertThatThrownBy(() -> changeManagementService.approve(planned.changeId(), "a"))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.APPROVAL_INVALID));
+    }
+
+    @Test
+    @Transactional
+    void mutatedOperationsCannotReuseApproval() {
+        var planned = changeManagementService.planClientUpdate(
+                TARGET_B, REALM, CLIENT, Map.of("name", "Reviewed"), "a", null);
+        changeManagementService.approve(planned.changeId(), "a");
+        changeRepository.findById(planned.changeId()).operationsJson.get(0).put("after", "Unreviewed");
+        assertThatThrownBy(() -> changeManagementService.apply(planned.changeId(), "a"))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.APPROVAL_INVALID));
+        verify(adminApi, never()).updateClient(any(), any(), any());
+    }
+
+    @Test
+    @Transactional
+    void historicalPendingPlansRemainReadableButRequireReplanning() {
+        var planned = changeManagementService.planClientUpdate(
+                TARGET_B, REALM, CLIENT, Map.of("name", "Historical"), "a", null);
+        changeRepository.findById(planned.changeId()).policyRevision = null;
+        assertThat(changeManagementService.getChange(planned.changeId()).changeId()).isEqualTo(planned.changeId());
+        assertThatThrownBy(() -> changeManagementService.approve(planned.changeId(), "a"))
+                .isInstanceOf(McpException.class).hasMessageContaining("REPLAN_REQUIRED");
+        assertThatThrownBy(() -> changeManagementService.apply(planned.changeId(), "a"))
+                .isInstanceOf(McpException.class).hasMessageContaining("REPLAN_REQUIRED");
+    }
+
+    @Test
+    @Transactional
+    void changedTargetContextInvalidatesApprovedPlan() {
+        var planned = changeManagementService.planClientUpdate(
+                TARGET_B, REALM, CLIENT, Map.of("name", "Context"), "a", null);
+        changeManagementService.approve(planned.changeId(), "a");
+        changeRepository.findById(planned.changeId()).targetContextFingerprint = "different-target-context";
+        assertThatThrownBy(() -> changeManagementService.apply(planned.changeId(), "a"))
+                .isInstanceOf(McpException.class).hasMessageContaining("REPLAN_REQUIRED");
+        verify(adminApi, never()).updateClient(any(), any(), any());
+    }
+
+    @Test
+    void concurrentAppliesOfTheSamePlanOnlyWriteOnce() throws Exception {
+        var planned = changeManagementService.planClientUpdate(
+                TARGET_A, REALM, CLIENT, Map.of("name", "Concurrent"), "a", null);
+        CountDownLatch firstWrite = new CountDownLatch(1);
+        CountDownLatch secondStarted = new CountDownLatch(1);
+        CountDownLatch releaseWrite = new CountDownLatch(1);
+        doAnswer(inv -> {
+            firstWrite.countDown();
+            if (!releaseWrite.await(10, TimeUnit.SECONDS)) {
+                throw new IllegalStateException("test did not release first write");
+            }
+            liveClient.set(copy(inv.getArgument(2)));
+            return null;
+        }).when(adminApi).updateClient(any(), eq(REALM), any());
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            var first = executor.submit(() -> changeManagementService.apply(planned.changeId(), "a"));
+            try {
+                assertThat(firstWrite.await(10, TimeUnit.SECONDS)).isTrue();
+                var second = executor.submit(() -> {
+                    secondStarted.countDown();
+                    return changeManagementService.apply(planned.changeId(), "b");
+                });
+                assertThat(secondStarted.await(5, TimeUnit.SECONDS)).isTrue();
+                assertThatThrownBy(() -> second.get(100, TimeUnit.MILLISECONDS))
+                        .isInstanceOf(java.util.concurrent.TimeoutException.class);
+                releaseWrite.countDown();
+                assertThat(first.get(10, TimeUnit.SECONDS).status()).isEqualTo(ChangeStatus.VERIFIED);
+                assertThat(second.get(10, TimeUnit.SECONDS).status()).isEqualTo(ChangeStatus.VERIFIED);
+            } finally {
+                releaseWrite.countDown();
+            }
+        }
+        verify(adminApi, times(1)).updateClient(any(), eq(REALM), any());
     }
 
     @Test

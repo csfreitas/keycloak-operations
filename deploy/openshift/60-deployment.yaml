@@ -7,7 +7,8 @@ metadata:
     app.kubernetes.io/name: keycloak-operations-mcp
     app.kubernetes.io/component: mcp-server
 spec:
-  replicas: 2
+  # MCP sessions and SSE currently use in-process state; horizontal fan-out is not implemented.
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: keycloak-operations-mcp
@@ -36,7 +37,17 @@ spec:
           envFrom:
             - secretRef:
                 name: keycloak-mcp-credentials
+            - secretRef:
+                name: keycloak-operations-platform-identity
+            - secretRef:
+                name: keycloak-operations-database
           env:
+            - name: QUARKUS_PROFILE
+              value: "oidc"
+            - name: QUARKUS_CONFIG_LOCATIONS
+              value: "/deployments/config/application.properties"
+            - name: RHBK_NAMESPACE
+              value: "REPLACE_WITH_RHBK_NAMESPACE"
             - name: DISCOVERY_KUBERNETES_ENABLED
               value: "true"
             - name: DISCOVERY_OPENSHIFT_ENABLED

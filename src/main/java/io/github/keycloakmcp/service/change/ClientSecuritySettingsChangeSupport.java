@@ -154,7 +154,7 @@ public class ClientSecuritySettingsChangeSupport {
         });
     }
 
-    private static Map<String, Object> desiredState(ClientSecurityChangeRequest request) {
+    public static Map<String, Object> desiredState(ClientSecurityChangeRequest request) {
         Map<String, Object> desired = new LinkedHashMap<>();
         if (request.pkceCodeChallengeMethod() != null) {
             desired.put(PKCE, normalizePkce(request.pkceCodeChallengeMethod()));
@@ -164,6 +164,9 @@ public class ClientSecuritySettingsChangeSupport {
         putIfPresent(desired, DIRECT_ACCESS_GRANTS, request.directAccessGrantsEnabled());
         putIfPresent(desired, SERVICE_ACCOUNTS, request.serviceAccountsEnabled());
         putIfPresent(desired, PUBLIC_CLIENT, request.publicClient());
+        if (desired.isEmpty()) {
+            throw McpException.invalidArgument("at least one client security or flow setting must be provided");
+        }
         return desired;
     }
 

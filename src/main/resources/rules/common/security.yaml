@@ -75,11 +75,11 @@ rules:
       Replace "*" web origins with explicit trusted origins.
     references: []
     condition:
-      key: keycloak.clients.wildcardWebOrigin
+      key: keycloak.clients.wildcardWebOrigins
       greaterThan: 0
     appliesWhen:
       evidenceRequired:
-        - keycloak.clients.wildcardWebOrigin
+        - keycloak.clients.wildcardWebOrigins
 
   - id: KC-SEC-005
     title: Implicit flow enabled on clients
@@ -93,18 +93,18 @@ rules:
       Disable implicit flow; use authorization code + PKCE for public clients.
     references: []
     condition:
-      key: keycloak.clients.implicitFlowCount
+      key: keycloak.clients.implicitFlowEnabled
       greaterThan: 0
     appliesWhen:
       evidenceRequired:
-        - keycloak.clients.implicitFlowCount
+        - keycloak.clients.implicitFlowEnabled
 
   - id: KC-SEC-006
     title: Public clients without PKCE S256
     category: security
     severity: HIGH
     description: >
-      Public clients that use standard flow should require PKCE with S256.
+      Enabled public OpenID Connect clients that use standard flow should require PKCE with S256.
     impact: >
       Authorization code interception becomes practical without PKCE.
     recommendation: >
