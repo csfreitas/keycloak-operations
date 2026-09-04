@@ -12,7 +12,7 @@ data:
     quarkus.management.enabled=true
     quarkus.management.port=9001
     quarkus.otel.enabled=true
-    keycloak.mcp.read-only=true
+    mcp.read-only=true
     keycloak.auth-realm=master
     keycloak.client-id=keycloak-mcp
     assessment.rules.path=rules
