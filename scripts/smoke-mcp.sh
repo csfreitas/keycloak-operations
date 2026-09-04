@@ -180,6 +180,9 @@ call_tool "keycloak_get_group" "$(jq -n --arg t "${TARGET_ID}" '{targetId:$t, re
 call_tool "keycloak_list_roles" "$(jq -n --arg t "${TARGET_ID}" '{targetId:$t, realm:"mcp-demo"}')"
 call_tool "keycloak_get_role" "$(jq -n --arg t "${TARGET_ID}" '{targetId:$t, realm:"mcp-demo", roleName:"user"}')"
 call_tool "keycloak_discover_environment" "$(jq -n --arg t "${TARGET_ID}" '{targetId:$t}')"
+call_tool "keycloak_health_check" "$(jq -n --arg t "${TARGET_ID}" '{targetId:$t}')"
+call_tool "keycloak_generate_operations_report" "$(jq -n --arg t "${TARGET_ID}" \
+  '{targetId:$t, profile:"keycloak-production", metricsWindow:"15m"}')"
 
 log "tools/call keycloak_get_realm (unknown target)..."
 UNKNOWN_PARAMS="$(jq -n '{name:"keycloak_get_realm", arguments:{targetId:"does-not-exist", realm:"master"}}')"

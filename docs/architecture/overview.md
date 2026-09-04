@@ -28,7 +28,7 @@ both call the same services (for example `ClientService`, `AssessmentHistoryServ
 |-------|----------------|
 | MCP Tools | Thin Quarkiverse `@Tool` facade (`keycloak_*`) |
 | REST API | Versioned `/api/v1` for Fleet / overview / history |
-| Services | Domain orchestration, audit, metrics, persistence |
+| Services | Domain orchestration, reporting, audit, metrics, persistence |
 | Persistence | JPA entities + Flyway (targets, assessments, health, audit, snapshots) |
 | Adapters | Keycloak Admin Client (stable API); OpenShift/Kubernetes inventory; VM future |
 | Observability | `MetricsProvider` / factory (semantic queries; no raw PromQL tools); performance evidence |
@@ -54,8 +54,8 @@ Design rules:
   `UNSUPPORTED_CAPABILITY` when unused.
 - Client secrets are never mapped into `ClientDetails`.
 - Credentials are referenced via `credentialRef` only — never stored in PostgreSQL plaintext.
-- Operational tools are **read-only by default**. Write operations require an explicit future design,
-  authorization model, and approval workflow.
+- Operational tools are **read-only by default**. Controlled writes use the accepted
+  plan → approve → apply → verify lifecycle and require explicit authorization.
 ## Assessment
 
 ```mermaid
@@ -75,6 +75,12 @@ flowchart TB
 Assessment consumes **normalized evidence keys** (for example `deployment.replicas`),
 not raw Kubernetes objects. Health checks and assessments are distinct concepts:
 health answers “is it up?”; assessment answers “is it production-ready?”.
+
+## Reporting and AI assistance
+
+`OperationsReportService` composes snapshots, health, assessment, findings, and semantic metrics into one sanitized target report shared by REST and MCP. Report completeness is separate from health and assessment status; provider gaps remain explicit.
+
+AI agents orchestrate typed MCP tools and explain deterministic facts. They do not own health, scoring, authorization, risk, policy, approval, apply, or verification decisions. See [operations-reporting.md](operations-reporting.md), [ai-assisted-operations.md](ai-assisted-operations.md), and [ADR 0008](../adr/0008-ai-assists-backend-decides.md).
 
 ## Security
 

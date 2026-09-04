@@ -5,10 +5,10 @@ This directory is reserved for container-based integration tests of
 
 ## Compatibility matrix
 
-| Target | Image | Auth required | Status in 0.1.0 |
+| Target | Image | Auth required | Current status |
 |--------|-------|---------------|-----------------|
-| Keycloak Community 26.7.x | `quay.io/keycloak/keycloak:26.7.1` | No (public Quay) | **Primary local / CI path** via `dev/compose.yaml` |
-| Keycloak Community 26.6.x | `quay.io/keycloak/keycloak:26.6.x` | No | Planned automated IT (same Admin API) |
+| Keycloak Community 26.7.x | `quay.io/keycloak/keycloak:26.7.1` | No (public Quay) | **TESTED**: version, controlled client URL write/restore, stale-plan rejection, and read-only MCP/report smoke |
+| Keycloak Community 26.6.x | `quay.io/keycloak/keycloak:26.6.x` | No | **NOT VERIFIED** by the automated smoke job |
 | RHBK 26.6.x (e.g. 26.6.5) | `registry.redhat.io/rhbk/keycloak-rhel9:26.6` (exact tag may vary) | **Yes** — Red Hat registry credentials | **Not auto-tested** |
 
 ## Why RHBK is not auto-tested
@@ -28,6 +28,32 @@ Therefore:
 
 ## Running community Keycloak integration checks locally
 
+Quarkus tests use a disposable PostgreSQL container named
+`keycloak-operations-test-postgres-<run-id>`. It carries the project label
+`io.github.keycloak-operations.test-resource=postgresql`, is never reused, and
+is removed when the test process finishes normally. This keeps Podman Desktop
+entries attributable to this repository and prevents completed runs from
+accumulating stopped database containers. On macOS, the Maven test forks also
+use the Podman CLI with exact resource names and explicit cleanup because Podman
+Desktop can leave the Testcontainers Ryuk sidecar running, and its JVM fallback
+can prune unrelated volumes. Linux CI and macOS hosts without Podman keep the
+standard Testcontainers lifecycle. The test database uses `tmpfs`, so neither
+path creates anonymous data volumes.
+
+The local Compose project is named `keycloak-operations`. PostgreSQL and
+Prometheus data use clearly named, reusable volumes instead of anonymous ones:
+`keycloak-operations-postgres-data` and
+`keycloak-operations-prometheus-data`. A normal shutdown preserves them; a
+disposable validation reset removes them:
+
+```bash
+# Preserve reusable local data
+podman compose -f dev/compose.yaml down --remove-orphans
+
+# Full disposable reset (used by validation/CI)
+podman compose -f dev/compose.yaml down -v --remove-orphans
+```
+
 ```bash
 # From repository root
 podman compose -f dev/compose.yaml up -d
@@ -37,19 +63,27 @@ export KEYCLOAK_URL=http://localhost:8080
 export KEYCLOAK_AUTH_REALM=master
 export KEYCLOAK_CLIENT_ID=keycloak-mcp
 export KEYCLOAK_CLIENT_SECRET=change-me
+mvn -Dit.test=KeycloakCommunity26_7IT,ControlledClientChangeIT failsafe:integration-test failsafe:verify
 mvn quarkus:dev
 # in another terminal:
 ./scripts/smoke-mcp.sh
 ```
 
-## Planned IT layout (0.2.0+)
+## Scope of the automated community smoke test
 
-```
-integration-tests/
-  src/test/java/io/github/keycloakmcp/
-    KeycloakCommunityIT.java   # Testcontainers + quay.io/keycloak
-    RhbkIT.java                # enabled only when RHBK_IMAGE + registry auth present
-```
+The `community-keycloak-integration` CI job runs for pull requests and pushes to
+`main`. It starts PostgreSQL, Keycloak 26.7.1, and Prometheus; configures a
+disposable service account; runs the real Community/version and controlled-write
+ITs; starts the packaged application; and runs `scripts/smoke-mcp.sh`. The smoke
+covers target discovery, representative Admin REST reads, health, environment
+discovery, and generation of the operations report through MCP.
+
+The controlled-write IT creates a uniquely named client only in the imported
+disposable realm after enforcing the exact local loopback target. It performs
+plan, approval when required, apply, read-back verification, restoration, stale
+plan rejection, and fixture removal. It does **not** verify Keycloak 26.6, RHBK,
+OpenShift, Kubernetes, or the Web Origin `+` sentinel. Other placeholder `*IT`
+classes must not be cited as compatibility evidence.
 
 Enable RHBK tests explicitly, for example:
 

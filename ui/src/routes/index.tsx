@@ -10,6 +10,7 @@ import { InfrastructurePage } from '../pages/InfrastructurePage';
 import { HistoryPage } from '../pages/HistoryPage';
 import { ChangesPage } from '../pages/ChangesPage';
 import { ChangeDetailPage } from '../pages/ChangeDetailPage';
+import { OperationsReportPage } from '../pages/OperationsReportPage';
 
 /** Forces a full remount of TargetLayout when targetId changes. */
 function TargetLayoutWrapper() {
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
           { index: true, element: <TargetOverviewPage /> },
           { path: 'health', element: <HealthPage /> },
           { path: 'assessment', element: <AssessmentPage /> },
+          { path: 'report', element: <OperationsReportPage /> },
           { path: 'performance', element: <PerformancePage /> },
           { path: 'infrastructure', element: <InfrastructurePage /> },
           { path: 'history', element: <HistoryPage /> },

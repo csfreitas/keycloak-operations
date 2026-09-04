@@ -27,7 +27,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: ui
-          image: quay.io/keycloakmcp/keycloak-operations-ui:0.7.0-SNAPSHOT
+          image: quay.io/keycloakmcp/keycloak-operations-ui:0.8.0-SNAPSHOT
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

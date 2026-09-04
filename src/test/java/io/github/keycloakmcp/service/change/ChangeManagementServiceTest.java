@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,6 +21,8 @@ import org.keycloak.representations.idm.ClientRepresentation;
 
 import io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapter;
 import io.github.keycloakmcp.domain.change.ChangeStatus;
+import io.github.keycloakmcp.domain.change.ChangeRisk;
+import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.ErrorCode;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.persistence.entity.ChangeRecordEntity;
@@ -57,6 +60,7 @@ class ChangeManagementServiceTest {
                 .thenAnswer(inv -> copy(liveClient.get()));
         doAnswer(inv -> {
             ClientRepresentation updated = inv.getArgument(2);
+            assertThat(updated.getSecret()).isNull();
             liveClient.set(copy(updated));
             return null;
         }).when(adminApi).updateClient(any(), eq(REALM), any());
@@ -194,6 +198,116 @@ class ChangeManagementServiceTest {
                 .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.VERIFICATION_FAILED));
     }
 
+    @Test
+    void planApproveApplyVerifyClientUrlSets() {
+        var planned = changeManagementService.planClientUrlUpdate(urlRequest(
+                TARGET_A,
+                List.of("https://new.example/callback", "https://new.example/callback"),
+                null));
+
+        assertThat(planned.status()).isEqualTo(ChangeStatus.WAITING_APPROVAL);
+        assertThat(planned.risk()).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(planned.desiredState().get("redirectUris"))
+                .isEqualTo(List.of("https://new.example/callback"));
+        assertThat(planned.diff()).hasSize(2);
+
+        changeManagementService.approve(planned.changeId(), "approver");
+        var applied = changeManagementService.apply(planned.changeId(), "applier");
+
+        assertThat(applied.status()).isEqualTo(ChangeStatus.VERIFIED);
+        assertThat(liveClient.get().getRedirectUris()).containsExactly("https://new.example/callback");
+        assertThat(liveClient.get().getWebOrigins()).containsExactly("https://old.example");
+        assertThat(liveClient.get().getRootUrl()).isEqualTo("https://preserved.example");
+    }
+
+    @Test
+    void unsafeClientUrlAdditionDeniedByProductionPolicy() {
+        assertThatThrownBy(() -> changeManagementService.planClientUrlUpdate(urlRequest(
+                        TARGET_B,
+                        List.of("http://external.example/callback"),
+                        null)))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.POLICY_DENIED));
+        verify(adminApi, never()).updateClient(any(), any(), any());
+    }
+
+    @Test
+    void staleClientUrlBaselineRequiresReplan() {
+        var planned = changeManagementService.planClientUrlUpdate(urlRequest(
+                TARGET_A,
+                List.of("https://new.example/callback"),
+                null));
+        changeManagementService.approve(planned.changeId(), "approver");
+        ClientRepresentation changed = copy(liveClient.get());
+        changed.setRedirectUris(List.of("https://external.example/callback"));
+        liveClient.set(changed);
+
+        assertThatThrownBy(() -> changeManagementService.apply(planned.changeId(), "applier"))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.CHANGE_CONFLICT));
+        assertThat(changeManagementService.getChange(planned.changeId()).status()).isEqualTo(ChangeStatus.FAILED);
+    }
+
+    @Test
+    void clientUrlPlanIsIdempotentPerTarget() {
+        String key = "client-urls-" + System.nanoTime();
+        ClientUrlChangeRequest request = new ClientUrlChangeRequest(
+                TARGET_A,
+                REALM,
+                CLIENT,
+                List.of("https://new.example/callback"),
+                null,
+                "planner",
+                key);
+
+        var first = changeManagementService.planClientUrlUpdate(request);
+        var second = changeManagementService.planClientUrlUpdate(request);
+
+        assertThat(second.changeId()).isEqualTo(first.changeId());
+    }
+
+    @Test
+    void clientUrlVerificationFailureIsPersisted() {
+        var planned = changeManagementService.planClientUrlUpdate(urlRequest(
+                TARGET_A,
+                List.of("https://new.example/callback"),
+                null));
+        changeManagementService.approve(planned.changeId(), "approver");
+        doAnswer(inv -> null).when(adminApi).updateClient(any(), eq(REALM), any());
+
+        assertThatThrownBy(() -> changeManagementService.apply(planned.changeId(), "applier"))
+                .isInstanceOf(McpException.class)
+                .satisfies(ex -> assertThat(((McpException) ex).getCode()).isEqualTo(ErrorCode.VERIFICATION_FAILED));
+        assertThat(changeManagementService.getChange(planned.changeId()).status()).isEqualTo(ChangeStatus.FAILED);
+    }
+
+    @Test
+    void clientUrlAdapterFailureIsPersistedWithoutLeakingCause() {
+        var planned = changeManagementService.planClientUrlUpdate(urlRequest(
+                TARGET_A,
+                List.of("https://new.example/callback"),
+                null));
+        changeManagementService.approve(planned.changeId(), "approver");
+        doAnswer(inv -> {
+            throw new IllegalStateException("sensitive adapter detail");
+        }).when(adminApi).updateClient(any(), eq(REALM), any());
+
+        assertThatThrownBy(() -> changeManagementService.apply(planned.changeId(), "applier"))
+                .isInstanceOf(McpException.class)
+                .hasMessage("Change apply failed");
+        var failed = changeManagementService.getChange(planned.changeId());
+        assertThat(failed.status()).isEqualTo(ChangeStatus.FAILED);
+        assertThat(failed.resultMessage()).doesNotContain("sensitive adapter detail");
+    }
+
+    private static ClientUrlChangeRequest urlRequest(
+            String targetId,
+            List<String> redirectUris,
+            List<String> webOrigins) {
+        return new ClientUrlChangeRequest(
+                targetId, REALM, CLIENT, redirectUris, webOrigins, "planner", null);
+    }
+
     private static ClientRepresentation sampleClient(String name, String description) {
         ClientRepresentation rep = new ClientRepresentation();
         rep.setId("client-uuid-1");
@@ -201,6 +315,10 @@ class ChangeManagementServiceTest {
         rep.setName(name);
         rep.setDescription(description);
         rep.setAttributes(new HashMap<>());
+        rep.setRedirectUris(new java.util.ArrayList<>(List.of("https://old.example/callback")));
+        rep.setWebOrigins(new java.util.ArrayList<>(List.of("https://old.example")));
+        rep.setRootUrl("https://preserved.example");
+        rep.setSecret("server-side-secret");
         return rep;
     }
 
@@ -211,7 +329,14 @@ class ChangeManagementServiceTest {
         copy.setName(source.getName());
         copy.setDescription(source.getDescription());
         copy.setAttributes(source.getAttributes() == null ? new HashMap<>() : new HashMap<>(source.getAttributes()));
-        copy.setSecret(null);
+        copy.setRedirectUris(source.getRedirectUris() == null
+                ? null
+                : new java.util.ArrayList<>(source.getRedirectUris()));
+        copy.setWebOrigins(source.getWebOrigins() == null
+                ? null
+                : new java.util.ArrayList<>(source.getWebOrigins()));
+        copy.setRootUrl(source.getRootUrl());
+        copy.setSecret(source.getSecret());
         return copy;
     }
 }

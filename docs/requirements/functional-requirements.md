@@ -207,3 +207,75 @@ Equivalent Change Management REST endpoints under `/api/v1` **MUST** share the s
 ### FR-CHANGE-015
 
 Change lifecycle state **MUST** be persisted in PostgreSQL via versioned Flyway migrations without storing plaintext secrets.
+
+## Realm and client administration (milestone 0.8.1)
+
+### FR-CLIENT-001
+
+Client administration **MUST** use typed semantic requests for each supported operation. Collection-valued settings such as redirect URIs and Web Origins **MUST NOT** be accepted through the milestone 0.8 generic scalar `desiredState` contract or through arbitrary `ClientRepresentation` payloads.
+
+### FR-CLIENT-002
+
+The platform **MUST** support controlled replacement of a client's complete `redirectUris` and `webOrigins` sets. Inputs **MUST** be bounded, validated, normalized, de-duplicated, and represented deterministically before diff, fingerprint, persistence, apply, and verification.
+
+### FR-CLIENT-003
+
+Collection changes **MUST** produce deterministic, reviewable evidence of values added and removed. Reordering or duplicate removal alone **MUST NOT** create an effective change.
+
+### FR-CLIENT-004
+
+The platform **MUST** deterministically classify and evaluate policy for redirect URI and Web Origin changes based on the effective transition, including scheme, wildcard use, environment, additions, and removals. The caller or LLM **MUST NOT** provide the resulting risk or policy decision.
+
+### FR-CLIENT-005
+
+Later delivery slices of 0.8.1 **MAY** add typed client security/flow settings, create, enable, and disable operations only after each property has explicit validation, diff, risk, policy, apply, verification, compatibility, and test behavior. Their presence in a complete Keycloak representation alone is not sufficient to expose them.
+
+### FR-REALM-001
+
+Realm administration **MUST** expose only explicitly supported, non-sensitive, typed properties. Realm create/update/enable/disable operations **MUST** use the controlled change lifecycle and **MUST NOT** accept arbitrary realm attributes or a complete caller-supplied `RealmRepresentation`.
+
+### FR-REALM-002
+
+Every supported realm property **MUST** define deterministic validation, normalized diff, risk, environment policy, stale-plan detection, read-back verification, and compatibility behavior before it is exposed through MCP or REST.
+
+### FR-CHANGE-016
+
+MCP and REST planning surfaces for 0.8.1 **MUST** call the same application service and use equivalent typed contracts. Apply, approval, rejection, verification, persistence, and audit **MUST** continue to use the milestone 0.8 shared lifecycle.
+
+## Operations reporting and AI assistance
+
+### FR-REPORT-001
+
+The platform **MUST** generate a target-bound, point-in-time operations report through a shared application service used by REST and MCP.
+
+### FR-REPORT-002
+
+The report **MUST** distinguish report-generation completeness from target health and assessment status. Missing evidence **MUST NOT** be represented as a healthy state, a zero metric, or a deterministic PASS.
+
+### FR-REPORT-003
+
+The report **MUST** combine the sanitized evidence available for the target, including product and environment metadata, infrastructure inventory, health checks, deterministic assessment results, actionable findings, and semantic performance metrics when configured.
+
+### FR-REPORT-004
+
+Each report section **MUST** declare `COMPLETE`, `PARTIAL`, `FAILED`, or `SKIPPED`. Failure of one provider **MUST NOT** discard independently collected useful sections.
+
+### FR-REPORT-005
+
+The platform **MUST** expose both structured report data and a deterministic human-readable representation suitable for operators and AI agents. It **MUST NOT** require an LLM to calculate the report.
+
+### FR-REPORT-006
+
+Platform-specific report evidence **MUST** identify the collector and actual coverage. OpenShift/Kubernetes evidence may be included when configured; VM, Docker, or other runtime evidence **MUST** be marked unavailable until a real collector exists.
+
+### FR-AI-001
+
+AI agents **MAY** discover, orchestrate, correlate, summarize, and explain operational capabilities through MCP, but **MUST NOT** determine health, PASS/FAIL, severity, score, evidence completeness, risk, policy, authorization, approval validity, conflict, or verification outcome.
+
+### FR-AI-002
+
+AI-facing tools **SHOULD** return compact, typed, provenance-bearing responses that reference persisted assessments, health checks, snapshots, changes, and reports instead of returning unbounded raw provider objects.
+
+### FR-AI-003
+
+Any future model-generated explanation **MUST** be visibly separate from deterministic facts, include references to the source report or evidence identifiers, and remain optional to core platform operation.

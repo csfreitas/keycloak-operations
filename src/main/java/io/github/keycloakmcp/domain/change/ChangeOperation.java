@@ -5,8 +5,8 @@ import java.util.Objects;
 public record ChangeOperation(
         String property,
         ChangeOperationType operationType,
-        String before,
-        String after) {
+        Object before,
+        Object after) {
 
     public ChangeOperation {
         Objects.requireNonNull(property, "property");

@@ -61,3 +61,11 @@ Integration tests that require private registries or live clusters **MAY** be op
 ### NFR-COMPAT-001
 
 Public APIs and tool contracts **SHOULD** remain backward compatible when reasonable across minor SNAPSHOT iterations within a milestone series.
+
+### NFR-REPORT-001
+
+Operations report generation **MUST** degrade section by section, preserve successfully collected evidence, and communicate partial completeness without exposing internal exception details.
+
+### NFR-AI-001
+
+Core discovery, health, assessment, reporting, change planning, authorization, apply, and verification workflows **MUST** remain functional and testable without an external LLM provider.

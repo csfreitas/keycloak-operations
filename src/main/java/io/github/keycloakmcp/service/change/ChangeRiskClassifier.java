@@ -1,5 +1,8 @@
 package io.github.keycloakmcp.service.change;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -41,5 +44,51 @@ public class ChangeRiskClassifier {
         }
         // Unknown properties are treated as HIGH until a later milestone allowlists them.
         return ChangeRisk.HIGH;
+    }
+
+    /** Transition-aware classification for client redirect URI and Web Origin set changes. */
+    public ChangeRisk classifyClientUrls(List<ChangeOperation> operations) {
+        ChangeRisk highest = ChangeRisk.MEDIUM;
+        for (ChangeOperation operation : operations) {
+            Set<String> before = asStringSet(operation.before());
+            for (String value : asStringSet(operation.after())) {
+                if (!before.contains(value)) {
+                    ChangeRisk valueRisk = classifyAddedClientUrl(operation.property(), value);
+                    if (valueRisk.ordinal() > highest.ordinal()) {
+                        highest = valueRisk;
+                    }
+                }
+            }
+        }
+        return highest;
+    }
+
+    private static ChangeRisk classifyAddedClientUrl(String property, String value) {
+        if ("*".equals(value)) {
+            return ChangeRisk.CRITICAL;
+        }
+        if (ClientUrlSettingsChangeSupport.WEB_ORIGINS.equals(property) && "+".equals(value)) {
+            return ChangeRisk.HIGH;
+        }
+        if (ClientUrlSettingsChangeSupport.containsPathWildcard(value)) {
+            return ChangeRisk.HIGH;
+        }
+        try {
+            URI uri = new URI(value);
+            if ("http".equalsIgnoreCase(uri.getScheme())
+                    && !ClientUrlSettingsChangeSupport.isLoopbackHttp(value)) {
+                return ChangeRisk.HIGH;
+            }
+        } catch (URISyntaxException e) {
+            return ChangeRisk.HIGH;
+        }
+        return ChangeRisk.MEDIUM;
+    }
+
+    private static Set<String> asStringSet(Object value) {
+        if (!(value instanceof Collection<?> collection)) {
+            return Set.of();
+        }
+        return collection.stream().map(String::valueOf).collect(java.util.stream.Collectors.toSet());
     }
 }

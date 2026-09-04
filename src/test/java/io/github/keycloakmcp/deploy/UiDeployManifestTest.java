@@ -22,6 +22,6 @@ class UiDeployManifestTest {
         assertThat(yaml).doesNotContain("ClusterRole");
         assertThat(yaml.toLowerCase()).doesNotContain("secretref");
         assertThat(yaml).doesNotContain("DISCOVERY_KUBERNETES_ENABLED");
-        assertThat(yaml).contains("0.7.0-SNAPSHOT");
+        assertThat(yaml).contains("0.8.0-SNAPSHOT");
     }
 }

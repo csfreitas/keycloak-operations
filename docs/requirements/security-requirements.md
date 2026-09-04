@@ -94,6 +94,18 @@ Destructive operations **MUST** be denied by default in the 0.8 foundation.
 
 Change records and apply effects for Target A **MUST NOT** be readable or writable as Target B through authorization or query bugs.
 
+### SEC-CLIENT-001
+
+Redirect URI and Web Origin validation **MUST** reject malformed values and unsafe user-information or parent-directory forms. Full wildcards and other policy-defined unsafe patterns **MUST** be denied by default for production targets; any supported wildcard or non-HTTPS exception **MUST** be explicit, deterministic, environment-aware, and visible in the plan.
+
+### SEC-CLIENT-002
+
+Client update and create operations **MUST NOT** return, persist, log, fingerprint, or unintentionally overwrite client secrets, registration access tokens, private keys, or credential values. Apply **MUST** build the outbound representation from trusted read-back state plus allowlisted semantic operations.
+
+### SEC-REALM-001
+
+Realm changes that weaken transport, authentication, brute-force, event-audit, or account-security controls **MUST** be classified as high/critical risk or denied by deterministic policy. The LLM **MUST NOT** downgrade this outcome.
+
 ## Multi-target isolation
 
 ### SEC-MULTI-001
@@ -109,3 +121,17 @@ Target-scoped operations **SHOULD** enforce target authorization before executio
 ### SEC-RBAC-001
 
 Documentation and deploy manifests **SHOULD NOT** recommend `realm-admin` as the default Keycloak service-account role for this platform.
+
+## Reports and AI
+
+### SEC-REPORT-001
+
+Operations reports **MUST** enforce target authorization and pass structured data and rendered output through sensitive-data filtering. Reports **MUST NOT** include credential values, tokens, passwords, private keys, Kubernetes Secret contents, or unrestricted environment variables.
+
+### SEC-AI-001
+
+Prompts, model context, model responses, and AI audit metadata **MUST NOT** become an alternate path around target isolation, semantic API validation, read-only mode, change policy, approval, or redaction.
+
+### SEC-AI-002
+
+Provider URLs, credentials, kubeconfig, bearer tokens, raw Admin REST paths, arbitrary PromQL, and arbitrary mutation payloads **MUST NOT** be accepted from an AI caller. The backend resolves configured providers from `targetId`.

@@ -1,8 +1,8 @@
 # Security
 
-## Principles (0.1.0)
+## Principles
 
-1. **Read-only by default** — `keycloak.mcp.read-only=true`; write tools are not registered.
+1. **Read-only by default** — `mcp.read-only=true`; controlled writes require target write authorization, policy, approval, apply, and verification.
 2. **No secrets in tool output** — `ClientDetails` has no secret fields; mappers never copy secrets.
 3. **Defense in depth redaction** — `SensitiveDataFilter` recursively redacts maps/lists/beans for keys matching password, secret, token, credential patterns.
 4. **No secrets in logs** — audit and log helpers run string redaction before logging.
@@ -33,10 +33,7 @@ convenience. That is **DEV ONLY**. Production deployments must:
 
 ## OpenShift RBAC and Secrets
 
-The assessor `ClusterRole` includes `get/list/watch` on `secrets` so collectors can
-correlate Secret *metadata*. In Kubernetes, authorized `get`/`list` on Secret
-objects still returns `.data`. The application **must** redact secret values via
-`SensitiveDataFilter` and should prefer namespace-scoped Roles when possible.
+The assessor `ClusterRole` deliberately omits Kubernetes `secrets`. Collectors do not require or return Secret contents. Prefer namespace-scoped Roles when cluster-wide inventory is not required.
 
 ## Network and pod hardening
 
@@ -60,3 +57,5 @@ Metadata such as `name` and `namespace` is preserved.
 Assessment MCP tools return **compact** DTOs (scores, finding ids, evidence *keys*
 only) and always pass through `SensitiveDataFilter`. Full evidence maps are not
 dumped to LLM tool responses.
+
+Operations reports enforce `ASSESS` authorization, sanitize both structured and Markdown output, and replace provider failures with safe section statuses instead of returning raw exception messages. AI callers cannot supply provider credentials, endpoints, arbitrary Admin REST, arbitrary PromQL, or policy decisions.

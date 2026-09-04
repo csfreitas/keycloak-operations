@@ -2,6 +2,8 @@
 
 AI-assisted workflow: [`development/ai-assisted-development.md`](development/ai-assisted-development.md) and root [`AGENTS.md`](../AGENTS.md).
 
+For a durable handoff between this cloud workspace, a local Docker/Podman environment, and CI, see [`development/local-cloud-workflow.md`](development/local-cloud-workflow.md).
+
 ## Prerequisites
 
 - Java 21+
@@ -103,5 +105,5 @@ Demo client secrets are for **local development only**.
 - Package root: `io.github.keycloakmcp`
 - DTOs are Java records
 - CDI `@ApplicationScoped` services
-- No write MCP tools in 0.1.0
+- Operational reads and planning remain available in default read-only mode; approve/reject/apply require the controlled change lifecycle and `mcp.read-only=false`
 - Prefer feature flags over `version.equals` for capability detection

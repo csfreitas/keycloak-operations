@@ -3,6 +3,7 @@ package io.github.keycloakmcp.service.change;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -61,5 +62,61 @@ class ChangePolicyAndRiskTest {
         String fb = fingerprinter.fingerprintPlan("t", "r", "CLIENT", "c", "UPDATE", b);
         assertThat(fa).isNotEqualTo(fb);
         assertThat(fa).hasSize(64);
+    }
+
+    @Test
+    void structuredFingerprintsAreStableForNormalizedUrlSets() {
+        List<ChangeOperation> a = List.of(new ChangeOperation(
+                "redirectUris",
+                ChangeOperationType.UPDATE,
+                List.of("https://old.example/callback"),
+                List.of("https://a.example/callback", "https://b.example/callback")));
+        List<ChangeOperation> b = List.of(new ChangeOperation(
+                "redirectUris",
+                ChangeOperationType.UPDATE,
+                List.of("https://old.example/callback"),
+                List.of("https://a.example/callback", "https://b.example/callback")));
+
+        assertThat(fingerprinter.fingerprintPlan("t", "r", "CLIENT", "c", "UPDATE", a))
+                .isEqualTo(fingerprinter.fingerprintPlan("t", "r", "CLIENT", "c", "UPDATE", b));
+        assertThat(fingerprinter.fingerprintBaseline(java.util.Map.of(
+                "redirectUris", List.of("https://a.example", "https://b.example"))))
+                .isEqualTo(fingerprinter.fingerprintBaseline(java.util.Map.of(
+                        "redirectUris", List.of("https://a.example", "https://b.example"))));
+    }
+
+    @Test
+    void legacyScalarFingerprintsRemainCompatibleWithVersionZeroEight() {
+        assertThat(fingerprinter.fingerprintBaseline(Map.of("name", "Old", "description", "Desc")))
+                .isEqualTo("287ae186fcf7d946321af6f0979c262fc30a09a5f5f2355a26f215aa2a7d8929");
+        assertThat(fingerprinter.fingerprintPlan(
+                "t",
+                "r",
+                "CLIENT",
+                "c",
+                "UPDATE",
+                List.of(new ChangeOperation("name", ChangeOperationType.UPDATE, "old", "new"))))
+                .isEqualTo("7d1fc17c7675a30dd95f175be74be0d80f41fe4697a0198e77749071821ef119");
+    }
+
+    @Test
+    void classifiesClientUrlTransitionsAndDeniesUnsafeProductionAdditions() {
+        List<ChangeOperation> exactHttps = List.of(new ChangeOperation(
+                "redirectUris", ChangeOperationType.UPDATE, List.of(), List.of("https://app.example/callback")));
+        List<ChangeOperation> wildcard = List.of(new ChangeOperation(
+                "redirectUris", ChangeOperationType.UPDATE, List.of(), List.of("https://app.example/*")));
+        List<ChangeOperation> nonLoopbackHttp = List.of(new ChangeOperation(
+                "redirectUris", ChangeOperationType.UPDATE, List.of(), List.of("http://app.example/callback")));
+        List<ChangeOperation> plusOrigin = List.of(new ChangeOperation(
+                "webOrigins", ChangeOperationType.UPDATE, List.of(), List.of("+")));
+
+        assertThat(riskClassifier.classifyClientUrls(exactHttps)).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(riskClassifier.classifyClientUrls(wildcard)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientUrls(nonLoopbackHttp)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientUrls(plusOrigin)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(policyEvaluator.evaluateClientUrls(TargetEnvironment.PRD, ChangeRisk.HIGH, true).decision())
+                .isEqualTo(ChangePolicyDecision.DENY);
+        assertThat(policyEvaluator.evaluateClientUrls(TargetEnvironment.HML, ChangeRisk.HIGH, true).decision())
+                .isEqualTo(ChangePolicyDecision.APPROVAL_REQUIRED);
     }
 }

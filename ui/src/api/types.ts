@@ -200,6 +200,45 @@ export interface SnapshotDetail extends SnapshotSummary {
   // summary may include inventory nested
 }
 
+// --- Operations reports ---
+
+export type ReportStatus = 'COMPLETE' | 'PARTIAL' | 'FAILED';
+export type ReportSectionStatus = 'COMPLETE' | 'PARTIAL' | 'FAILED' | 'SKIPPED';
+
+export interface ReportSection {
+  name: string;
+  status: ReportSectionStatus;
+  message: string;
+}
+
+export interface OperationsAssessmentReport {
+  assessmentId: string;
+  profile: string;
+  status: string;
+  overallScore: number;
+  evidenceCompleteness: number;
+  confidence: string | null;
+  findings: unknown[];
+}
+
+export interface OperationsReport {
+  schemaVersion: string;
+  reportId: string;
+  targetId: string;
+  targetDisplayName: string;
+  productType: string;
+  environment: string;
+  configuredInfrastructureType: string;
+  generatedAt: string;
+  status: ReportStatus;
+  sections: ReportSection[];
+  environmentSnapshot: SnapshotDetail | null;
+  healthCheck: HealthCheckDetail | null;
+  assessment: OperationsAssessmentReport | null;
+  performance: unknown | null;
+  markdown: string;
+}
+
 // --- Inventory ---
 
 export interface InventoryResult {

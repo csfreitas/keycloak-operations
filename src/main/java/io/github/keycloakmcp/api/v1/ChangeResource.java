@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.github.keycloakmcp.domain.change.ChangeRecord;
+import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.service.change.ChangeManagementService;
@@ -93,6 +94,12 @@ public class ChangeResource {
         String idempotencyKey = stringVal(body.get("idempotencyKey"));
         return sensitiveDataFilter.redact(changeManagementService.planClientUpdate(
                 targetId, realm, clientId, desiredState, actor, idempotencyKey));
+    }
+
+    @POST
+    @Path("/plan/client-urls")
+    public ChangeRecord planClientUrls(ClientUrlChangeRequest request) {
+        return sensitiveDataFilter.redact(changeManagementService.planClientUrlUpdate(request));
     }
 
     private static String stringVal(Object value) {
