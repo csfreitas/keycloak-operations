@@ -29,3 +29,7 @@ A version **MUST NOT** be marked as integration-tested when the corresponding IT
 ### COMPAT-007
 
 Controlled write operations **MUST** remain capability- and version-aware. Planning **MUST** fail safely (for example `UNSUPPORTED_CAPABILITY`) when a mutation is not available on the target product/version rather than assuming upstream-only Admin features exist on RHBK.
+
+### COMPAT-008
+
+Realm and client administration **MUST** remain compatible with the project's stable Keycloak Admin REST integration boundary. Experimental administration APIs, including a version-specific Admin API v2, **MUST NOT** become a mandatory dependency without capability detection, tested Keycloak/RHBK coverage, and an explicit architecture decision.

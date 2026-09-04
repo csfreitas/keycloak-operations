@@ -1,13 +1,12 @@
 # MCP Tools
 
-All tools in **0.1.0** are read-only. Write operations are not registered while
-`mcp.read-only=true`.
+Operational tools are read-only by default. Change planning is a dry run and remains available while `mcp.read-only=true`; approve, reject, and apply are gated by write authorization, policy, approval, and the global read-only setting.
 
 Every administrative tool requires **`targetId`** — a registered Keycloak/RHBK
 environment. Use `keycloak_list_targets` when unknown. Arbitrary URLs are rejected
 by design (SSRF protection).
 
-## Available in 0.1.0
+## Available
 
 | Tool | targetId required | Other arguments | Description |
 |------|-------------------|-----------------|-------------|
@@ -32,11 +31,20 @@ by design (SSRF protection).
 | `keycloak_get_metrics` | yes | `category`, `window?` | Semantic category metrics |
 | `keycloak_run_assessment` | yes | `profile?` | Run + persist assessment (compact) |
 | `keycloak_health_check` | yes | — | Lightweight health check |
+| `keycloak_generate_operations_report` | yes | `profile?`, `metricsWindow?` | Sanitized platform, health, assessment, findings, and performance report |
 | `keycloak_list_assessment_profiles` | no | — | Built-in profiles |
 | `keycloak_list_assessments` | yes | `page?`, `size?` | Assessment history |
 | `keycloak_get_assessment` | yes | `assessmentId` | Assessment summary |
 | `keycloak_get_latest_assessment` | yes | — | Latest assessment |
 | `keycloak_get_findings` | yes | filters / page | Persisted findings (compact) |
+| `keycloak_plan_client_update` | yes | semantic allowlisted fields | Plan milestone 0.8 client configuration update |
+| `keycloak_plan_update_client_urls` | yes | realm, client, typed URI/origin sets | Plan typed redirect URI/Web Origin replacement |
+| `keycloak_get_change` | no | `changeId` | Get a change lifecycle record |
+| `keycloak_list_changes` | optional filter | status/page | List change lifecycle records |
+| `keycloak_approve_change` | no | `changeId`, actor | Approve an exact plan fingerprint |
+| `keycloak_reject_change` | no | `changeId`, actor/reason | Reject a change |
+| `keycloak_apply_change` | no | `changeId` | Apply an authorized approved plan |
+| `keycloak_verify_change` | no | `changeId` | Re-run read-back verification |
 
 ## Planned later
 

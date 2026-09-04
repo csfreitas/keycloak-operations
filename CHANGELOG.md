@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Target-bound operations reports combining sanitized platform inventory, health, deterministic assessment, actionable findings, and optional semantic performance metrics
+- Shared REST `POST /api/v1/targets/{targetId}/operations-reports` and MCP `keycloak_generate_operations_report` surfaces
+- AI-assisted operations architecture with deterministic backend decision boundaries and evidence provenance
+- Typed client redirect URI and Web Origin planning through shared MCP and REST application services
+- Deterministic URI validation, normalized set diffs, transition-aware risk/policy, stale-plan checks, apply, and read-back verification
+- Structured change-operation persistence and fingerprinting with compatibility for existing 0.8 scalar records
+- Real community Keycloak 26.7.1 CI smoke path covering PostgreSQL, Prometheus, MCP reads, health, environment discovery, and operations-report generation
+
+### Security
+
+- Report sections degrade explicitly without returning raw provider exception details; structured and Markdown output are redacted
+- Production defaults deny path-wildcard redirects, non-loopback HTTP additions, and the Web Origin `+` sentinel
+- Client updates preserve unrelated configuration and clear secret material before outbound Admin REST writes
+
 ## [0.6.1-SNAPSHOT] — 2026-08-07
 
 ### Added

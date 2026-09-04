@@ -4,6 +4,7 @@ How the platform performs **safe, semantic, target-bound** writes against Keyclo
 
 Related: [ADR 0007](../adr/0007-plan-approve-apply-change-model.md),
 [milestone 0.8](../milestones/0.8-controlled-administration.md),
+[milestone 0.8.1](../milestones/0.8.1-realm-client-administration.md),
 [security](security.md), [persistence](persistence.md).
 
 ## Principle
@@ -94,6 +95,7 @@ Defaults (configurable):
 - **Baseline fingerprint** — hash of observed current state at plan time.
 - Approval stores the approved fingerprint; apply refuses mismatches (`APPROVAL_INVALID`).
 - Before apply, re-read resource; baseline drift → `CHANGE_CONFLICT` / `REPLAN_REQUIRED`.
+- Legacy scalar plans retain the 0.8 fingerprint algorithm; structured collection plans use canonical typed values so upgrading does not invalidate pending scalar plans.
 
 ## Verification
 
@@ -125,4 +127,10 @@ Controlled non-sensitive **client configuration update** (allowlisted properties
 display name / description / PKCE challenge method). Demonstrates the full lifecycle
 without delete, password, or secret workflows.
 
-Broader realm/client/user/flow/IdP administration belongs to milestones **0.8.1–0.8.4**.
+## Typed client URL sets (0.8.1 Slice 1)
+
+The typed `ClientUrlChangeRequest` replaces complete desired sets for `redirectUris` and/or `webOrigins`. Null means unchanged; an explicit empty collection means remove all values. `ClientUrlSettingsChangeSupport` validates and deterministically normalizes each set, produces item-level additions/removals for review, and retains structured lists in `ChangeOperation` for persistence and fingerprints.
+
+Apply reads a fresh trusted `ClientRepresentation`, verifies the relevant baseline only, changes the allowlisted URL fields, clears secret material defensively, updates through `StableAdminApiAdapter`, and reads back normalized values for verification. Risk classification is transition-aware: exact values are at least MEDIUM, while path wildcards, non-loopback HTTP, and the Web Origin `+` sentinel are HIGH. Unsafe additions are denied by default in production.
+
+Broader realm/client/user/flow/IdP administration remains incremental after **0.8.1**. Fleet reporting/onboarding and platform authorization are prioritized before expanding all administration domains.

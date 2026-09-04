@@ -40,7 +40,7 @@ Historical milestone commits (immutable):
 | | |
 |--|--|
 | Latest completed | **0.8** Controlled Administration & Change Management |
-| Next (PLANNED) | **0.8.1** Realm & Client Administration |
+| Current (IN PROGRESS) | **0.8.1** Realm & Client Administration — Slice 1 |
 | Index | [milestones/README.md](milestones/README.md) |
 
 ## What already works
@@ -49,14 +49,19 @@ MCP + REST shared services; multi-target registry; Keycloak Admin reads + contro
 
 **0.8 foundation:** ChangeRequest/ChangePlan lifecycle, safe diff, risk, environment policy, approval bound to plan fingerprint, apply with stale-plan protection, read-back verification, audit, semantic MCP/REST change tools, proof-of-concept non-sensitive client config update (`name` / `description` / `pkceCodeChallengeMethod`).
 
+**0.8.1 Slice 1:** typed replacement of client redirect URI and Web Origin sets; deterministic validation/normalization; item-level set diff; structured fingerprint/persistence with legacy scalar compatibility; transition-aware risk/policy; stale-plan protection; secret-cleared apply; read-back verification; shared REST `POST /changes/plan/client-urls` and MCP `keycloak_plan_update_client_urls` surfaces.
+
+**Operations report foundation (working tree):** shared `OperationsReportService` combines sanitized snapshots, health, deterministic assessments/findings, and optional semantic metrics. REST `POST /targets/{targetId}/operations-reports` returns the complete structured report and Markdown; MCP `keycloak_generate_operations_report` returns a compact agent-oriented envelope and Markdown. Section completeness is explicit and independent from target health. See [operations-reporting.md](architecture/operations-reporting.md) and [ADR 0008](adr/0008-ai-assists-backend-decides.md).
+
 ## Known limitations
 
 - Opt-in ITs skipped without `RUN_*_IT` + live stack (`ControlledClientChangeIT` placeholder)
-- Full realm/client/user/flow/IdP administration deferred to 0.8.1–0.8.4
+- Client flow/lifecycle and realm administration remain incomplete in 0.8.1; broad administration remains deferred behind fleet reporting/onboarding and authorization work
+- Web Origin `+` behavior and controlled URL writes are not verified against a live Keycloak/RHBK target
 - Destructive ops, password/secret workflows out of scope
 - SSE is in-process (not multi-replica fan-out)
 - Identity A OIDC disabled by default (OPEN_LAB)
-- VM inventory still future
+- VM and Docker inventory collectors are not implemented; only OpenShift/Kubernetes have detailed infrastructure inventory
 - `mcp.read-only=true` by default; apply requires explicit opt-out + WRITE
 
 ## Test baseline (after 0.8)
@@ -72,6 +77,27 @@ cd ui && npm run test:run && npm run build
 | Failsafe | **5** run, **5** skipped |
 | Frontend | **50** Vitest tests |
 | Builds | Backend + UI **SUCCESS** |
+
+The table above is the accepted 0.8 baseline. Current 0.8.1 working-tree validation must be reported separately until the full backend, UI, and opt-in integration commands have been executed in a suitable environment.
+
+Current working-tree report validation in the cloud workspace:
+
+| Check | Result |
+|---|---|
+| Operations report unit/delegation tests | **7 passed** |
+| UI Vitest | **51 passed** |
+| UI production build | **SUCCESS** |
+| Backend diagnostic package with Java 17 override | **SUCCESS**; not the Java 21 baseline |
+| Full `mvn clean verify` | **BLOCKED**; Docker/PostgreSQL Dev Services unavailable in this workspace |
+| Live Keycloak/RHBK report execution | **NOT VERIFIED** |
+
+The community CI workflow now defines a real read-only smoke path for Keycloak
+26.7.1, PostgreSQL, Prometheus, MCP, and operations-report generation. It remains
+`NOT VERIFIED` until that workflow or the equivalent local procedure completes
+against the current working tree.
+
+Local validation handoff:
+[`development/local-validation-0.8.1-operations-report.md`](development/local-validation-0.8.1-operations-report.md).
 
 ## New Agent Quick Start
 

@@ -4,7 +4,7 @@ Backend + Web UI for **administration**, **diagnostics**, **health**, **assessme
 
 | | |
 |---|---|
-| Version | **0.7.0-SNAPSHOT** *(experimental / evolving)* |
+| Version | **0.8.0-SNAPSHOT** *(experimental / evolving)* |
 | Artifact | `io.github.keycloakmcp:keycloak-operations-mcp` |
 | Web UI | `ui/` (React + TypeScript + Vite) |
 | Runtime | Java **21**, Quarkus **3.38.1**, Node **≥ 20** (UI) |
@@ -21,18 +21,24 @@ Operators ask natural-language and console questions about realms, HA posture, m
 - REST `/api/v1` for fleet, history, inventory, assessments, health, metrics
 - OpenShift/Kubernetes infrastructure inventory (target-aware)
 - Deterministic assessment engine + health checks
+- Consolidated on-demand operations report for humans and AI agents
 - Semantic Prometheus / OpenShift Monitoring metrics (no raw PromQL from clients)
 - PostgreSQL persistence (Flyway) for operational history — **not** a TSDB
 - **Fleet Operations Console** (`ui/`) — fleet, overview, health, assessment, performance, infrastructure, history
+- Controlled administration — plan, review, approve, apply, verify, and audit
 
 Status detail: [`docs/project-state.md`](docs/project-state.md).
 
 ## Architecture (summary)
 
-```text
-Browser (ui/) → REST / SSE → Application Services → Target Registry
-MCP agents  ↗                 → Keycloak / Infrastructure / Metrics providers
-                              → Evidence → Rules → Findings
+```mermaid
+flowchart TB
+  Human[Operator / Web UI] --> REST[REST API]
+  Agent[AI agent] --> MCP[MCP tools]
+  REST --> Services[Application services]
+  MCP --> Services
+  Services --> Providers[Keycloak, infrastructure, metrics]
+  Services --> Evidence[Evidence, rules, reports, changes]
 ```
 
 The browser never talks to Keycloak Admin, Kubernetes/OpenShift, Prometheus, or PostgreSQL directly.
@@ -80,7 +86,7 @@ More: [`docs/development.md`](docs/development.md), [`ui/README.md`](ui/README.m
 
 ## Roadmap
 
-0.1–0.7 ✅ → **0.8 drift (next)** → 0.9 schedules/alerts → 1.0.
+0.1–0.8 ✅ → **0.8.1 Realm & Client Administration** → **0.8.2 Fleet Reporting & Target Onboarding** → 0.9 schedules/alerts → 1.0.
 Details: [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Status

@@ -13,10 +13,12 @@ Delivery index only. Specs: [`milestones/`](milestones/). Requirements: [`requir
 | ✅ | 0.6.1 Metrics Hardening | [0.6.1](milestones/0.6.1-metrics-hardening.md) |
 | ✅ | 0.7 Web UI | [0.7](milestones/0.7-web-ui.md) |
 | ✅ | **0.8 Controlled Administration & Change Management** | [0.8](milestones/0.8-controlled-administration.md) |
-| 📋 | **0.8.1 Realm & Client Administration** *(next)* | — |
-| 📋 | 0.8.2 Users, Groups & Roles | — |
-| 📋 | 0.8.3 Authentication Flows & Client Scopes | — |
-| 📋 | 0.8.4 Identity Providers & Advanced Realm Configuration | — |
+| 🚧 | **0.8.1 Realm & Client Administration** *(Slice 1)* | [0.8.1](milestones/0.8.1-realm-client-administration.md) |
+| 📋 | **0.8.2 Fleet Reporting & Target Onboarding** *(report foundation started)* | [0.8.2](milestones/0.8.2-fleet-reporting-target-onboarding.md) |
+| 📋 | 0.8.3 Platform Authorization & Governance | — |
+| 📋 | 0.8.4 Users, Groups & Roles | — |
+| 📋 | 0.8.5 Authentication Flows & Client Scopes | — |
+| 📋 | 0.8.6 Identity Providers & Advanced Realm Configuration | — |
 | 📋 | 0.9 Schedules / alerts | — |
 | 📋 | 1.0 Production-ready platform | — |
 
