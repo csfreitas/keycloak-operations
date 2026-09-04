@@ -27,11 +27,11 @@ Workflow: [`../../AGENTS.md`](../../AGENTS.md) · HEAD snapshot: [`../project-st
 
 | Commit | Notes |
 |--------|--------|
-| `7270d34` | Conceptual 0.1–0.3 (`0.1.0`) |
-| `64a0f8c` | 0.4 |
-| `a5a8d08` | Track `target` Java package |
-| `a0ffe9b` | 0.5 |
-| `59461d1` | 0.6 |
-| `089f6ea` | 0.6.1 hardening |
-| `bcad150` | 0.7 Web UI |
+| `198c237` | Conceptual 0.1–0.3 (`0.1.0`) |
+| `4d01a9a` | 0.4 |
+| `5f9a1b7` | Track `target` Java package |
+| `c0d00a3` | 0.5 |
+| `81eff56` | 0.6 |
+| `9ebadc9` | 0.6.1 hardening |
+| `610e444` | 0.7 Web UI |
 | *(in progress)* | 0.8 Controlled Administration |

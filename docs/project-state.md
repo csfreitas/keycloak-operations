@@ -29,11 +29,11 @@ Historical milestone commits (immutable):
 
 | Milestone | Commit |
 |-----------|--------|
-| 0.7 Web UI | `bcad150` |
-| 0.6.1 Metrics Hardening | `089f6ea` |
-| 0.6 Metrics | `59461d1` |
-| 0.5 Assessment depth | `a0ffe9b` |
-| 0.4 Inventory | `64a0f8c` |
+| 0.7 Web UI | `610e444` |
+| 0.6.1 Metrics Hardening | `9ebadc9` |
+| 0.6 Metrics | `81eff56` |
+| 0.5 Assessment depth | `c0d00a3` |
+| 0.4 Inventory | `4d01a9a` |
 
 ## Milestone status
 
