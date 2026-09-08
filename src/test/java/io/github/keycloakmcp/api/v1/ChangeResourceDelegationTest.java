@@ -10,6 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import io.github.keycloakmcp.domain.change.ChangeRecord;
+import io.github.keycloakmcp.domain.change.ClientCreateChangeRequest;
+import io.github.keycloakmcp.domain.change.ClientEnabledChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientSecurityChangeRequest;
 import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
@@ -65,5 +67,28 @@ class ChangeResourceDelegationTest {
 
         assertThat(resource.planClientSecurity(request)).isSameAs(expected);
         verify(service).planClientSecurityUpdate(request);
+    }
+
+    @Test
+    void typedClientLifecycleEndpointsDelegateToSharedApplicationService() {
+        ChangeManagementService service = mock(ChangeManagementService.class);
+        SensitiveDataFilter filter = mock(SensitiveDataFilter.class);
+        ChangeRecord expected = mock(ChangeRecord.class);
+        ClientCreateChangeRequest create = new ClientCreateChangeRequest(
+                "target-a", "realm-a", "client-a", "Name", null,
+                false, true, true, false, false, "operator", "create-1");
+        ClientEnabledChangeRequest enabled = new ClientEnabledChangeRequest(
+                "target-a", "realm-a", "client-a", true, "operator", "enabled-1");
+        when(service.planClientCreate(create)).thenReturn(expected);
+        when(service.planClientEnabledUpdate(enabled)).thenReturn(expected);
+        when(filter.redact(expected)).thenReturn(expected);
+        ChangeResource resource = new ChangeResource();
+        resource.changeManagementService = service;
+        resource.sensitiveDataFilter = filter;
+
+        assertThat(resource.planClientCreate(create)).isSameAs(expected);
+        assertThat(resource.planClientEnabled(enabled)).isSameAs(expected);
+        verify(service).planClientCreate(create);
+        verify(service).planClientEnabledUpdate(enabled);
     }
 }

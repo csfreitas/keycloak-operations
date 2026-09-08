@@ -33,7 +33,9 @@ public class AssessmentScoring {
     public Map<String, Integer> categoryScores(List<Finding> findings) {
         Map<String, Integer> scores = new LinkedHashMap<>();
         for (String category : CATEGORIES) {
-            scores.put(category, scoreFor(findings, category));
+            if (hasEvaluatedFindings(findings, category)) {
+                scores.put(category, scoreFor(findings, category));
+            }
         }
         // Also include any non-standard categories that have OPEN findings
         if (findings != null) {
@@ -42,10 +44,18 @@ public class AssessmentScoring {
                     continue;
                 }
                 String normalized = normalizeCategory(finding.category());
-                scores.putIfAbsent(normalized, scoreFor(findings, normalized));
+                if (hasEvaluatedFindings(findings, normalized)) {
+                    scores.putIfAbsent(normalized, scoreFor(findings, normalized));
+                }
             }
         }
         return Map.copyOf(scores);
+    }
+
+    private static boolean hasEvaluatedFindings(List<Finding> findings, String category) {
+        return findings != null && findings.stream().anyMatch(f -> f != null
+                && category.equals(normalizeCategory(f.category()))
+                && f.status() != FindingStatus.NOT_EVALUATED && f.status() != FindingStatus.SKIPPED);
     }
 
     private int scoreFor(List<Finding> findings, String categoryFilter) {

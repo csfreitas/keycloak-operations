@@ -14,6 +14,9 @@ import io.github.keycloakmcp.target.TargetRegistry;
 import io.github.keycloakmcp.target.TargetResolver;
 import io.github.keycloakmcp.target.TargetSummary;
 import io.github.keycloakmcp.target.TargetType;
+import io.github.keycloakmcp.target.Target;
+import io.github.keycloakmcp.target.TargetAuthorizationService;
+import io.github.keycloakmcp.target.TargetPermission;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
 import io.quarkiverse.mcp.server.ToolCallException;
@@ -36,6 +39,9 @@ public class TargetTools {
     TargetResolver targetResolver;
 
     @Inject
+    TargetAuthorizationService targetAuthorization;
+
+    @Inject
     AuditService auditService;
 
     @Inject
@@ -49,7 +55,7 @@ public class TargetTools {
             description = "List registered Keycloak/RHBK targets (sanitized metadata only). "
                     + "Call this before other tools when targetId is unknown.")
     public List<TargetSummary> keycloakListTargets() {
-        return invoke("keycloak_list_targets", null, () -> TargetMapper.toSummaries(targetRegistry.list()));
+        return invoke("keycloak_list_targets", null, () -> TargetMapper.toSummaries(readableTargets()));
     }
 
     @Tool(
@@ -60,7 +66,11 @@ public class TargetTools {
         return invoke(
                 "keycloak_get_target",
                 targetId,
-                () -> TargetMapper.toDetails(targetResolver.require(targetId)));
+                () -> {
+                    Target target = targetResolver.require(targetId);
+                    targetAuthorization.assertAllowed(target, TargetPermission.READ);
+                    return TargetMapper.toDetails(target);
+                });
     }
 
     @Tool(
@@ -79,12 +89,18 @@ public class TargetTools {
         return invoke("keycloak_find_targets", null, () -> {
             TargetType typeFilter = parseType(product);
             TargetEnvironment envFilter = parseEnvironment(environment);
-            return targetRegistry.list().stream()
+            return readableTargets().stream()
                     .filter(t -> typeFilter == null || t.type() == typeFilter)
                     .filter(t -> envFilter == null || t.environment() == envFilter)
                     .map(TargetMapper::toSummary)
                     .toList();
         });
+    }
+
+    private List<Target> readableTargets() {
+        targetAuthorization.assertSession();
+        return targetRegistry.list().stream()
+                .filter(t -> targetAuthorization.isAllowed(t, TargetPermission.READ)).toList();
     }
 
     private static TargetType parseType(String product) {

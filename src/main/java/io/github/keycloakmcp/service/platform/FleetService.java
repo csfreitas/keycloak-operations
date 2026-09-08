@@ -51,11 +51,10 @@ public class FleetService {
     }
 
     public List<FleetItem> fleet() {
+        targetAuthorization.assertSession();
         List<FleetItem> items = new ArrayList<>();
         for (Target target : targetRegistry.list()) {
-            try {
-                targetAuthorization.assertAllowed(target, TargetPermission.READ);
-            } catch (RuntimeException e) {
+            if (!targetAuthorization.isAllowed(target, TargetPermission.READ)) {
                 continue;
             }
             String targetId = target.id().value();
@@ -80,7 +79,7 @@ public class FleetService {
                     signals.productVersion(),
                     signals.runtime(),
                     health == null ? HealthStatus.UNKNOWN : health.overallStatus(),
-                    assessment == null ? null : assessment.score(),
+                    assessment == null || !Boolean.TRUE.equals(assessment.scoreAvailable()) ? null : assessment.score(),
                     assessment == null ? null : assessment.status(),
                     assessment == null ? null : assessment.evidenceCompleteness(),
                     critical,
@@ -88,7 +87,8 @@ public class FleetService {
                     target.hasMetrics(),
                     health == null ? null : health.createdAt(),
                     assessment == null ? null : assessment.createdAt(),
-                    target.tags()));
+                    target.tags(),
+                    assessment == null ? null : assessment.scoreAvailable()));
         }
         return List.copyOf(items);
     }

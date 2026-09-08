@@ -26,6 +26,8 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class AssessmentPersistenceMapper {
 
+    public static final String SCORE_EVALUATION_REVISION = "2026-09-evidence-trust-v1";
+
     private final SensitiveDataFilter sensitiveDataFilter;
 
     @Inject
@@ -54,6 +56,8 @@ public class AssessmentPersistenceMapper {
         summary.put("findingCount", counts.values().stream().mapToInt(Integer::intValue).sum());
         summary.put("score", result.overallScore());
         summary.put("overallScore", result.overallScore());
+        summary.put("scoreAvailable", result.scoreAvailable());
+        summary.put("evaluationRevision", SCORE_EVALUATION_REVISION);
         summary.put("evidenceCompleteness", result.evidenceCompleteness());
         summary.put("confidence", entity.confidence);
         summary.put("categoryScores", result.categoryScores());
@@ -118,6 +122,8 @@ public class AssessmentPersistenceMapper {
         Map<String, Integer> categoryScores = entity.categoryScores;
         Integer completeness = entity.evidenceCompleteness;
         String confidence = entity.confidence;
+        Boolean scoreAvailable = null;
+        String evaluationRevision = null;
         if (entity.summary != null) {
             if (completeness == null && entity.summary.get("evidenceCompleteness") instanceof Number n) {
                 completeness = n.intValue();
@@ -139,6 +145,17 @@ public class AssessmentPersistenceMapper {
             putCount(counts, "medium", entity.summary.get("mediumCount"));
             putCount(counts, "low", entity.summary.get("lowCount"));
             putCount(counts, "info", entity.summary.get("infoCount"));
+            if (entity.summary.get("evaluationRevision") instanceof String revision) {
+                evaluationRevision = revision;
+            }
+            if (SCORE_EVALUATION_REVISION.equals(evaluationRevision)
+                    && entity.summary.get("scoreAvailable") instanceof Boolean recordedAvailability) {
+                scoreAvailable = recordedAvailability
+                        && "COMPLETE".equals(entity.status)
+                        && Integer.valueOf(100).equals(completeness)
+                        && entity.rulesEvaluated != null && entity.rulesEvaluated > 0
+                        && Integer.valueOf(0).equals(entity.rulesNotEvaluated);
+            }
         }
         return new AssessmentRunSummary(
                 entity.id,
@@ -153,7 +170,9 @@ public class AssessmentPersistenceMapper {
                 completeness,
                 confidence,
                 categoryScores,
-                counts.isEmpty() ? null : Map.copyOf(counts));
+                counts.isEmpty() ? null : Map.copyOf(counts),
+                scoreAvailable,
+                evaluationRevision);
     }
 
     public Finding toDomainFinding(AssessmentFindingEntity entity) {

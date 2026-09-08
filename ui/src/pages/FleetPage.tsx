@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFleet } from '../hooks/useFleet';
 import { StatusBadge } from '../components/StatusBadge';
 import { EnvBadge } from '../components/EnvBadge';
-import { ScoreBar } from '../components/ScoreBar';
+import { AssessmentScore } from '../components/AssessmentScore';
 import { LoadingState } from '../components/LoadingState';
 import { ErrorState } from '../components/ErrorState';
 import { EmptyState } from '../components/EmptyState';
@@ -82,7 +82,8 @@ function FleetTable({ items }: { items: FleetItem[] }) {
                 <StatusBadge status={item.healthStatus} size="sm" />
               </td>
               <td style={{ minWidth: 120 }}>
-                <ScoreBar score={item.latestAssessmentScore} showLabel />
+                <AssessmentScore score={item.latestAssessmentScore} status={item.latestAssessmentStatus} completeness={item.evidenceCompleteness} scoreAvailable={item.scoreAvailable} />
+                <div className="text-xs text-muted">Coverage: {item.evidenceCompleteness == null ? 'Unknown' : `${item.evidenceCompleteness}%`}</div>
               </td>
               <td>
                 <FindingCounts critical={item.criticalFindings} high={item.highFindings} />
@@ -119,7 +120,7 @@ export function FleetPage() {
       <div className="page-content">
         <EmptyState
           title="No targets registered"
-          description="Register targets via the API or MCP tools to see them here."
+          description="Ask the platform administrator to configure a target and grant you access. Target registration through the API or MCP is not available yet."
         />
       </div>
     );

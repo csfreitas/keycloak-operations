@@ -21,8 +21,9 @@ import io.github.keycloakmcp.assessment.engine.EvidenceSubject;
 import io.github.keycloakmcp.collector.EvidenceCollector;
 import io.github.keycloakmcp.config.AssessmentConfig;
 import io.github.keycloakmcp.domain.common.ServerInfo;
+import io.github.keycloakmcp.domain.error.ErrorCode;
+import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.target.Target;
-import io.github.keycloakmcp.target.TargetType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -61,22 +62,40 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
         String targetId = target.id().value();
         Instant now = Instant.now();
         List<Evidence> evidence = new ArrayList<>();
+        List<Map<String, String>> issues = new ArrayList<>();
 
-        ServerInfoRepresentation serverInfo = adminApi.getServerInfo(target);
-        SystemInfoRepresentation systemInfo = serverInfo.getSystemInfo();
-        String rawVersion = systemInfo == null ? null : systemInfo.getVersion();
-        String version = versionDetector.parseVersion(rawVersion).orElse(rawVersion);
-        ServerInfo.Product product = productFromTarget(target.type());
-        ServerInfo.Product detected = versionDetector.detectProduct(serverInfo);
-        if (detected != ServerInfo.Product.UNKNOWN) {
-            product = detected;
+        ServerInfoRepresentation serverInfo = null;
+        try {
+            serverInfo = adminApi.getServerInfo(target);
+            if (serverInfo == null) {
+                issues.add(issue("INVALID_RESPONSE", "server-info"));
+            }
+        } catch (RuntimeException e) {
+            // Server metadata may require privileges that realm/client reads do not.
+            // Do not escalate or discard permitted resource evidence merely to observe a version.
+            issues.add(issue(failureCode(e), "server-info"));
+            LOG.warnf("Server metadata unavailable for target=%s; continuing permitted resource collection", targetId);
         }
+        SystemInfoRepresentation systemInfo = serverInfo == null ? null : serverInfo.getSystemInfo();
+        String rawVersion = systemInfo == null ? null : systemInfo.getVersion();
+        String version = rawVersion == null || rawVersion.isBlank()
+                ? null : versionDetector.parseVersion(rawVersion).orElse(null);
+        if (serverInfo != null && version == null) {
+            issues.add(issue("MISSING_FIELDS", "server-info.version"));
+        }
+        ServerInfo.Product product = versionDetector.detectProduct(serverInfo);
 
         evidence.add(ev(targetId, "server", "keycloak.version", version, now, null));
-        evidence.add(ev(targetId, "server", "keycloak.product", product.name(), now, null));
+        if (rawVersion != null && !rawVersion.isBlank()) {
+            evidence.add(ev(targetId, "server", "keycloak.version.raw", rawVersion, now, null));
+        }
+        evidence.add(ev(targetId, "server", "keycloak.product",
+                product == ServerInfo.Product.UNKNOWN ? null : product.name(), now, null));
+        evidence.add(ev(targetId, "server", "keycloak.product.configured", target.type().name(), now, null));
 
         List<RealmRepresentation> realms = adminApi.listRealms(target);
         if (realms == null) {
+            issues.add(issue("INVALID_RESPONSE", "realms"));
             realms = List.of();
         }
         evidence.add(ev(targetId, "realm", "keycloak.realm.count", realms.size(), now, null));
@@ -89,6 +108,7 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
                 ? realms
                 : realms.subList(0, maxRealms);
         if (realms.size() > maxRealms) {
+            issues.add(issue("TRUNCATED", "realms"));
             LOG.warnf("Realm collection truncated to assessment.max-realms=%d for target=%s", maxRealms, targetId);
         }
 
@@ -96,10 +116,8 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
         int bruteForceDisabledCount = 0;
         int sslNoneCount = 0;
         List<String> bruteForceDisabled = new ArrayList<>();
-        boolean allBruteForceProtected = true;
-        boolean anySslNone = false;
-        boolean anyRegistrationAllowed = false;
-        int applicationRealmCount = 0;
+        int realmsCollected = 0;
+        int clientsObserved = 0;
 
         int clientsTotal = 0;
         int clientsEnabled = 0;
@@ -118,62 +136,62 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
 
         for (RealmRepresentation brief : bounded) {
             if (brief == null || brief.getRealm() == null || brief.getRealm().isBlank()) {
+                issues.add(issue("INVALID_RESPONSE", "realms"));
                 continue;
             }
             String realmName = brief.getRealm();
             EvidenceSubject realmSubject = EvidenceSubject.realm(realmName);
+            boolean isMaster = MASTER.equalsIgnoreCase(realmName);
+            boolean inAggregates = !isMaster || includeMasterInAggregates;
+            evidence.add(ev(targetId, "realm", "realm.name", realmName, now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.assessmentIncluded", inAggregates, now, realmSubject));
 
             RealmRepresentation realm;
             try {
                 realm = adminApi.getRealm(target, realmName);
             } catch (RuntimeException e) {
-                LOG.warnf(e, "Failed to load realm details for %s on target=%s", realmName, targetId);
+                issues.add(issue(failureCode(e), "realm:" + realmName));
+                LOG.warnf("Failed to load realm details for %s on target=%s", realmName, targetId);
                 continue;
             }
+            if (realm == null) {
+                issues.add(issue("INVALID_RESPONSE", "realm:" + realmName));
+                continue;
+            }
+            realmsCollected++;
 
-            boolean isMaster = MASTER.equalsIgnoreCase(realmName);
-            boolean inAggregates = !isMaster || includeMasterInAggregates;
-
-            boolean enabled = Boolean.TRUE.equals(realm.isEnabled());
-            boolean bruteForce = Boolean.TRUE.equals(realm.isBruteForceProtected());
             String sslRequired = realm.getSslRequired() == null ? "" : realm.getSslRequired();
-            boolean registrationAllowed = Boolean.TRUE.equals(realm.isRegistrationAllowed());
-            boolean verifyEmail = Boolean.TRUE.equals(realm.isVerifyEmail());
-            boolean resetPassword = Boolean.TRUE.equals(realm.isResetPasswordAllowed());
-            boolean rememberMe = Boolean.TRUE.equals(realm.isRememberMe());
-            boolean loginWithEmail = Boolean.TRUE.equals(realm.isLoginWithEmailAllowed());
-            boolean duplicateEmails = Boolean.TRUE.equals(realm.isDuplicateEmailsAllowed());
-            boolean eventsEnabled = Boolean.TRUE.equals(realm.isEventsEnabled());
-            boolean adminEventsEnabled = Boolean.TRUE.equals(realm.isAdminEventsEnabled());
+            if (realm.isBruteForceProtected() == null || realm.getSslRequired() == null
+                    || realm.isRegistrationAllowed() == null) {
+                issues.add(issue("MISSING_FIELDS", "realm:" + realmName));
+            }
 
             // Per-realm evidence (including master) for admin packs
-            evidence.add(ev(targetId, "realm", "realm.enabled", enabled, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.sslRequired", sslRequired, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.registrationAllowed", registrationAllowed, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.bruteForceProtected", bruteForce, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.verifyEmail", verifyEmail, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.resetPasswordAllowed", resetPassword, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.rememberMe", rememberMe, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.loginWithEmailAllowed", loginWithEmail, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.duplicateEmailsAllowed", duplicateEmails, now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.enabled", realm.isEnabled(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.sslRequired", realm.getSslRequired(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.registrationAllowed", realm.isRegistrationAllowed(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.bruteForceProtected", realm.isBruteForceProtected(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.verifyEmail", realm.isVerifyEmail(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.resetPasswordAllowed", realm.isResetPasswordAllowed(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.rememberMe", realm.isRememberMe(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.loginWithEmailAllowed", realm.isLoginWithEmailAllowed(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.duplicateEmailsAllowed", realm.isDuplicateEmailsAllowed(), now, realmSubject));
             evidence.add(ev(targetId, "realm", "realm.passwordPolicy", realm.getPasswordPolicy(), now, realmSubject));
             evidence.add(ev(targetId, "realm", "realm.otpPolicyType", realm.getOtpPolicyType(), now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.eventsEnabled", eventsEnabled, now, realmSubject));
-            evidence.add(ev(targetId, "realm", "realm.adminEventsEnabled", adminEventsEnabled, now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.eventsEnabled", realm.isEventsEnabled(), now, realmSubject));
+            evidence.add(ev(targetId, "realm", "realm.adminEventsEnabled", realm.isAdminEventsEnabled(), now, realmSubject));
+            if (isMaster) {
+                evidence.add(ev(targetId, "realm", "realm.master.registrationAllowed", realm.isRegistrationAllowed(), now, realmSubject));
+                evidence.add(ev(targetId, "realm", "realm.master.sslRequired", realm.getSslRequired(), now, realmSubject));
+            }
 
             if (inAggregates) {
-                applicationRealmCount++;
-                if (!bruteForce) {
-                    allBruteForceProtected = false;
+                if (Boolean.FALSE.equals(realm.isBruteForceProtected())) {
                     bruteForceDisabledCount++;
                     bruteForceDisabled.add(realmName);
                 }
                 if ("none".equalsIgnoreCase(sslRequired.trim())) {
-                    anySslNone = true;
                     sslNoneCount++;
-                }
-                if (registrationAllowed) {
-                    anyRegistrationAllowed = true;
                 }
             }
 
@@ -182,13 +200,17 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
             try {
                 clients = adminApi.listClients(target, realmName, false);
             } catch (RuntimeException e) {
-                LOG.warnf(e, "Failed to list clients for realm=%s target=%s", realmName, targetId);
+                issues.add(issue(failureCode(e), "clients:" + realmName));
+                LOG.warnf("Failed to list clients for realm=%s target=%s", realmName, targetId);
                 continue;
             }
             if (clients == null) {
+                issues.add(issue("INVALID_RESPONSE", "clients:" + realmName));
                 clients = List.of();
             }
+            clientsObserved += clients.size();
             if (clients.size() > maxClients) {
+                issues.add(issue("TRUNCATED", "clients:" + realmName));
                 LOG.warnf(
                         "Client collection truncated to assessment.max-clients-per-realm=%d for realm=%s target=%s",
                         maxClients,
@@ -199,9 +221,12 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
 
             for (ClientRepresentation client : clients) {
                 if (client == null) {
+                    issues.add(issue("INVALID_RESPONSE", "clients:" + realmName));
                     continue;
                 }
                 String clientId = client.getClientId() == null ? client.getId() : client.getClientId();
+                // Client IDs are unique only inside a realm. Do not collapse affected resources.
+                String clientRef = clientId == null ? null : realmName + "/" + clientId;
                 clientsTotal++;
                 if (Boolean.TRUE.equals(client.isEnabled())) {
                     clientsEnabled++;
@@ -223,13 +248,13 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
                 if (hasWildcardRedirect) {
                     wildcardRedirectCount++;
                     if (clientId != null) {
-                        wildcardRedirectClients.add(clientId);
+                        wildcardRedirectClients.add(clientRef);
                     }
                 }
                 if (hasLocalhostRedirect) {
                     localhostRedirectCount++;
                     if (clientId != null) {
-                        localhostRedirectClients.add(clientId);
+                        localhostRedirectClients.add(clientRef);
                     }
                 }
 
@@ -243,20 +268,20 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
                 if (hasWildcardOrigin) {
                     wildcardWebOriginsCount++;
                     if (clientId != null) {
-                        wildcardWebOriginClients.add(clientId);
+                        wildcardWebOriginClients.add(clientRef);
                     }
                 }
 
                 if (Boolean.TRUE.equals(client.isImplicitFlowEnabled())) {
                     implicitFlowCount++;
                     if (clientId != null) {
-                        implicitFlowClients.add(clientId);
+                        implicitFlowClients.add(clientRef);
                     }
                 }
                 if (Boolean.TRUE.equals(client.isDirectAccessGrantsEnabled())) {
                     directAccessGrantsCount++;
                     if (clientId != null) {
-                        directAccessClients.add(clientId);
+                        directAccessClients.add(clientRef);
                     }
                 }
 
@@ -267,31 +292,23 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
                 }
                 boolean publicClient = Boolean.TRUE.equals(client.isPublicClient());
                 boolean hasPkceS256 = pkce != null && "S256".equalsIgnoreCase(pkce.trim());
-                if (publicClient && !hasPkceS256) {
+                if (client.isImplicitFlowEnabled() == null || client.isDirectAccessGrantsEnabled() == null
+                        || client.isEnabled() == null || (Boolean.TRUE.equals(client.isEnabled())
+                        && (client.getProtocol() == null || ("openid-connect".equals(client.getProtocol())
+                        && (client.isStandardFlowEnabled() == null || (Boolean.TRUE.equals(client.isStandardFlowEnabled())
+                        && client.isPublicClient() == null)))))) {
+                    issues.add(issue("MISSING_FIELDS", "clients:" + realmName));
+                }
+                boolean pkceApplicable = Boolean.TRUE.equals(client.isEnabled())
+                        && "openid-connect".equals(client.getProtocol())
+                        && Boolean.TRUE.equals(client.isStandardFlowEnabled()) && publicClient;
+                if (pkceApplicable && !hasPkceS256) {
                     publicWithoutPkceCount++;
                     if (clientId != null) {
-                        publicWithoutPkceClients.add(clientId);
+                        publicWithoutPkceClients.add(clientRef);
                     }
                 }
             }
-        }
-
-        // Target-level aggregate booleans for YAML rules (EvidenceContext.find returns first match)
-        if (applicationRealmCount == 0) {
-            // No application realms: treat aggregates as satisfied / non-triggering defaults
-            evidence.add(ev(targetId, "realm", "realm.bruteForceProtected", true, now, null));
-            evidence.add(ev(targetId, "realm", "realm.sslRequired", "external", now, null));
-            evidence.add(ev(targetId, "realm", "realm.registrationAllowed", false, now, null));
-        } else {
-            evidence.add(ev(targetId, "realm", "realm.bruteForceProtected", allBruteForceProtected, now, null));
-            evidence.add(ev(
-                    targetId,
-                    "realm",
-                    "realm.sslRequired",
-                    anySslNone ? "none" : "external",
-                    now,
-                    null));
-            evidence.add(ev(targetId, "realm", "realm.registrationAllowed", anyRegistrationAllowed, now, null));
         }
 
         evidence.add(ev(
@@ -352,7 +369,37 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
                 now,
                 null));
 
+        if (issues.stream().anyMatch(i -> !i.get("scope").startsWith("server-info"))) {
+            // These counters require exhaustive collection. Zero after an incomplete read is
+            // unknown, not PASS. Positive observed findings remain useful lower bounds.
+            // Missing server metadata alone does not invalidate complete realm/client reads.
+            evidence.removeIf(e -> e.subject() == null && e.value() instanceof Number n && n.intValue() == 0
+                    && (e.key().startsWith("keycloak.clients.") || e.key().startsWith("keycloak.realms.")));
+        }
+        evidence.add(ev(targetId, "collection", "keycloak.collection.complete", issues.isEmpty(), now, null));
+        evidence.add(ev(targetId, "collection", "keycloak.collection.issues", List.copyOf(issues), now, null));
+        evidence.add(ev(targetId, "collection", "keycloak.collection.realmsDiscovered", realms.size(), now, null));
+        evidence.add(ev(targetId, "collection", "keycloak.collection.realmsCollected", realmsCollected, now, null));
+        evidence.add(ev(targetId, "collection", "keycloak.collection.clientsObserved", clientsObserved, now, null));
+        evidence.add(ev(targetId, "collection", "keycloak.collection.clientsInspected", clientsTotal, now, null));
+
         return List.copyOf(evidence);
+    }
+
+    private static Map<String, String> issue(String code, String scope) {
+        return Map.of("code", code, "scope", scope);
+    }
+
+    private static String failureCode(RuntimeException failure) {
+        if (failure instanceof McpException m && (m.getCode() == ErrorCode.AUTHORIZATION_FAILED
+                || m.getCode() == ErrorCode.AUTHENTICATION_FAILED)) {
+            return "UNAUTHORIZED";
+        }
+        if (failure instanceof jakarta.ws.rs.WebApplicationException http
+                && (http.getResponse().getStatus() == 401 || http.getResponse().getStatus() == 403)) {
+            return "UNAUTHORIZED";
+        }
+        return "UNAVAILABLE";
     }
 
     private Evidence ev(
@@ -409,13 +456,4 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
         return colon < 0 ? hostPort : hostPort.substring(0, colon);
     }
 
-    private static ServerInfo.Product productFromTarget(TargetType type) {
-        if (type == null) {
-            return ServerInfo.Product.UNKNOWN;
-        }
-        return switch (type) {
-            case RHBK -> ServerInfo.Product.RHBK;
-            case KEYCLOAK -> ServerInfo.Product.KEYCLOAK;
-        };
-    }
 }

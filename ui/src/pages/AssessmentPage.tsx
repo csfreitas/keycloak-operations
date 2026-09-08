@@ -5,6 +5,7 @@ import { fetchAssessments, runAssessment } from '../api/assessments';
 import { fetchFindings } from '../api/findings';
 import { StatusBadge } from '../components/StatusBadge';
 import { ScoreBar } from '../components/ScoreBar';
+import { AssessmentScore, isAssessmentScoreAvailable } from '../components/AssessmentScore';
 import { FindingList } from '../components/FindingList';
 import { LoadingState } from '../components/LoadingState';
 import { ErrorState } from '../components/ErrorState';
@@ -16,15 +17,15 @@ interface OutletCtx {
 }
 
 function CategoryScoreList({ scores }: { scores: AssessmentRunSummary['categoryScores'] }) {
-  if (!scores || scores.length === 0) return null;
+  if (!scores || Object.keys(scores).length === 0) return null;
   return (
     <div style={{ marginTop: 'var(--space-4)' }}>
       <h4 className="text-xs text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 'var(--space-3)' }}>
         Category Scores
       </h4>
-      {scores.map((cs) => (
-        <div key={cs.category} style={{ marginBottom: 'var(--space-2)' }}>
-          <ScoreBar score={cs.score} label={cs.category} />
+      {Object.entries(scores).map(([category, score]) => (
+        <div key={category} style={{ marginBottom: 'var(--space-2)' }}>
+          <ScoreBar score={score} label={category} />
         </div>
       ))}
     </div>
@@ -43,14 +44,15 @@ function AssessmentCard({
   findingsLoading: boolean;
 }) {
   const [expanded, setExpanded] = useState(isLatest);
-  const fc = assessment.findingCounts;
+  const fc = assessment.findingCounts ?? { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+  const scoreAvailable = isAssessmentScoreAvailable(assessment.status, assessment.evidenceCompleteness, assessment.scoreAvailable);
 
   return (
     <div className="card" style={{ marginBottom: 'var(--space-4)' }} data-testid="assessment-card">
       <div className="card__header" style={{ cursor: 'pointer' }} onClick={() => setExpanded((v) => !v)}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', flex: 1, flexWrap: 'wrap' }}>
           <StatusBadge status={assessment.status} />
-          {assessment.score != null && (
+          {scoreAvailable && assessment.score != null && (
             <span className="font-semibold" style={{ color: assessment.score >= 80 ? 'var(--color-healthy)' : assessment.score >= 60 ? 'var(--color-warning)' : 'var(--color-critical)' }}>
               {Math.round(assessment.score)}
             </span>
@@ -73,27 +75,25 @@ function AssessmentCard({
       {expanded && (
         <div style={{ marginTop: 'var(--space-4)' }}>
           <div style={{ display: 'flex', gap: 'var(--space-6)', marginBottom: 'var(--space-4)', flexWrap: 'wrap' }}>
-            {assessment.score != null && (
-              <div>
-                <div className="stat-card__label">Score</div>
-                <ScoreBar score={assessment.score} />
-              </div>
-            )}
+            <div>
+              <div className="stat-card__label">Evaluated posture score</div>
+              <AssessmentScore score={assessment.score} status={assessment.status} completeness={assessment.evidenceCompleteness} scoreAvailable={assessment.scoreAvailable} />
+            </div>
             {assessment.evidenceCompleteness != null && (
               <div>
                 <div className="stat-card__label">Evidence Completeness</div>
-                <span className="font-semibold">{Math.round(assessment.evidenceCompleteness * 100)}%</span>
+                <span className="font-semibold">{assessment.evidenceCompleteness}%</span>
               </div>
             )}
             {assessment.confidence != null && (
               <div>
                 <div className="stat-card__label">Confidence</div>
-                <span className="font-semibold">{Math.round(assessment.confidence * 100)}%</span>
+                <span className="font-semibold" aria-label="Assessment confidence">{assessment.confidence}</span>
               </div>
             )}
           </div>
 
-          <CategoryScoreList scores={assessment.categoryScores} />
+          {scoreAvailable && <CategoryScoreList scores={assessment.categoryScores} />}
 
           <hr className="divider" />
 

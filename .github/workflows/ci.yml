@@ -59,6 +59,7 @@ jobs:
         run: mvn -B -Dit.test=KeycloakCommunity26_7IT,ControlledClientChangeIT failsafe:integration-test failsafe:verify
       - name: Start the application
         env:
+          QUARKUS_PROFILE: local-lab
           POSTGRES_JDBC_URL: jdbc:postgresql://localhost:5432/kcops
           KEYCLOAK_URL: http://localhost:8080
           KEYCLOAK_CLIENT_SECRET: change-me

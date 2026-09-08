@@ -12,6 +12,9 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class ChangePolicyEvaluator {
 
+    /** Bump whenever validation, transition risk, or execution policy semantics change. */
+    public static final String REVISION = "2026-09-trust-foundation-v1";
+
     public record PolicyResult(ChangePolicyDecision decision, String reason, boolean requiresApproval) {
     }
 
@@ -71,6 +74,20 @@ public class ChangePolicyEvaluator {
                     true);
         }
         return evaluate(env, ChangeOperationType.UPDATE, risk, false);
+    }
+
+    public PolicyResult evaluateClientCreate(
+            TargetEnvironment environment,
+            ChangeRisk risk,
+            boolean denyInProduction) {
+        TargetEnvironment env = environment == null ? TargetEnvironment.UNKNOWN : environment;
+        if (env == TargetEnvironment.PRD && denyInProduction) {
+            return new PolicyResult(
+                    ChangePolicyDecision.DENY,
+                    "Production policy denies creating a client with Direct Access Grants enabled",
+                    true);
+        }
+        return evaluate(env, ChangeOperationType.CREATE, risk, false);
     }
 
     private PolicyResult evaluateDev(ChangeRisk risk) {

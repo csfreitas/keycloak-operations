@@ -84,4 +84,14 @@ describe('FleetPage', () => {
       expect(screen.getByText(/CRIT/)).toBeInTheDocument();
     });
   });
+
+  it('does not show a green score for incomplete collection, even when the score is 100', async () => {
+    vi.mocked(fleetApi.fetchFleet).mockResolvedValue([
+      { ...fleetItemHealthy, latestAssessmentScore: 100, latestAssessmentStatus: 'PARTIAL', evidenceCompleteness: 30 },
+    ]);
+    renderFleetPage();
+    expect(await screen.findByTestId('assessment-inconclusive')).toBeInTheDocument();
+    expect(screen.getByText('Coverage: 30%')).toBeInTheDocument();
+    expect(screen.queryByTestId('score-bar')).not.toBeInTheDocument();
+  });
 });

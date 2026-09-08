@@ -111,13 +111,31 @@ class OperationsReportServiceTest {
         var report = service.generate("rhbk-prd", "keycloak-production", "15m", TriggerType.MCP);
 
         assertThat(report.status()).isEqualTo(ReportStatus.COMPLETE);
+        assertThat(report.schemaVersion()).isEqualTo("1.1");
+        assertThat(report.provenance().collectionCompletedAt()).isAfterOrEqualTo(report.provenance().collectionStartedAt());
+        assertThat(report.provenance().collectionMode()).isEqualTo("INDEPENDENT_SECTION_COLLECTIONS");
+        assertThat(report.provenance().bundledRuleCatalogSha256()).matches("[0-9a-f]{64}");
+        assertThat(report.provenance().retainedEvidenceReplayAvailable()).isFalse();
+        assertThat(report.assessment().scoreAvailable()).isTrue();
+        assertThat(new ObjectMapper().findAndRegisterModules().valueToTree(report)
+                .path("assessment").path("scoreAvailable").asBoolean()).isTrue();
+        var filtered = new SensitiveDataFilter(new ObjectMapper().findAndRegisterModules()).redact(report);
+        assertThat(filtered.provenance()).isEqualTo(report.provenance());
+        assertThat(filtered.assessment().scoreAvailable()).isTrue();
         assertThat(report.healthCheck().overallStatus()).isEqualTo(HealthStatus.HEALTHY);
         assertThat(report.assessment().findings()).hasSize(1);
         assertThat(report.environmentSnapshot().summary()).containsEntry("clientSecret", "[REDACTED]");
         assertThat(report.environmentSnapshot().summary()).doesNotContainKey("keycloakUrl");
-        assertThat(report.markdown()).contains("# Keycloak / RHBK Operations Report", "RHBK-HA-001");
+        assertThat(report.markdown()).contains("# Keycloak / RHBK Operations Report", "RHBK-HA-001",
+                "Evidence (sanitized)", "readyReplicas", "Impact:", "Subject: TARGET / rhbk-prd",
+                "https://www.keycloak.org/high-availability/introduction");
         assertThat(report.markdown()).doesNotContain("hidden");
         assertThat(report.markdown()).doesNotContain("internal.example.test");
+        assertThat(report.markdown()).doesNotContain("<img", "![external]");
+        assertThat(report.markdown()).contains("&lt;img");
+        assertThat(report.assessment().findings().get(0).description()).doesNotContain("report-leak");
+        assertThat(report.assessment().findings().get(0).evidence().toString()).doesNotContain("nested-leak");
+        assertThat(report.markdown()).doesNotContain("report-leak", "nested-leak");
         assertThat(report.sections()).anySatisfy(section -> {
             assertThat(section.name()).isEqualTo("performance");
             assertThat(section.status()).isEqualTo(ReportSectionStatus.SKIPPED);
@@ -149,6 +167,12 @@ class OperationsReportServiceTest {
             }
         });
         assertThat(report.markdown()).doesNotContain("must-not-leak");
+        assertThat(report.assessment().scoreAvailable()).isFalse();
+        var json = new ObjectMapper().findAndRegisterModules().valueToTree(report);
+        assertThat(json.path("assessment").has("scoreAvailable")).isTrue();
+        assertThat(json.path("assessment").path("scoreAvailable").asBoolean()).isFalse();
+        assertThat(report.markdown()).contains("INCONCLUSIVE", "not an atomic snapshot", "assessment-1");
+        assertThat(report.markdown()).doesNotContain("Score: **72**");
     }
 
     @Test
@@ -244,19 +268,32 @@ class OperationsReportServiceTest {
                 .doesNotContain("assessment-leak");
     }
 
+    @Test
+    void unavailableServerMetadataMakesPlatformSectionPartial() {
+        Instant now = Instant.now();
+        when(targetResolver.require("rhbk-prd")).thenReturn(target());
+        when(snapshotService.create("rhbk-prd")).thenReturn(new SnapshotSummary("snap-1", "rhbk-prd", "hash", now));
+        when(snapshotService.getDetail("rhbk-prd", "snap-1")).thenReturn(new SnapshotDetail(
+                "snap-1", "rhbk-prd", "hash", now, Map.of("serverInfoError", "SERVER_METADATA_UNAVAILABLE")));
+        var report = service.generate("rhbk-prd", null, null, TriggerType.API);
+        assertThat(report.sections()).filteredOn(section -> section.name().equals("platform"))
+                .singleElement().extracting(section -> section.status()).isEqualTo(ReportSectionStatus.PARTIAL);
+    }
+
     private static AssessmentResult assessment(Instant now, AssessmentStatus status) {
         Finding actionable = new Finding(
                 "rhbk-prd",
                 "RHBK-HA-001",
-                "Single replica",
+                "Single replica <img src=x> ![external](https://example.test/image)",
                 "availability",
                 Severity.HIGH,
                 FindingStatus.FAIL,
-                "Only one ready replica was observed.",
-                Map.of("readyReplicas", 1),
+                "Only one ready replica was observed. token=report-leak",
+                Map.of("readyReplicas", 1, "diagnostic", List.of("secret=nested-leak")),
                 "Authentication availability is reduced.",
                 "Run multiple replicas across failure domains.",
-                List.of());
+                List.of("https://www.keycloak.org/high-availability/introduction"))
+                .withSubject(io.github.keycloakmcp.assessment.engine.EvidenceSubject.target("rhbk-prd"));
         Finding pass = new Finding(
                 "rhbk-prd", "RHBK-TLS-001", "TLS", "security", Severity.INFO, FindingStatus.PASS,
                 "TLS is configured.", Map.of(), null, null, List.of());

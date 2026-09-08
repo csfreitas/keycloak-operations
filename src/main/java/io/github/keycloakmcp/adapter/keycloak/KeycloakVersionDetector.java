@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.keycloak.representations.info.FeatureRepresentation;
 import org.keycloak.representations.info.ServerInfoRepresentation;
@@ -17,30 +18,40 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class KeycloakVersionDetector {
 
+    private static final Pattern RHBK_BUILD = Pattern.compile(
+            "\\d+\\.\\d+\\.\\d+\\.redhat(?:[-.]\\d+)?\\b", Pattern.CASE_INSENSITIVE);
+
     public ServerInfo.Product detectProduct(String versionOrProductHint) {
         return detectProduct(versionOrProductHint, Map.of());
     }
 
     public ServerInfo.Product detectProduct(String versionOrProductHint, Map<String, ?> serverInfo) {
-        String productName = firstNonBlank(
+        String[] observedHints = {
                 stringValue(serverInfo, "product"),
                 stringValue(serverInfo, "productName"),
                 stringValue(serverInfo, "serverName"),
                 nestedString(serverInfo, "systemInfo", "product"),
                 nestedString(serverInfo, "systemInfo", "productName"),
+                stringValue(serverInfo, "version"),
+                nestedString(serverInfo, "systemInfo", "version"),
                 nestedString(serverInfo, "profileInfo", "name"),
-                versionOrProductHint);
-
-        if (productName == null || productName.isBlank()) {
-            return ServerInfo.Product.UNKNOWN;
+                versionOrProductHint };
+        // An observed Red Hat build marker is stronger than generic "Keycloak" branding
+        // or profileName="default". Never pass configured target tags as observed hints.
+        for (String hint : observedHints) {
+            if (hint == null) {
+                continue;
+            }
+            String normalized = hint.toLowerCase(Locale.ROOT);
+            if (normalized.contains("red hat") || normalized.contains("rhbk")
+                    || normalized.contains("build of keycloak") || RHBK_BUILD.matcher(hint).find()) {
+                return ServerInfo.Product.RHBK;
+            }
         }
-
-        String normalized = productName.toLowerCase(Locale.ROOT);
-        if (normalized.contains("red hat") || normalized.contains("rhbk") || normalized.contains("build of keycloak")) {
-            return ServerInfo.Product.RHBK;
-        }
-        if (normalized.contains("keycloak")) {
-            return ServerInfo.Product.KEYCLOAK;
+        for (String hint : observedHints) {
+            if (hint != null && hint.toLowerCase(Locale.ROOT).contains("keycloak")) {
+                return ServerInfo.Product.KEYCLOAK;
+            }
         }
         return ServerInfo.Product.UNKNOWN;
     }
@@ -56,14 +67,21 @@ public class KeycloakVersionDetector {
             profileName = serverInfo.getProfileInfo().getName();
         }
         String version = systemInfo == null ? null : systemInfo.getVersion();
-        ServerInfo.Product detected = detectProduct(firstNonBlank(systemProduct, profileName, version), Map.of());
+        Map<String, String> observed = new LinkedHashMap<>();
+        if (systemProduct != null) {
+            observed.put("product", systemProduct);
+        }
+        if (profileName != null) {
+            observed.put("productName", profileName);
+        }
+        ServerInfo.Product detected = detectProduct(version, observed);
         if (detected != ServerInfo.Product.UNKNOWN) {
             return detected;
         }
         // Community Keycloak often omits productName; profile "default" is not a product marker.
         // If Admin API features are visible, treat as Keycloak unless RHBK markers appear later.
         Map<String, Boolean> features = extractFeatureFlags(serverInfo);
-        if (featureEnabled(features, "ADMIN_API", "ADMIN_V2") || version != null) {
+        if (featureEnabled(features, "ADMIN_API", "ADMIN_V2") || (version != null && !version.isBlank())) {
             return ServerInfo.Product.KEYCLOAK;
         }
         return ServerInfo.Product.UNKNOWN;

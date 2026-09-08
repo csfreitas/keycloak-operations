@@ -20,6 +20,18 @@ class ChangePolicyAndRiskTest {
     private final ChangePlanFingerprinter fingerprinter = new ChangePlanFingerprinter();
 
     @Test
+    void safetyContextHashSeparatesNullEmptyAndDelimiterValues() {
+        Map<String, Object> withNull = new java.util.HashMap<>();
+        withNull.put("name", null);
+        assertThat(fingerprinter.fingerprintContext(withNull))
+                .isNotEqualTo(fingerprinter.fingerprintContext(Map.of("name", "")));
+        assertThat(fingerprinter.fingerprintContext(Map.of("a", "x|b=y")))
+                .isNotEqualTo(fingerprinter.fingerprintContext(Map.of("a", "x", "b", "y")));
+        assertThat(fingerprinter.fingerprintContext(Map.of("a", "x", "b", "y")))
+                .isEqualTo(fingerprinter.fingerprintContext(Map.of("b", "y", "a", "x")));
+    }
+
+    @Test
     void classifiesNameAsLowAndPkceAsMedium() {
         assertThat(riskClassifier.classifyProperty("name")).isEqualTo(ChangeRisk.LOW);
         assertThat(riskClassifier.classifyProperty("pkceCodeChallengeMethod")).isEqualTo(ChangeRisk.MEDIUM);
@@ -142,5 +154,25 @@ class ChangePolicyAndRiskTest {
                 .isEqualTo(ChangePolicyDecision.DENY);
         assertThat(policyEvaluator.evaluateClientSecurity(TargetEnvironment.HML, ChangeRisk.HIGH, true).decision())
                 .isEqualTo(ChangePolicyDecision.APPROVAL_REQUIRED);
+    }
+
+    @Test
+    void classifiesClientLifecycleTransitions() {
+        List<ChangeOperation> create = List.of(new ChangeOperation(
+                "clientId", ChangeOperationType.CREATE, null, "new-client"));
+        List<ChangeOperation> enable = List.of(new ChangeOperation(
+                "enabled", ChangeOperationType.UPDATE, false, true));
+        List<ChangeOperation> disable = List.of(new ChangeOperation(
+                "enabled", ChangeOperationType.UPDATE, true, false));
+
+        assertThat(riskClassifier.classifyClientCreate(create)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientEnabled(enable)).isEqualTo(ChangeRisk.HIGH);
+        assertThat(riskClassifier.classifyClientEnabled(disable)).isEqualTo(ChangeRisk.MEDIUM);
+        assertThat(policyEvaluator.evaluate(
+                        TargetEnvironment.DEV, ChangeOperationType.CREATE, ChangeRisk.HIGH, false)
+                .decision()).isEqualTo(ChangePolicyDecision.APPROVAL_REQUIRED);
+        assertThat(policyEvaluator.evaluateClientCreate(
+                        TargetEnvironment.PRD, ChangeRisk.HIGH, true)
+                .decision()).isEqualTo(ChangePolicyDecision.DENY);
     }
 }

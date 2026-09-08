@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Map;
+import java.util.List;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,8 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.keycloakmcp.domain.change.DiffKind;
+import io.github.keycloakmcp.domain.change.ChangeOperation;
+import io.github.keycloakmcp.domain.change.ChangeOperationType;
 import io.github.keycloakmcp.domain.error.ErrorCode;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
@@ -56,10 +60,24 @@ class ClientConfigChangeSupportTest {
     }
 
     @Test
-    void appliesPkceAttribute() {
+    void rejectsPkceOnLegacyPlanningPathIncludingAliasesAndRemoval() {
         ClientRepresentation rep = new ClientRepresentation();
-        var planned = support.plan(rep, Map.of("pkceCodeChallengeMethod", "S256"));
-        support.applyToRepresentation(rep, planned.operations());
+        for (String property : List.of("pkceCodeChallengeMethod", "pkce.code.challenge.method", "pkce_code_challenge_method")) {
+            Map<String, Object> removal = new HashMap<>();
+            removal.put(property, null);
+            assertThatThrownBy(() -> support.plan(rep, removal)).isInstanceOf(McpException.class);
+            assertThatThrownBy(() -> support.plan(rep, Map.of(property, "S256")))
+                    .isInstanceOf(McpException.class);
+        }
+    }
+
+    @Test
+    void refusesPersistedLegacyPkceOperationAtApply() {
+        ClientRepresentation rep = new ClientRepresentation();
+        rep.setAttributes(Map.of("pkce.code.challenge.method", "S256"));
+        assertThatThrownBy(() -> support.applyToRepresentation(rep, List.of(
+                new ChangeOperation("pkceCodeChallengeMethod", ChangeOperationType.UPDATE, "S256", ""))))
+                .isInstanceOf(McpException.class).hasMessageContaining("REPLAN_REQUIRED");
         assertThat(rep.getAttributes()).containsEntry("pkce.code.challenge.method", "S256");
     }
 }

@@ -13,6 +13,25 @@ import jakarta.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class AuditRepository implements PanacheRepositoryBase<AuditEventEntity, String> {
 
+    public PageResult<AuditEventEntity> listForTargets(
+            java.util.Set<String> targetIds, Optional<String> source, int page, int size) {
+        int p = PageResult.clampPage(page);
+        int s = PageResult.clampSize(size);
+        if (targetIds.isEmpty()) {
+            return new PageResult<>(List.of(), p, s, 0);
+        }
+        String jpql = "targetId in ?1";
+        var params = new java.util.ArrayList<Object>();
+        params.add(targetIds);
+        if (source.isPresent() && !source.get().isBlank()) {
+            jpql += " and source = ?2";
+            params.add(source.get().trim().toUpperCase(java.util.Locale.ROOT));
+        }
+        var query = find(jpql, Sort.by("createdAt").descending(), params.toArray());
+        long total = query.count();
+        return new PageResult<>(query.page(Page.of(p, s)).list(), p, s, total);
+    }
+
     public PageResult<AuditEventEntity> list(
             Optional<String> targetId,
             Optional<String> source,

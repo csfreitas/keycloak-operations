@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import io.github.keycloakmcp.domain.change.ChangeOperation;
+import io.github.keycloakmcp.domain.change.ChangeOperationType;
 import io.github.keycloakmcp.domain.change.ChangeRisk;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -86,6 +87,24 @@ public class ChangeRiskClassifier {
             }
         }
         return highest;
+    }
+
+    /** Creating a security principal is always treated as HIGH risk. */
+    public ChangeRisk classifyClientCreate(List<ChangeOperation> operations) {
+        if (operations == null || operations.isEmpty()
+                || operations.stream().anyMatch(op -> op.operationType() != ChangeOperationType.CREATE)) {
+            return ChangeRisk.CRITICAL;
+        }
+        return ChangeRisk.HIGH;
+    }
+
+    /** Enabling exposure is HIGH risk; disabling an existing client is MEDIUM risk. */
+    public ChangeRisk classifyClientEnabled(List<ChangeOperation> operations) {
+        if (operations == null || operations.size() != 1
+                || !ClientLifecycleChangeSupport.ENABLED.equals(operations.get(0).property())) {
+            return ChangeRisk.CRITICAL;
+        }
+        return Boolean.TRUE.equals(operations.get(0).after()) ? ChangeRisk.HIGH : ChangeRisk.MEDIUM;
     }
 
     private static ChangeRisk classifyAddedClientUrl(String property, String value) {

@@ -1,7 +1,7 @@
 import { Link, useOutletContext } from 'react-router-dom';
 import type { TargetOverview } from '../api/types';
 import { StatusBadge } from '../components/StatusBadge';
-import { ScoreBar } from '../components/ScoreBar';
+import { AssessmentScore } from '../components/AssessmentScore';
 import { LoadingState } from '../components/LoadingState';
 
 interface OutletCtx {
@@ -94,7 +94,7 @@ export function TargetOverviewPage() {
           {latestAssessment ? (
             <>
               <div style={{ marginBottom: 'var(--space-4)' }}>
-                <ScoreBar score={latestAssessment.score} />
+                <AssessmentScore score={latestAssessment.score} status={latestAssessment.status} completeness={latestAssessment.evidenceCompleteness} scoreAvailable={latestAssessment.scoreAvailable} />
               </div>
               <StatusBadge status={latestAssessment.status} />
               <div style={{ marginTop: 'var(--space-3)' }}>
@@ -104,17 +104,17 @@ export function TargetOverviewPage() {
                   label="Findings"
                   value={
                     <span>
-                      {latestAssessment.findingCounts.critical > 0 && (
+                      {(latestAssessment.findingCounts?.critical ?? 0) > 0 && (
                         <span style={{ color: 'var(--color-severity-critical)', marginRight: 4 }}>
-                          {latestAssessment.findingCounts.critical}C
+                          {latestAssessment.findingCounts?.critical}C
                         </span>
                       )}
-                      {latestAssessment.findingCounts.high > 0 && (
+                      {(latestAssessment.findingCounts?.high ?? 0) > 0 && (
                         <span style={{ color: 'var(--color-severity-high)', marginRight: 4 }}>
-                          {latestAssessment.findingCounts.high}H
+                          {latestAssessment.findingCounts?.high}H
                         </span>
                       )}
-                      {latestAssessment.findingCounts.critical === 0 && latestAssessment.findingCounts.high === 0 && '—'}
+                      {(latestAssessment.findingCounts?.critical ?? 0) === 0 && (latestAssessment.findingCounts?.high ?? 0) === 0 && '—'}
                     </span>
                   }
                 />

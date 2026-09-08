@@ -35,6 +35,12 @@ export function ChangesPage() {
   const [error, setError] = useState<ApiResponseError | Error | null>(null);
 
   const load = useCallback(async () => {
+    if (!targetId) {
+      setItems([]);
+      setError(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -67,6 +73,8 @@ export function ChangesPage() {
         </div>
       </header>
 
+      {!targetId && <EmptyState title="Select a target" description="Open an authorized target from Fleet to view its changes." action={<Link className="btn btn--primary" to="/">Open Fleet</Link>} />}
+
       <div className="toolbar" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
         {STATUS_FILTERS.map((s) => (
           <button
@@ -87,7 +95,7 @@ export function ChangesPage() {
 
       {loading && <LoadingState message="Loading changes…" />}
       {error && !loading && <ErrorState error={error} onRetry={load} title="Failed to load changes" />}
-      {!loading && !error && items.length === 0 && (
+      {targetId && !loading && !error && items.length === 0 && (
         <EmptyState title="No changes" description="No change records match the current filter." />
       )}
       {!loading && !error && items.length > 0 && (

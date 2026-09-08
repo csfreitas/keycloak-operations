@@ -25,6 +25,8 @@ class AssessmentScoringTest {
     void emptyFindingsYieldPerfectScore() {
         assertThat(scoring.score(List.of())).isEqualTo(100);
         assertThat(scoring.score(null)).isEqualTo(100);
+        // Numeric API compatibility is retained; no unevaluated category is labeled healthy.
+        assertThat(scoring.categoryScores(List.of())).isEmpty();
     }
 
     @Test
@@ -97,6 +99,7 @@ class AssessmentScoringTest {
                 List.of());
 
         assertThat(scoring.score(List.of(notEvaluated, skipped))).isEqualTo(100);
+        assertThat(scoring.categoryScores(List.of(notEvaluated, skipped))).isEmpty();
     }
 
     @Test
@@ -108,6 +111,7 @@ class AssessmentScoringTest {
         Map<String, Integer> categories = scoring.categoryScores(findings);
         assertThat(categories.get("security")).isEqualTo(85); // 100 - 15
         assertThat(categories.get("availability")).isEqualTo(92); // 100 - 8
+        assertThat(categories).doesNotContainKeys("observability", "configuration", "capacity");
         assertThat(scoring.score(findings)).isEqualTo(77); // 100 - 15 - 8
     }
 

@@ -76,6 +76,71 @@ class MultiTargetAssessmentIsolationTest {
         assertThat(resultB.evidence()).allMatch(e -> "target-b".equals(e.targetId()));
     }
 
+    @Test
+    void partialKeycloakCollectionNeverYieldsConfidentCompleteScore() {
+        Target target = target("target-a");
+        when(evidenceService.collect(target)).thenReturn(new AssessmentEvidenceService.EvidenceCollectionResult(
+                List.of(new Evidence("target-a", "keycloak", "server", "keycloak.product", "KEYCLOAK", Instant.EPOCH),
+                        new Evidence("target-a", "keycloak", "realm", "realm.bruteForceProtected", true,
+                                Instant.EPOCH, EvidenceSubject.realm("safe"))),
+                List.of("keycloak"), List.of(), List.of("keycloak")));
+
+        AssessmentResult result = engine.assess(target, "keycloak-production");
+
+        assertThat(result.status()).isEqualTo(AssessmentStatus.PARTIAL);
+        assertThat(result.confidence()).isEqualTo(AssessmentConfidence.LOW);
+        assertThat(result.evidenceCompleteness()).isLessThan(100);
+        assertThat(result.scoreAvailable()).isFalse();
+    }
+
+    @Test
+    void noEvaluatedRulesNeverAdvertisesAvailableScore() {
+        Target target = target("target-a");
+        when(evidenceService.collect(target)).thenReturn(new AssessmentEvidenceService.EvidenceCollectionResult(
+                List.of(), List.of(), List.of("keycloak")));
+
+        AssessmentResult result = engine.assess(target, "keycloak-production");
+
+        assertThat(result.rulesEvaluated()).isZero();
+        assertThat(result.evidenceCompleteness()).isZero();
+        assertThat(result.confidence()).isEqualTo(AssessmentConfidence.LOW);
+        assertThat(result.scoreAvailable()).isFalse();
+        assertThat(result.categoryScores()).isEmpty();
+        var mapper = new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules();
+        assertThat(mapper.convertValue(result, Map.class)).containsEntry("scoreAvailable", false);
+        assertThat(new io.github.keycloakmcp.security.SensitiveDataFilter(mapper).redact(result).scoreAvailable()).isFalse();
+    }
+
+    @Test
+    void missingRulesCapConfidenceEvenWhenAllSourcesReturned() {
+        Target base = target("target-a");
+        Target target = new Target(base.id(), base.displayName(), base.type(), base.environment(), true,
+                base.keycloak(), new io.github.keycloakmcp.target.InfrastructureTargetConfiguration(
+                        io.github.keycloakmcp.target.InfrastructureType.KUBERNETES, "cluster", "namespace", "ref"),
+                null, Map.of());
+        when(evidenceService.collect(target)).thenReturn(new AssessmentEvidenceService.EvidenceCollectionResult(
+                List.of(new Evidence("target-a", "keycloak", "server", "keycloak.product", "KEYCLOAK", Instant.EPOCH),
+                        new Evidence("target-a", "keycloak", "realm", "realm.bruteForceProtected", true,
+                                Instant.EPOCH, EvidenceSubject.realm("safe"))),
+                List.of("keycloak", "infrastructure"), List.of()));
+
+        AssessmentResult result = engine.assess(target, "keycloak-production");
+        assertThat(result.rulesEvaluated()).isGreaterThan(0);
+        assertThat(result.rulesNotEvaluated()).isGreaterThan(0);
+        assertThat(result.confidence()).isEqualTo(AssessmentConfidence.MEDIUM);
+        assertThat(result.scoreAvailable()).isFalse();
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void deprecatedHelperWithoutEvidenceCannotAdvertiseComplete() {
+        AssessmentResult result = engine.run("keycloak-production", List.of());
+        assertThat(result.status()).isEqualTo(AssessmentStatus.PARTIAL);
+        assertThat(result.confidence()).isEqualTo(AssessmentConfidence.LOW);
+        assertThat(result.evidenceCompleteness()).isZero();
+        assertThat(result.scoreAvailable()).isFalse();
+    }
+
     private static Target target(String id) {
         return new Target(
                 new TargetId(id),

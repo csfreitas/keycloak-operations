@@ -28,8 +28,7 @@ public class ClientConfigChangeSupport {
 
     public static final Set<String> ALLOWED_PROPERTIES = Set.of(
             "name",
-            "description",
-            "pkceCodeChallengeMethod");
+            "description");
 
     private static final String PKCE_ATTR = "pkce.code.challenge.method";
     private static final Set<String> FORBIDDEN = Set.of(
@@ -116,23 +115,8 @@ public class ClientConfigChangeSupport {
             switch (op.property()) {
                 case "name" -> representation.setName(after);
                 case "description" -> representation.setDescription(after);
-                case "pkceCodeChallengeMethod" -> {
-                    Map<String, String> attrs = representation.getAttributes();
-                    if (attrs == null) {
-                        attrs = new LinkedHashMap<>();
-                        representation.setAttributes(attrs);
-                    } else {
-                        attrs = new LinkedHashMap<>(attrs);
-                        representation.setAttributes(attrs);
-                    }
-                    if (after == null || after.isBlank()) {
-                        // The admin-client serializer omits null map values. An explicit
-                        // empty value reaches Keycloak and removes the persisted attribute.
-                        attrs.put(PKCE_ATTR, "");
-                    } else {
-                        attrs.put(PKCE_ATTR, after);
-                    }
-                }
+                case "pkceCodeChallengeMethod" -> throw McpException.writeNotSupported(
+                        "REPLAN_REQUIRED: PKCE changes must use the typed client-security operation");
                 default -> throw McpException.writeNotSupported("Unsupported client property: " + op.property());
             }
         }

@@ -44,6 +44,7 @@ public class AssessmentEvidenceService {
         List<Evidence> evidence = new ArrayList<>();
         List<String> failedSources = new ArrayList<>();
         List<String> collectedSources = new ArrayList<>();
+        List<String> partialSources = new ArrayList<>();
 
         collectSource(target, keycloakEvidenceCollector, evidence, collectedSources, failedSources);
         if (target.hasInfrastructure()) {
@@ -65,10 +66,15 @@ public class AssessmentEvidenceService {
                 java.time.Instant.now()));
         collectedSources.add("target");
 
+        if (evidence.stream().anyMatch(e -> "keycloak.collection.complete".equals(e.key())
+                && Boolean.FALSE.equals(e.value()))) {
+            partialSources.add("keycloak");
+        }
         return new EvidenceCollectionResult(
                 List.copyOf(evidence),
                 List.copyOf(collectedSources),
-                List.copyOf(failedSources));
+                List.copyOf(failedSources),
+                List.copyOf(partialSources));
     }
 
     private void collectSource(
@@ -79,9 +85,11 @@ public class AssessmentEvidenceService {
             List<String> failedSources) {
         try {
             List<Evidence> collected = collector.collect(target);
-            if (collected != null) {
-                evidence.addAll(collected);
+            if (collected == null || collected.isEmpty()) {
+                failedSources.add(collector.source());
+                return;
             }
+            evidence.addAll(collected);
             collectedSources.add(collector.source());
         } catch (RuntimeException e) {
             LOG.warnf(e, "Evidence collection failed for source=%s target=%s",
@@ -93,6 +101,11 @@ public class AssessmentEvidenceService {
     public record EvidenceCollectionResult(
             List<Evidence> evidence,
             List<String> collectedSources,
-            List<String> failedSources) {
+            List<String> failedSources,
+            List<String> partialSources) {
+        public EvidenceCollectionResult(List<Evidence> evidence, List<String> collectedSources,
+                List<String> failedSources) {
+            this(evidence, collectedSources, failedSources, List.of());
+        }
     }
 }

@@ -85,12 +85,37 @@ plan rejection, and fixture removal. It does **not** verify Keycloak 26.6, RHBK,
 OpenShift, Kubernetes, or the Web Origin `+` sentinel. Other placeholder `*IT`
 classes must not be cited as compatibility evidence.
 
-Enable RHBK tests explicitly, for example:
+## Opt-in read-only RHBK check
+
+`Rhbk26_6IT` is a real read-only integration check, not a flag-only placeholder.
+Provision the disposable RHBK separately at the **exact** `http://localhost:8280`
+URL, import the existing `mcp-demo` realm, and provide a read-only client
+`keycloak-mcp-readonly` in `master` with the view/query privileges required to
+inspect that realm and its clients. The test does not provision the container,
+create clients, grant roles, or mutate target configuration. Never add master
+administrator privileges just to expose server-info metadata.
+
+Set the full version obtained from the running RHBK distribution as fixture
+metadata (for example, the output version from `kc.sh --version`). If the
+restricted Admin REST credential exposes a version, the test compares it
+exactly. If server-info is forbidden or metadata is missing, the API version
+remains unknown; the environment variable is **not** substituted as observed
+API evidence. Outages and invalid credentials are failures, not acceptable
+unknown-version outcomes.
 
 ```bash
-export RHBK_IMAGE=registry.redhat.io/rhbk/keycloak-rhel9:26.6
 export RUN_RHBK_IT=true
-mvn -Dit.test=RhbkIT verify
+export RHBK_URL=http://localhost:8280
+export RHBK_EXPECTED_VERSION=26.6.3.redhat-00002  # Replace with the actual full runtime version.
+# Supply RHBK_CLIENT_SECRET through the local secret mechanism; never commit it.
+mvn -Dit.test=Rhbk26_6IT verify
 ```
 
-Until those classes exist, use the compose + smoke script path above.
+The profile fixes `mcp.read-only=true`, disables infrastructure/metrics
+discovery, and opts into local-lab Identity A (not authenticated OIDC). It checks
+permitted Admin REST reads, persisted assessment evidence, a partial operations
+report, rule-catalog provenance, and credential non-disclosure. Absent
+OpenShift/Prometheus evidence must remain missing. This does **not** validate
+OpenShift HA, real IdP authentication, metrics, or RHBK controlled writes.
+The usual project test resource supplies and cleans up the disposable platform
+PostgreSQL database; runtime fixture cleanup remains the caller's responsibility.

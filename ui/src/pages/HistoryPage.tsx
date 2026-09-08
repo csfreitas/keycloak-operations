@@ -6,7 +6,7 @@ import { fetchHealthChecks } from '../api/health';
 import { fetchSnapshots } from '../api/snapshots';
 import { fetchAudit } from '../api/audit';
 import { StatusBadge } from '../components/StatusBadge';
-import { ScoreBar } from '../components/ScoreBar';
+import { AssessmentScore } from '../components/AssessmentScore';
 import { LoadingState } from '../components/LoadingState';
 import { EmptyState } from '../components/EmptyState';
 
@@ -31,7 +31,7 @@ function AssessmentHistory({ items }: { items: AssessmentRunSummary[] }) {
               <td className="text-xs text-muted">{new Date(a.startedAt).toLocaleString()}</td>
               <td className="text-sm">{a.profile}</td>
               <td><StatusBadge status={a.status} size="sm" /></td>
-              <td style={{ minWidth: 120 }}><ScoreBar score={a.score} /></td>
+              <td style={{ minWidth: 120 }}><AssessmentScore score={a.score} status={a.status} completeness={a.evidenceCompleteness} scoreAvailable={a.scoreAvailable} /></td>
               <td className="text-xs text-muted">{a.triggerType}</td>
             </tr>
           ))}

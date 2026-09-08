@@ -50,6 +50,8 @@ MCP tools and REST share the same application services. Change planning uses sem
 | POST | `/changes/plan/client-update` | Plan allowlisted client config update |
 | POST | `/changes/plan/client-urls` | Plan typed redirect URI and/or Web Origin set replacement |
 | POST | `/changes/plan/client-security` | Plan typed client security and OAuth/OIDC flow settings |
+| POST | `/changes/plan/client-create` | Plan typed, secret-free OpenID Connect client creation |
+| POST | `/changes/plan/client-enabled` | Plan enabling or disabling an existing client |
 | POST | `/changes/{changeId}/approve` | Approve (bound to plan fingerprint) |
 | POST | `/changes/{changeId}/reject` | Reject |
 | POST | `/changes/{changeId}/apply` | Apply approved plan (`mcp.read-only=false`) |

@@ -40,6 +40,22 @@ public class ClientUrlSettingsChangeSupport {
     private static final Pattern PARENT_DIRECTORY = Pattern.compile(
             "(?i)(^|/)(?:\\.\\.|%2e%2e|\\.%2e|%2e\\.)(?:/|$)");
 
+    /** Normalize request intent without consulting live state, including idempotent retries. */
+    public Map<String, Object> desiredState(ClientUrlChangeRequest request) {
+        if (request == null || (request.redirectUris() == null && request.webOrigins() == null)) {
+            throw McpException.invalidArgument("at least one of redirectUris or webOrigins must be provided");
+        }
+        validateRequestTotalLength(request);
+        Map<String, Object> desired = new LinkedHashMap<>();
+        if (request.redirectUris() != null) {
+            desired.put(REDIRECT_URIS, normalizeDesired(request.redirectUris(), UrlKind.REDIRECT_URI));
+        }
+        if (request.webOrigins() != null) {
+            desired.put(WEB_ORIGINS, normalizeDesired(request.webOrigins(), UrlKind.WEB_ORIGIN));
+        }
+        return immutableState(desired);
+    }
+
     public PlannedClientUrlChange plan(ClientRepresentation current, ClientUrlChangeRequest request) {
         Objects.requireNonNull(current, "current");
         if (request == null) {

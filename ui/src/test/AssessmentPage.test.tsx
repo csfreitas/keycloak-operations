@@ -93,4 +93,26 @@ describe('AssessmentPage', () => {
       expect(screen.getByTestId('error-state')).toBeInTheDocument();
     });
   });
+
+  it('renders the actual backend percentage, confidence enum and category map', async () => {
+    vi.mocked(assessmentsApi.fetchAssessments).mockResolvedValue({
+      items: [assessmentRunSummary], page: 0, size: 20, total: 1,
+    });
+    renderWithOutlet();
+    expect(await screen.findByText('100%')).toBeInTheDocument();
+    expect(screen.getByLabelText('Assessment confidence')).toHaveTextContent('HIGH');
+    expect(screen.queryByText('10000%')).not.toBeInTheDocument();
+    expect(screen.getByText('Category Scores')).toBeInTheDocument();
+  });
+
+  it('suppresses overall and category score bars when evidence is partial', async () => {
+    vi.mocked(assessmentsApi.fetchAssessments).mockResolvedValue({
+      items: [{ ...assessmentRunSummary, score: 100, status: 'PARTIAL', evidenceCompleteness: 30 }],
+      page: 0, size: 20, total: 1,
+    });
+    renderWithOutlet();
+    expect(await screen.findByTestId('assessment-inconclusive')).toBeInTheDocument();
+    expect(screen.getByText('30%')).toBeInTheDocument();
+    expect(screen.queryByTestId('score-bar')).not.toBeInTheDocument();
+  });
 });

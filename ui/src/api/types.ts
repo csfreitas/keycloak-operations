@@ -3,7 +3,7 @@
 // =========================================================
 
 export type HealthStatus = 'HEALTHY' | 'WARNING' | 'CRITICAL' | 'UNKNOWN';
-export type AssessmentStatus = 'PASSED' | 'FAILED' | 'PARTIAL' | 'PENDING' | 'RUNNING' | 'ERROR';
+export type AssessmentStatus = 'COMPLETE' | 'PASSED' | 'FAILED' | 'PARTIAL' | 'PENDING' | 'RUNNING' | 'ERROR';
 export type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
 export type FindingStatus = 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED' | 'SUPPRESSED';
 export type ProductType = 'KEYCLOAK' | 'RHBK' | 'UNKNOWN';
@@ -40,6 +40,7 @@ export interface FleetItem {
   runtime: string | null;
   healthStatus: HealthStatus;
   latestAssessmentScore: number | null;
+  scoreAvailable?: boolean | null;
   latestAssessmentStatus: AssessmentStatus | null;
   evidenceCompleteness: number | null;
   criticalFindings: number;
@@ -97,15 +98,17 @@ export interface AssessmentRunSummary {
   targetId: string;
   profile: string;
   score: number | null;
+  scoreAvailable?: boolean | null;
+  evaluationRevision?: string | null;
   status: AssessmentStatus;
   triggerType: TriggerType;
   startedAt: string;
   completedAt: string | null;
   createdAt: string;
   evidenceCompleteness: number | null;
-  confidence: number | null;
-  categoryScores: CategoryScore[];
-  findingCounts: FindingCounts;
+  confidence: string | null;
+  categoryScores: Record<string, number> | null;
+  findingCounts: FindingCounts | null;
 }
 
 // --- Health ---
@@ -216,8 +219,12 @@ export interface OperationsAssessmentReport {
   profile: string;
   status: string;
   overallScore: number;
+  scoreAvailable?: boolean | null;
   evidenceCompleteness: number;
   confidence: string | null;
+  rulesEvaluated: number;
+  rulesNotEvaluated: number;
+  missingEvidence: string[];
   findings: unknown[];
 }
 
@@ -237,6 +244,13 @@ export interface OperationsReport {
   assessment: OperationsAssessmentReport | null;
   performance: unknown | null;
   markdown: string;
+  provenance?: {
+    collectionStartedAt: string;
+    collectionCompletedAt: string;
+    collectionMode: string;
+    bundledRuleCatalogSha256: string | null;
+    retainedEvidenceReplayAvailable: boolean;
+  } | null;
 }
 
 // --- Inventory ---

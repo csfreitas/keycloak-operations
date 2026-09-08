@@ -59,6 +59,8 @@ Production UI image: `ui/Dockerfile` (nginx unprivileged). OpenShift: `deploy/op
 
 ## Run (Streamable HTTP)
 
+For a packaged local lab, explicitly set `QUARKUS_PROFILE=local-lab`; listeners default to loopback. Without a lab profile, operations fail closed until Identity A is configured. For authenticated access use `oidc`, the backend token audience and exact role/target grants in [identity-model.md](identity-model.md). Never expose local-lab on a shared/public interface.
+
 ```bash
 export KEYCLOAK_URL=http://localhost:8080
 export KEYCLOAK_AUTH_REALM=master
