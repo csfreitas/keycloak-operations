@@ -6,17 +6,19 @@ Thanks for contributing to **Keycloak / RHBK Operations** (`keycloak-operations-
 
 - **Java 21**
 - **Maven 3.9+** (wrapper not required if system Maven is available)
-- **Node.js ≥ 20** and npm (for `ui/`)
-- Docker (optional) for local Keycloak / PostgreSQL / Prometheus via `dev/compose.yaml`
+- **Node.js 24 LTS** and npm recommended (for `ui/`; supported engines in `ui/package.json`)
+- Docker or Podman for disposable PostgreSQL tests and optional live Keycloak/Prometheus fixtures
 
 ## Build & test
 
 ```bash
-mvn clean verify
+JENV_VERSION=21 jenv exec mvn clean verify
 cd ui && npm ci && npm run test:run && npm run build
 ```
 
 This is the default validation gate (backend + frontend). Opt-in integration tests may require environment flags and live dependencies — see [`integration-tests/README.md`](integration-tests/README.md) and [`docs/compatibility.md`](docs/compatibility.md). Do not mark a version as tested if the IT was skipped.
+
+Without jenv, select Java 21 explicitly. Documentation-only work uses source/contract review and Markdown/link validation rather than starting runtime fixtures; state that application tests were not rerun.
 
 ## Development workflow
 
@@ -24,7 +26,7 @@ This is the default validation gate (backend + frontend). Opt-in integration tes
 2. Prefer requirements ([`docs/requirements/`](docs/requirements/)) and architecture ([`docs/architecture/`](docs/architecture/)) over ad-hoc prompts.
 3. Implement the agreed scope; share logic between MCP and REST via application services.
 4. Add/update tests for behavior you change — especially isolation and security.
-5. Update docs when architecture or public behavior changes.
+5. Reconcile architecture/operator guides, requirements, current milestone acceptance, project-state, CHANGELOG Unreleased and artifact-version status together; see [release bookkeeping](docs/development/release-versioning.md).
 6. Run `mvn clean verify` before opening a PR.
 
 ## Documentation expectations

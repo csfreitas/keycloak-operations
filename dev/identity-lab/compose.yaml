@@ -1,0 +1,45 @@
+# Disposable identity validation. Public fixture credentials, never production.
+name: keycloak-operations-identity-lab
+services:
+  postgres:
+    image: docker.io/library/postgres:16
+    container_name: kcops-identity-postgres
+    labels: {io.github.keycloak-operations.purpose: identity-validation, io.github.keycloak-operations.run-id: "${KCOPS_LAB_RUN_ID:-manual}"}
+    environment: {POSTGRES_DB: kcops, POSTGRES_USER: kcops, POSTGRES_PASSWORD: kcops}
+    ports: ["127.0.0.1:15432:5432"]
+    tmpfs: ["/var/lib/postgresql/data:rw"]
+  idp:
+    image: quay.io/keycloak/keycloak:26.7.1
+    container_name: kcops-identity-idp
+    labels: {io.github.keycloak-operations.purpose: identity-validation, io.github.keycloak-operations.run-id: "${KCOPS_LAB_RUN_ID:-manual}"}
+    command: ["start-dev", "--import-realm"]
+    ports: ["127.0.0.1:18280:8080"]
+    volumes: ["./idp:/opt/keycloak/data/import:ro,Z"]
+  target-a:
+    image: quay.io/keycloak/keycloak:26.7.1
+    container_name: kcops-identity-target-a
+    labels: {io.github.keycloak-operations.purpose: identity-validation, io.github.keycloak-operations.run-id: "${KCOPS_LAB_RUN_ID:-manual}"}
+    command: ["start-dev", "--import-realm", "--metrics-enabled=true"]
+    ports: ["127.0.0.1:18080:8080"]
+    volumes: ["./target-a:/opt/keycloak/data/import:ro,Z"]
+  target-b:
+    image: quay.io/keycloak/keycloak:26.7.1
+    container_name: kcops-identity-target-b
+    labels: {io.github.keycloak-operations.purpose: identity-validation, io.github.keycloak-operations.run-id: "${KCOPS_LAB_RUN_ID:-manual}"}
+    command: ["start-dev", "--import-realm", "--metrics-enabled=true"]
+    ports: ["127.0.0.1:18180:8080"]
+    volumes: ["./target-b:/opt/keycloak/data/import:ro,Z"]
+  prometheus:
+    profiles: ["metrics"]
+    image: docker.io/prom/prometheus:v2.55.1
+    container_name: kcops-identity-prometheus
+    labels: {io.github.keycloak-operations.purpose: identity-validation, io.github.keycloak-operations.run-id: "${KCOPS_LAB_RUN_ID:-manual}"}
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=1h"]
+    ports: ["127.0.0.1:18490:9090"]
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml:ro,Z"]
+    tmpfs: ["/prometheus:rw,mode=1777"]
+networks:
+  default:
+    labels:
+      io.github.keycloak-operations.purpose: identity-validation
+      io.github.keycloak-operations.run-id: "${KCOPS_LAB_RUN_ID:-manual}"

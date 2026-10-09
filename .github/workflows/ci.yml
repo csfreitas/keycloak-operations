@@ -18,6 +18,20 @@ jobs:
       - name: Build and test
         run: mvn -B clean verify
 
+  reference-profile-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Check offline reference profile and retained trial regressions
+        run: node --test dev/reference-agent/*.test.mjs
+      - name: Check offline access-aware client contract (no model calls)
+        run: node --test dev/access-aware-client/*.test.mjs scripts/configuration-client-lab.test.mjs scripts/configuration-lab-checks.test.mjs
+      - name: Check planned SecOps/IAM catalogue integrity (not product acceptance)
+        run: node --test dev/secops-scenarios/*.test.mjs
+
   ui-unit-and-build:
     runs-on: ubuntu-latest
     defaults:
@@ -27,11 +41,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: npm
           cache-dependency-path: ui/package-lock.json
       - name: Install dependencies
         run: npm ci
+      - name: Audit locked UI dependencies
+        run: npm audit --audit-level=moderate --ignore-scripts
       - name: Test and build
         run: npm run test:run && npm run build
 

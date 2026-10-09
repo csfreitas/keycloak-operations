@@ -12,7 +12,7 @@ const MAX_EVENTS = 50;
 export function useEvents(enabled = true): UseEventsResult {
   const [events, setEvents] = useState<OperationalEvent[]>([]);
   const [connected, setConnected] = useState(false);
-  const sourceRef = useRef<EventSource | null>(null);
+  const sourceRef = useRef<ReturnType<typeof connectEventStream> | null>(null);
 
   useEffect(() => {
     if (!enabled) return;

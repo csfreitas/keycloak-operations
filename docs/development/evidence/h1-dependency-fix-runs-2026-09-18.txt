@@ -1,0 +1,105 @@
+H1 dependency remediation — selected execution excerpts — 2026-09-18
+Local unsigned evidence. These are selected summary lines, not full logs or an attestation.
+See ../h1-dependency-fix-2026-09-18.md for scope, manual browser observations and limitations.
+
+Backend baseline/final: Java 21 via JENV_VERSION=21 jenv exec, Maven clean verify.
+UI final: per-command Node 24.21.0/npm 11.19.0; npm ci --ignore-scripts, npm test -- --run, npm run build.
+Repeated install: npm ci --ignore-scripts --audit=false.
+CI audit command executed locally: npm audit --audit-level=moderate --ignore-scripts --fetch-retries=0 --fetch-timeout=10000.
+Lab runners: scripts/validate-identity-lab.sh --metrics --browser, scripts/validate-installation-lab.sh, then scripts/validate-identity-lab.sh.
+Each lab exit code includes cleanup; browser-mode exit includes the post-browser compact-JWT log scan.
+Installation diagnostics: /private/tmp/kcops-installation.5Ku3na.
+No real cluster, CI service run, image build, native/STDIO package or opt-in Maven integration suite is claimed.
+
+Java baseline
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-baseline-20260918.log
+SHA-256: ed8a35ba77bc88a54cd6fa84b9a7f14e0de9ad53e52d2e72e20e779009060cad
+[INFO] Tests run: 496, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T14:25:48-03:00
+
+Java final
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-verify-20260918.log
+SHA-256: d6b2765b4f98e9bb74b35a6188882f2d5d96af2ca250bbd2bed19e430f9a497f
+[INFO] Tests run: 496, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T14:29:22-03:00
+
+UI baseline, Node 25
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-ui-baseline-20260918.log
+SHA-256: 1e075cfb6b787ef4bac5e73f7cbc1d68dbfd6d8bffd14e771d4688dc2a1570db
+ Test Files  19 passed (19)
+      Tests  133 passed (133)
+
+UI clean install, Node 24
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-ui-remediation-ci-node24-20260918.log
+SHA-256: f91e9f771258cf361fdb6f825b3b11b2ce4f09bba2854c7aa38b28ebdaa7e54b
+added 181 packages in 3s
+
+UI tests, Node 24
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-ui-remediation-tests-node24-20260918.log
+SHA-256: ee28ef7a38164a83385bfc6522bfd52ade43830d6a458b97e83875c28bd0c12f
+ Test Files  19 passed (19)
+      Tests  133 passed (133)
+
+UI build, Node 24
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-ui-remediation-build-node24-20260918.log
+SHA-256: 90c596d34a1a836aa1cbb8f506a9652ae66ca7e935fab29ff4ef49ffd884c5ac
+✓ built in 2.47s
+
+UI clean install repeated, Node 24
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-ui-repro-check-20260918.log
+SHA-256: 63e8295751c309ceb9344b25d80b5101ab5d8fca4419300585fbf97b2806108e
+added 181 packages in 2s
+
+CI audit command locally, Node 24
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-ci-audit-20260918.log
+SHA-256: 6d8c5c8f3d7684adb070417bd608d01ae90aa3dc26a65af03ffda4955f38d9a3
+found 0 vulnerabilities
+
+Identity + metrics + browser lab
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-metrics-browser-20260918.log
+SHA-256: 33a7f8dcef97411cbc6fc07fc0f535a6ea0680fb676b620abae6f4e91ae6cfd1
+Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.2obUq4
+
+Installation lab
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-installation-20260918.log
+SHA-256: f1e35dcc3ad3d1cf7f0f0b3aef3b3d20330e6524e7de366e68854ef6dd84385d
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+
+Default identity lab
+Exit code: 0 (observed from completed process)
+Raw local log: /private/tmp/kcops-h1-dependency-fix-identity-20260918.log
+SHA-256: ccc956c8710332701b1fda6026f52c954e8ca27a706499f1cc9ccf8231feb25a
+Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.4O0ODt
+
+Final resource verification:
+Podman: 0 containers, 0 volumes, default podman network only.
+Preserved reusable images: quay.io/keycloak/keycloak:26.7.1; docker.io/library/postgres:16; registry.redhat.io/rhbk/keycloak-rhel9:26.6; docker.io/prom/prometheus:v2.55.1.
+No listeners on lab TCP ports 15432,18080,18180,18280,18081,18082,19001,19002,18300,18490,18590.
+Shared /private/tmp/kcops-identity-lab.lock absent.
+Owned temporary Node download/runtime /private/tmp/kcops-node24.C9F6fs removed after all lab processes exited; global Node v25.6.1/npm 11.9.0 unchanged.
+Reusable dependency/build caches and diagnostic evidence retained; no global prune.
+
+Retained evidence verification:
+All 537 source-manifest entries match; aggregate a4cd60240687a6248d0a7f7df880dae351c54d0bdf6d8b5df44951bbb15f6771.
+All 453 inventory path/hash records match the inspected files.
+Inventory SHA-256 f9d25f2eca4743c9c70aaf6742c6ce83ec14416a67607344301472e2f1149a99.
+Full/runtime retained audits byte-match their original successful responses; each reports total vulnerabilities 0.

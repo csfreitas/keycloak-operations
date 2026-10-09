@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 import type { ChangeRecord, TargetOverview } from '../api/types';
 import { fetchChanges } from '../api/changes';
@@ -30,38 +30,6 @@ export function ChangesPage() {
   const outlet = useOutletContext<OutletCtx | undefined>();
   const targetId = params.targetId ?? outlet?.targetId ?? searchParams.get('targetId') ?? undefined;
 
-  const [items, setItems] = useState<ChangeRecord[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<ApiResponseError | Error | null>(null);
-
-  const load = useCallback(async () => {
-    if (!targetId) {
-      setItems([]);
-      setError(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const page = await fetchChanges({
-        targetId,
-        status: status || undefined,
-        page: 0,
-        size: 50,
-      });
-      setItems(page.items);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [status, targetId]);
-
-  useEffect(() => {
-    void load();
-  }, [load]);
-
   return (
     <div className="page" style={{ padding: 'var(--space-4) var(--space-6)' }}>
       <header className="page-header">
@@ -80,7 +48,8 @@ export function ChangesPage() {
           <button
             key={s || 'all'}
             type="button"
-            className={'btn btn--sm' + (status === s ? ' btn--primary' : '')}
+            className={'btn btn--sm' + (status === s ? ' btn--primary' : ' btn--secondary')}
+            aria-pressed={status === s}
             onClick={() => {
               const next = new URLSearchParams(searchParams);
               if (s) next.set('status', s);
@@ -93,9 +62,47 @@ export function ChangesPage() {
         ))}
       </div>
 
+      {targetId && <ChangesResult key={JSON.stringify([targetId, status])} targetId={targetId} status={status} />}
+    </div>
+  );
+}
+
+/** Results belong to one target/filter visit, including when navigation returns to the same target. */
+function ChangesResult({ targetId, status }: { targetId: string; status: string }) {
+  const [items, setItems] = useState<ChangeRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<ApiResponseError | Error | null>(null);
+  const generation = useRef(0);
+
+  const load = useCallback(async () => {
+    const requestGeneration = ++generation.current;
+    setLoading(true);
+    setItems([]);
+    setError(null);
+    try {
+      const page = await fetchChanges({ targetId, status: status || undefined, page: 0, size: 50 });
+      if (requestGeneration !== generation.current) return;
+      if (page.items.some((item) => item.targetId !== targetId)) {
+        throw new Error('Change target does not match the selected target');
+      }
+      setItems(page.items);
+    } catch (err) {
+      if (requestGeneration === generation.current) setError(err as Error);
+    } finally {
+      if (requestGeneration === generation.current) setLoading(false);
+    }
+  }, [status, targetId]);
+
+  useEffect(() => {
+    void load();
+    return () => { generation.current += 1; };
+  }, [load]);
+
+  return (
+    <>
       {loading && <LoadingState message="Loading changes…" />}
       {error && !loading && <ErrorState error={error} onRetry={load} title="Failed to load changes" />}
-      {targetId && !loading && !error && items.length === 0 && (
+      {!loading && !error && items.length === 0 && (
         <EmptyState title="No changes" description="No change records match the current filter." />
       )}
       {!loading && !error && items.length > 0 && (
@@ -140,6 +147,6 @@ export function ChangesPage() {
           </table>
         </div>
       )}
-    </div>
+    </>
   );
 }

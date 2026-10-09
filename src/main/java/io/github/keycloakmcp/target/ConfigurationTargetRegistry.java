@@ -133,7 +133,8 @@ public class ConfigurationTargetRegistry implements TargetRegistry {
                 type,
                 entry.clusterId().orElse(null),
                 entry.namespace().orElse(null),
-                entry.credentialRef().orElse(null));
+                entry.credentialRef().orElse(null),
+                entry.installation().map(i -> new KubernetesInstallationBinding(i.apiVersion(), i.kind(), i.name(), i.uid())).orElse(null));
     }
 
     private static ObservabilityTargetConfiguration toObservability(McpRuntimeConfig.ObservabilityEntry entry) {

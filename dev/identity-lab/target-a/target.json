@@ -1,0 +1,61 @@
+{
+  "id": "agt2-realm-a-v1",
+  "realm": "target-a",
+  "enabled": true,
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "bruteForceProtected": true,
+  "verifyEmail": true,
+  "clients": [
+    {
+      "clientId": "configuration-reader",
+      "enabled": true,
+      "secret": "local-configuration-reader",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "clientId": "operations-reader",
+      "enabled": true,
+      "secret": "local-target-a",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false
+    },
+    {
+      "id": "agt2-portal-a-v1",
+      "clientId": "portal-a",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:3000/a"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-configuration-reader",
+      "enabled": true,
+      "serviceAccountClientId": "configuration-reader",
+      "clientRoles": {"realm-management": ["view-realm", "view-clients"]}
+    },
+    {
+      "username": "service-account-operations-reader",
+      "enabled": true,
+      "serviceAccountClientId": "operations-reader",
+      "clientRoles": {
+        "realm-management": [
+          "view-realm",
+          "view-clients",
+          "query-clients",
+          "query-users",
+          "view-users"
+        ]
+      }
+    }
+  ]
+}

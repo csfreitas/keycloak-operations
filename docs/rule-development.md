@@ -50,14 +50,14 @@ tests; production HA uses the YAML pack.
 
 ```
 src/main/resources/rules/
-├── common/           # security.yaml, production.yaml
+├── index.yaml
+├── common/           # security.yaml, production.yaml, admin-security.yaml
 ├── openshift/        # ha.yaml
-├── kubernetes/       # planned
-├── keycloak/26.6/    # version-specific packs (planned)
-├── keycloak/26.7/
-├── rhbk/26.6/
-└── vm/               # planned
+├── capacity.yaml
+└── performance.yaml
 ```
+
+This is the indexed production pack layout. Version-specific and host/container packs remain planned; an unindexed legacy file does not automatically become an active rule pack.
 
 ## Evidence keys
 
@@ -66,8 +66,8 @@ producing those keys. Example:
 
 | Key | Type | Producer (planned / current) |
 |-----|------|------------------------------|
-| `deployment.replicas` | number | OpenShift/K8s collector (0.2.0); tests inject directly |
-| `realm.bruteForceProtected` | boolean | Keycloak collector (planned) |
+| `deployment.replicas` | number | Current inventory evidence; desired replicas, not healthy replicas |
+| `realm.bruteForceProtected` | boolean | Implemented Keycloak collector; realm-scoped subject |
 
 ## Testing
 
@@ -77,3 +77,5 @@ Prefer the Evidence → Rule → Finding pipeline test style used in `RuleEngine
 2. Wrap in `EvidenceContext`
 3. Run `RuleEngine.evaluate`
 4. Assert finding id / severity, or emptiness when healthy
+
+Also test absent/denied/truncated evidence and reversed collection order across two realms. Missing evidence is NOT_EVALUATED, never a passing empty result. Production packs must declare required evidence/applicability, stable entity scope and references. See [scoring](scoring.md) for score availability and [D2](milestones/d2-rhbk-openshift.md) for curated live rule acceptance.

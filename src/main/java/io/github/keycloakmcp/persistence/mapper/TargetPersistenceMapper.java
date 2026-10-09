@@ -8,6 +8,7 @@ import java.util.Map;
 import io.github.keycloakmcp.persistence.entity.TargetEntity;
 import io.github.keycloakmcp.target.InfrastructureTargetConfiguration;
 import io.github.keycloakmcp.target.InfrastructureType;
+import io.github.keycloakmcp.target.KubernetesInstallationBinding;
 import io.github.keycloakmcp.target.KeycloakTargetConfiguration;
 import io.github.keycloakmcp.target.ObservabilityTargetConfiguration;
 import io.github.keycloakmcp.target.Target;
@@ -54,7 +55,9 @@ public class TargetPersistenceMapper {
                     InfrastructureType.parse(entity.infraType),
                     entity.infraClusterId,
                     entity.infraNamespace,
-                    entity.infraCredentialRef);
+                    entity.infraCredentialRef,
+                    entity.installationUid == null ? null : new KubernetesInstallationBinding(
+                            entity.installationApiVersion, entity.installationKind, entity.installationName, entity.installationUid));
         }
 
         ObservabilityTargetConfiguration observability = null;
@@ -106,6 +109,12 @@ public class TargetPersistenceMapper {
             entity.infraNamespace = null;
             entity.infraCredentialRef = null;
         }
+
+        var binding = target.infrastructure() == null ? null : target.infrastructure().installation();
+        entity.installationApiVersion = binding == null ? null : binding.apiVersion();
+        entity.installationKind = binding == null ? null : binding.kind();
+        entity.installationName = binding == null ? null : binding.name();
+        entity.installationUid = binding == null ? null : binding.uid();
 
         if (target.observability() != null) {
             Map<String, Object> obs = new LinkedHashMap<>();

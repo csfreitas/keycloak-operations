@@ -1,0 +1,4104 @@
+{
+  "reviewDate": "2026-09-18",
+  "capturedAt": "2026-09-18T17:32:31.527Z",
+  "repositoryHead": "572cb7ba5aa9a132f3e04280de9378da08cc61e3",
+  "scope": "Read-only inventory of the current UI lockfile and previously built Quarkus main/boot JARs. Not a Maven dependency graph, SBOM or comprehensive vulnerability scan; not a signed attestation. No build, test, package installation or container operation was run to capture this inventory.",
+  "previousInventory": {
+    "path": "docs/development/evidence/h1-dependencies-2026-09-18-resolved-inventory.json",
+    "sha256": "8eae627a37eebcfe61d34162f062ed6c411122bfc14dd708cc1480b3077d8b93",
+    "capturedAt": "2026-09-18T17:03:18.648Z",
+    "uiPackageCount": 228,
+    "packagedJarCount": 353
+  },
+  "toolchain": {
+    "inventoryNode": "v24.21.0",
+    "inventoryNodeExecutable": "/private/tmp/kcops-node24.C9F6fs/node-v24.21.0-darwin-arm64/bin/node",
+    "globalNodeObserved": "v25.6.1",
+    "uiValidationNode": "v24.21.0",
+    "uiValidationNpm": "11.19.0",
+    "uiValidationProvenance": "Coordinator supplied final Node/npm runtime; Node executable version independently observed. Global Node selection was not changed.",
+    "javaVersionFromSurefire": "21.0.10",
+    "javaHomeFromSurefire": "/opt/homebrew/Cellar/openjdk@21/21.0.10/libexec/openjdk.jdk/Contents/Home",
+    "mavenHomeFromSurefire": "/opt/homebrew/Cellar/maven/3.9.12/libexec",
+    "javaSelection": "Java 21 via per-command jenv, per coordinator build invocation; no global selection changed."
+  },
+  "productVersions": {
+    "backend": "0.8.1-SNAPSHOT",
+    "ui": "0.8.1-dev.0",
+    "lockfileRoot": "0.8.1-dev.0",
+    "nodeEngine": "^22.12.0 || ^24.0.0"
+  },
+  "sourceFiles": [
+    {
+      "path": "pom.xml",
+      "sha256": "fd4161a98f991309e626a206990c7ffafa658ad8f2c519303042c896d498be26"
+    },
+    {
+      "path": "ui/package.json",
+      "sha256": "a66058f2fcd2fc08879ef2ef53baf31cc7dc209845f70b9080203c4d00b1005c"
+    },
+    {
+      "path": "ui/package-lock.json",
+      "sha256": "e65afe33130083b5590e3360cfa80277ae517122432d170e556523269750f34e"
+    }
+  ],
+  "counts": {
+    "uiLockedPackages": 231,
+    "uiDevFlagTrue": 221,
+    "uiDevFlagFalse": 10,
+    "uiOptionalFlagTrue": 53,
+    "packagedJars": 354,
+    "bootJars": 16,
+    "mainJars": 338
+  },
+  "oldPackagedVersions": {
+    "quarkus3381": [],
+    "mcp1131": [],
+    "keycloakCommon26011": []
+  },
+  "familyComparison": {
+    "quarkus": {
+      "before": [
+        "io.quarkus.quarkus-bootstrap-runner-3.38.1.jar",
+        "io.quarkus.quarkus-classloader-commons-3.38.1.jar",
+        "io.quarkus.quarkus-development-mode-spi-3.38.1.jar",
+        "io.quarkus.quarkus-value-registry-3.38.1.jar",
+        "io.quarkus.quarkus-vertx-latebound-mdc-provider-3.38.1.jar",
+        "io.quarkus.quarkus-agroal-3.38.1.jar",
+        "io.quarkus.quarkus-arc-3.38.1.jar",
+        "io.quarkus.quarkus-caffeine-3.38.1.jar",
+        "io.quarkus.quarkus-core-3.38.1.jar",
+        "io.quarkus.quarkus-credentials-3.38.1.jar",
+        "io.quarkus.quarkus-datasource-3.38.1.jar",
+        "io.quarkus.quarkus-datasource-common-3.38.1.jar",
+        "io.quarkus.quarkus-devservices-3.38.1.jar",
+        "io.quarkus.quarkus-flyway-3.38.1.jar",
+        "io.quarkus.quarkus-flyway-postgresql-3.38.1.jar",
+        "io.quarkus.quarkus-fs-util-1.4.2.jar",
+        "io.quarkus.quarkus-grpc-common-3.38.1.jar",
+        "io.quarkus.quarkus-hibernate-orm-3.38.1.jar",
+        "io.quarkus.quarkus-hibernate-orm-panache-3.38.1.jar",
+        "io.quarkus.quarkus-hibernate-orm-panache-common-3.38.1.jar",
+        "io.quarkus.quarkus-hibernate-validator-3.38.1.jar",
+        "io.quarkus.quarkus-jackson-3.38.1.jar",
+        "io.quarkus.quarkus-jdbc-postgresql-3.38.1.jar",
+        "io.quarkus.quarkus-jsonp-3.38.1.jar",
+        "io.quarkus.quarkus-micrometer-3.38.1.jar",
+        "io.quarkus.quarkus-micrometer-registry-prometheus-3.38.1.jar",
+        "io.quarkus.quarkus-mutiny-3.38.1.jar",
+        "io.quarkus.quarkus-narayana-jta-3.38.1.jar",
+        "io.quarkus.quarkus-netty-3.38.1.jar",
+        "io.quarkus.quarkus-oidc-3.38.1.jar",
+        "io.quarkus.quarkus-oidc-common-3.38.1.jar",
+        "io.quarkus.quarkus-opentelemetry-3.38.1.jar",
+        "io.quarkus.quarkus-panache-common-3.38.1.jar",
+        "io.quarkus.quarkus-panache-hibernate-common-3.38.1.jar",
+        "io.quarkus.quarkus-proxy-registry-3.38.1.jar",
+        "io.quarkus.quarkus-rest-3.38.1.jar",
+        "io.quarkus.quarkus-rest-common-3.38.1.jar",
+        "io.quarkus.quarkus-rest-jackson-3.38.1.jar",
+        "io.quarkus.quarkus-rest-jackson-common-3.38.1.jar",
+        "io.quarkus.quarkus-scheduler-3.38.1.jar",
+        "io.quarkus.quarkus-scheduler-api-3.38.1.jar",
+        "io.quarkus.quarkus-scheduler-common-3.38.1.jar",
+        "io.quarkus.quarkus-scheduler-kotlin-3.38.1.jar",
+        "io.quarkus.quarkus-scheduler-spi-3.38.1.jar",
+        "io.quarkus.quarkus-security-3.38.1.jar",
+        "io.quarkus.quarkus-security-runtime-spi-3.38.1.jar",
+        "io.quarkus.quarkus-smallrye-context-propagation-3.38.1.jar",
+        "io.quarkus.quarkus-smallrye-fault-tolerance-3.38.1.jar",
+        "io.quarkus.quarkus-smallrye-health-3.38.1.jar",
+        "io.quarkus.quarkus-smallrye-jwt-build-3.38.1.jar",
+        "io.quarkus.quarkus-smallrye-openapi-3.38.1.jar",
+        "io.quarkus.quarkus-swagger-ui-3.38.1.jar",
+        "io.quarkus.quarkus-tls-registry-3.38.1.jar",
+        "io.quarkus.quarkus-tls-registry-spi-3.38.1.jar",
+        "io.quarkus.quarkus-transaction-annotations-3.38.1.jar",
+        "io.quarkus.quarkus-vertx-3.38.1.jar",
+        "io.quarkus.quarkus-vertx-http-3.38.1.jar",
+        "io.quarkus.quarkus-virtual-threads-3.38.1.jar",
+        "io.quarkus.quarkus-websockets-next-spi-3.38.1.jar"
+      ],
+      "after": [
+        "io.quarkus.quarkus-bootstrap-runner-3.39.4.jar",
+        "io.quarkus.quarkus-classloader-commons-3.39.4.jar",
+        "io.quarkus.quarkus-development-mode-spi-3.39.4.jar",
+        "io.quarkus.quarkus-value-registry-3.39.4.jar",
+        "io.quarkus.quarkus-vertx-latebound-mdc-provider-3.39.4.jar",
+        "io.quarkus.quarkus-agroal-3.39.4.jar",
+        "io.quarkus.quarkus-arc-3.39.4.jar",
+        "io.quarkus.quarkus-caffeine-3.39.4.jar",
+        "io.quarkus.quarkus-core-3.39.4.jar",
+        "io.quarkus.quarkus-credentials-3.39.4.jar",
+        "io.quarkus.quarkus-datasource-3.39.4.jar",
+        "io.quarkus.quarkus-datasource-common-3.39.4.jar",
+        "io.quarkus.quarkus-devservices-3.39.4.jar",
+        "io.quarkus.quarkus-flyway-3.39.4.jar",
+        "io.quarkus.quarkus-flyway-postgresql-3.39.4.jar",
+        "io.quarkus.quarkus-fs-util-1.4.2.jar",
+        "io.quarkus.quarkus-grpc-common-3.39.4.jar",
+        "io.quarkus.quarkus-hibernate-orm-3.39.4.jar",
+        "io.quarkus.quarkus-hibernate-orm-panache-3.39.4.jar",
+        "io.quarkus.quarkus-hibernate-orm-panache-common-3.39.4.jar",
+        "io.quarkus.quarkus-hibernate-validator-3.39.4.jar",
+        "io.quarkus.quarkus-jackson-3.39.4.jar",
+        "io.quarkus.quarkus-jdbc-postgresql-3.39.4.jar",
+        "io.quarkus.quarkus-jsonp-3.39.4.jar",
+        "io.quarkus.quarkus-micrometer-3.39.4.jar",
+        "io.quarkus.quarkus-micrometer-registry-prometheus-3.39.4.jar",
+        "io.quarkus.quarkus-mutiny-3.39.4.jar",
+        "io.quarkus.quarkus-narayana-jta-3.39.4.jar",
+        "io.quarkus.quarkus-netty-3.39.4.jar",
+        "io.quarkus.quarkus-oidc-3.39.4.jar",
+        "io.quarkus.quarkus-oidc-common-3.39.4.jar",
+        "io.quarkus.quarkus-opentelemetry-3.39.4.jar",
+        "io.quarkus.quarkus-panache-common-3.39.4.jar",
+        "io.quarkus.quarkus-panache-hibernate-common-3.39.4.jar",
+        "io.quarkus.quarkus-proxy-registry-3.39.4.jar",
+        "io.quarkus.quarkus-rest-3.39.4.jar",
+        "io.quarkus.quarkus-rest-common-3.39.4.jar",
+        "io.quarkus.quarkus-rest-jackson-3.39.4.jar",
+        "io.quarkus.quarkus-rest-jackson-common-3.39.4.jar",
+        "io.quarkus.quarkus-scheduler-3.39.4.jar",
+        "io.quarkus.quarkus-scheduler-api-3.39.4.jar",
+        "io.quarkus.quarkus-scheduler-common-3.39.4.jar",
+        "io.quarkus.quarkus-scheduler-kotlin-3.39.4.jar",
+        "io.quarkus.quarkus-scheduler-spi-3.39.4.jar",
+        "io.quarkus.quarkus-security-3.39.4.jar",
+        "io.quarkus.quarkus-security-runtime-spi-3.39.4.jar",
+        "io.quarkus.quarkus-smallrye-context-propagation-3.39.4.jar",
+        "io.quarkus.quarkus-smallrye-fault-tolerance-3.39.4.jar",
+        "io.quarkus.quarkus-smallrye-health-3.39.4.jar",
+        "io.quarkus.quarkus-smallrye-jwt-build-3.39.4.jar",
+        "io.quarkus.quarkus-smallrye-openapi-3.39.4.jar",
+        "io.quarkus.quarkus-swagger-ui-3.39.4.jar",
+        "io.quarkus.quarkus-tls-registry-3.39.4.jar",
+        "io.quarkus.quarkus-tls-registry-spi-3.39.4.jar",
+        "io.quarkus.quarkus-transaction-annotations-3.39.4.jar",
+        "io.quarkus.quarkus-vertx-3.39.4.jar",
+        "io.quarkus.quarkus-vertx-http-3.39.4.jar",
+        "io.quarkus.quarkus-virtual-threads-3.39.4.jar",
+        "io.quarkus.quarkus-websockets-next-spi-3.39.4.jar"
+      ]
+    },
+    "mcp": {
+      "before": [
+        "io.quarkiverse.mcp.quarkus-mcp-server-core-1.13.1.jar",
+        "io.quarkiverse.mcp.quarkus-mcp-server-http-1.13.1.jar",
+        "io.quarkiverse.mcp.quarkus-mcp-server-sse-client-1.13.1.jar"
+      ],
+      "after": [
+        "io.quarkiverse.mcp.quarkus-mcp-server-core-1.13.2.jar",
+        "io.quarkiverse.mcp.quarkus-mcp-server-http-1.13.2.jar",
+        "io.quarkiverse.mcp.quarkus-mcp-server-sse-client-1.13.2.jar"
+      ]
+    },
+    "keycloakAdmin": {
+      "before": [
+        "org.keycloak.keycloak-admin-client-26.0.12.jar"
+      ],
+      "after": [
+        "org.keycloak.keycloak-admin-client-26.0.12.jar"
+      ]
+    },
+    "keycloakCommon": {
+      "before": [
+        "org.keycloak.keycloak-client-common-synced-26.0.11.jar"
+      ],
+      "after": [
+        "org.keycloak.keycloak-client-common-synced-26.0.12.jar"
+      ]
+    },
+    "fabric8Kubernetes": {
+      "before": [
+        "io.fabric8.kubernetes-client-7.8.0.jar",
+        "io.fabric8.kubernetes-client-api-7.8.0.jar"
+      ],
+      "after": [
+        "io.fabric8.kubernetes-client-7.8.0.jar",
+        "io.fabric8.kubernetes-client-api-7.8.0.jar"
+      ]
+    },
+    "fabric8OpenShift": {
+      "before": [
+        "io.fabric8.openshift-client-7.8.0.jar",
+        "io.fabric8.openshift-client-api-7.8.0.jar"
+      ],
+      "after": [
+        "io.fabric8.openshift-client-7.8.0.jar",
+        "io.fabric8.openshift-client-api-7.8.0.jar"
+      ]
+    },
+    "vertx": {
+      "before": [
+        "io.vertx.vertx-core-4.5.30.jar"
+      ],
+      "after": [
+        "io.vertx.vertx-core-4.5.34.jar"
+      ]
+    },
+    "netty": {
+      "before": [
+        "io.netty.netty-codec-http-4.1.136.Final.jar"
+      ],
+      "after": [
+        "io.netty.netty-codec-http-4.1.138.Final.jar"
+      ]
+    },
+    "jacksonCore": {
+      "before": [
+        "com.fasterxml.jackson.core.jackson-core-2.22.0.jar"
+      ],
+      "after": [
+        "com.fasterxml.jackson.core.jackson-core-2.22.2.jar"
+      ]
+    },
+    "jacksonDatabind": {
+      "before": [
+        "com.fasterxml.jackson.core.jackson-databind-2.22.0.jar"
+      ],
+      "after": [
+        "com.fasterxml.jackson.core.jackson-databind-2.22.2.jar"
+      ]
+    },
+    "resteasyClassic": {
+      "before": [
+        "org.jboss.resteasy.resteasy-client-6.2.16.Final.jar",
+        "org.jboss.resteasy.resteasy-client-api-6.2.16.Final.jar"
+      ],
+      "after": [
+        "org.jboss.resteasy.resteasy-client-6.2.18.Final.jar",
+        "org.jboss.resteasy.resteasy-client-api-6.2.18.Final.jar"
+      ]
+    },
+    "postgresql": {
+      "before": [
+        "org.postgresql.postgresql-42.7.13.jar"
+      ],
+      "after": [
+        "org.postgresql.postgresql-42.7.13.jar"
+      ]
+    },
+    "snakeyaml": {
+      "before": [
+        "org.yaml.snakeyaml-2.4.jar"
+      ],
+      "after": [
+        "org.yaml.snakeyaml-2.4.jar"
+      ]
+    },
+    "snakeyamlEngine": {
+      "before": [
+        "org.snakeyaml.snakeyaml-engine-3.0.1.jar"
+      ],
+      "after": [
+        "org.snakeyaml.snakeyaml-engine-3.0.1.jar"
+      ]
+    },
+    "smallryeJwt": {
+      "before": [
+        "io.smallrye.smallrye-jwt-4.6.3.jar",
+        "io.smallrye.smallrye-jwt-build-4.6.3.jar",
+        "io.smallrye.smallrye-jwt-common-4.6.3.jar"
+      ],
+      "after": [
+        "io.smallrye.smallrye-jwt-4.6.3.jar",
+        "io.smallrye.smallrye-jwt-build-4.6.3.jar",
+        "io.smallrye.smallrye-jwt-common-4.6.3.jar"
+      ]
+    },
+    "jose4j": {
+      "before": [
+        "org.bitbucket.b_c.jose4j-0.9.6.jar"
+      ],
+      "after": [
+        "org.bitbucket.b_c.jose4j-0.9.6.jar"
+      ]
+    }
+  },
+  "uiSelectedComparison": {
+    "keycloak-js": {
+      "before": {
+        "version": "26.2.4",
+        "dev": false
+      },
+      "after": {
+        "version": "26.2.4",
+        "dev": false,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "react": {
+      "before": {
+        "version": "18.3.1",
+        "dev": false
+      },
+      "after": {
+        "version": "18.3.1",
+        "dev": false,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "react-dom": {
+      "before": {
+        "version": "18.3.1",
+        "dev": false
+      },
+      "after": {
+        "version": "18.3.1",
+        "dev": false,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "react-router": {
+      "before": {
+        "version": "6.30.4",
+        "dev": false
+      },
+      "after": {
+        "version": "7.18.4",
+        "dev": false,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "react-router-dom": {
+      "before": {
+        "version": "6.30.4",
+        "dev": false
+      },
+      "after": {
+        "version": "7.18.4",
+        "dev": false,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "@remix-run/router": {
+      "before": {
+        "version": "1.23.3",
+        "dev": false
+      },
+      "after": null
+    },
+    "vite": {
+      "before": {
+        "version": "5.4.21",
+        "dev": true
+      },
+      "after": {
+        "version": "7.3.6",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "vitest": {
+      "before": {
+        "version": "2.1.9",
+        "dev": true
+      },
+      "after": {
+        "version": "4.1.11",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "@vitest/mocker": {
+      "before": {
+        "version": "2.1.9",
+        "dev": true
+      },
+      "after": {
+        "version": "4.1.11",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "esbuild": {
+      "before": {
+        "version": "0.21.5",
+        "dev": true
+      },
+      "after": {
+        "version": "0.28.2",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "rollup": {
+      "before": {
+        "version": "4.62.4",
+        "dev": true
+      },
+      "after": {
+        "version": "4.62.4",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "@vitejs/plugin-react": {
+      "before": {
+        "version": "4.7.0",
+        "dev": true
+      },
+      "after": {
+        "version": "5.2.0",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "jsdom": {
+      "before": {
+        "version": "25.0.1",
+        "dev": true
+      },
+      "after": {
+        "version": "25.0.1",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    },
+    "typescript": {
+      "before": {
+        "version": "5.9.3",
+        "dev": true
+      },
+      "after": {
+        "version": "5.9.3",
+        "dev": true,
+        "optional": false,
+        "devOptional": false
+      }
+    }
+  },
+  "existingBuildEvidence": {
+    "execution": "Previously executed by coordinator; this inventory read the retained log and reports, and did not rerun Maven.",
+    "log": {
+      "path": "/private/tmp/kcops-h1-dependency-fix-verify-20260918.log",
+      "sha256": "d6b2765b4f98e9bb74b35a6188882f2d5d96af2ca250bbd2bed19e430f9a497f",
+      "summaryLines": [
+        "[INFO] Tests run: 496, Failures: 0, Errors: 0, Skipped: 0",
+        "[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Total time:  02:16 min",
+        "[INFO] Finished at: 2026-09-18T14:29:22-03:00"
+      ]
+    },
+    "surefire": {
+      "reports": 87,
+      "tests": 496,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "failsafe": {
+      "reports": 5,
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 9
+    },
+    "surefireReports": [
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.ExplicitInfrastructureConfigTest.txt",
+        "sha256": "8b6837a9578f3972916a01fdf58d58b00a2e263104cfb5dac7505149aa2ce8af",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.InfrastructureClientFactoryIsolationTest.txt",
+        "sha256": "6a0613d3ea296d6b0ce4fe0efc34ad94188829c3ff85c760d9c871666f4f4de4",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakCapabilitiesTest.txt",
+        "sha256": "e407a814bcc69a902489f031d154b2491facf612271cfd38e7fa0879f817f830",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakClientFactoryTest.txt",
+        "sha256": "6566a156bc50145dda29cb88afd924f61de9f781dca0044a94e87bfdf089fbbc",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakVersionDetectorTest.txt",
+        "sha256": "7172fcf113d7751ce574a0e1b2294f3bec38790fc0c76a405bcc152432e40427",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.ChangeResourceDelegationTest.txt",
+        "sha256": "f2a1acddf1d84404186e8501d7a1636af7429d0eff34303c7fa51972c0bbc5ec",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.ChangeResourceTest.txt",
+        "sha256": "e21dc28b3a5e060eee7cb34dd21acf04a1aab46401ca83853e9ce1c95af91adb",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.EventsAuthorizationTest.txt",
+        "sha256": "a171ec9a1ad974fc5e57c8356f57fb27513d59788c4bb0448c063af45890d557",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.FleetResourceEnrichedTest.txt",
+        "sha256": "e4a7cbb4b9c5b80492bc47cc273532e4410548c3122ef93236e3bbed37de8c25",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.FleetResourceTest.txt",
+        "sha256": "ab3f510e6a128555cdb690a59bc793868ca3c57c623f924269c79da31517eac2",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.MeResourceTest.txt",
+        "sha256": "3c19cb04372c436eab9cb0e0619dfc9530ba57bf13a42e2eb8352bab5665a5df",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.OperationsReportResourceTest.txt",
+        "sha256": "bb20ea3134f382c1f88257d02529b97054908ce77c51bdb484f9d55010503bfe",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.TargetResourceTest.txt",
+        "sha256": "9ff2f2b2a229e5e4c6dec65668d8ff1e862c35444b80d06cd1934e0a1e9bd9aa",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.ConditionEvaluatorTest.txt",
+        "sha256": "80a37fc79fcbc60b229049d693d6d45ffd3e53fcebf740b77463412c1204e6a0",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.DeclarativeRuleValidationTest.txt",
+        "sha256": "6453de14a2dc7e0eacb8efaea38d8ea8636788d67a0cb2566d72f8db6000302e",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.MultiTargetAssessmentIsolationTest.txt",
+        "sha256": "2d1854f8393b35c503cd17e91bea519f29ff73932c6dacbc6b72caf009321bef",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.RuleEngineTest.txt",
+        "sha256": "11ce4c888e934a76ee0a0714b6699e4ffea594b966043a04f4c9aa756d0aeedf",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.RulePackFixtureTest.txt",
+        "sha256": "d3ff3bfb55d9950a03c0e9e71a60d10eae49852ef50dbe9c9d649f0d8cde558e",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.YamlRuleLoaderTest.txt",
+        "sha256": "7c8e6d9dca6cf4585f0a8306d9aac1d61899e9529b635bd5ba565fc532955bc6",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.scoring.AssessmentScoringTest.txt",
+        "sha256": "19b05e253dcf8beb9ce629f0f7aabef86c981b1c47abeb5ad1f09dce1963032b",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.collector.keycloak.KeycloakEvidenceCollectorTest.txt",
+        "sha256": "ea24766ab6ee9fd0b9d056d7718ec9c8a0c7344d6b19ccc4e46c65c92a49d7ba",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.collector.metrics.MetricsEvidenceCollectorTest.txt",
+        "sha256": "c8893b18a06f634b33312d9c77b3eb756c410d3e095e1359fa347b0e07570d2a",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.credential.ConfigCredentialProviderTest.txt",
+        "sha256": "9aed1d5d5e2cf449fdb99624fbdf650339202ce533bc404733784b19f249be77",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.deploy.KubernetesAssessorRbacManifestTest.txt",
+        "sha256": "7ff889baf00d1f907a701e71789ff732a8a94d52a849f872793702454262d79e",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.deploy.UiDeployManifestTest.txt",
+        "sha256": "2ab375b37dace81e10ff424ea403f3cbdbca37e4dfb7c50e620361c9ad808c78",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.discovery.EnvironmentDiscoveryTest.txt",
+        "sha256": "7c7b1594a1e7b7a645de764479cc472c2ce3c53300046ad2a1ed533a7a7dc0b9",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.domain.metrics.PerformanceSummaryTest.txt",
+        "sha256": "aa0d4dbe3cefecfa7220d69a21347a7775a0de1d41ee510bd6feb4482af08faf",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.DefaultKeycloakManagementHealthProviderTest.txt",
+        "sha256": "f60ba144a2976afa45f71f7a14494ca5dddb6e488f64efe62ca83ae9eb6a7a8f",
+        "tests": 57,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.HealthCheckEngineTest.txt",
+        "sha256": "5e2b531c470f7db02e9a757720df19ebd8a0859dfaef0394488dd428e589bca0",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.InventoryHealthChecksTest.txt",
+        "sha256": "3668f42a353946baff1c925bef5b2a2200c866369892fc331e1a586d9f174552",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.KeycloakAdminApiHealthCheckTest.txt",
+        "sha256": "6f2bc20c96f4223005c5e0adee3e89cc2a92545811fdda99740fa40464ebbd9b",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.http.BoundedBodyHandlerTest.txt",
+        "sha256": "c123e5eca7f32209848d0349389ca2f83fca08e128c49b7e314bf9f5a3790bef",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.it.DisposableRhbkGuardTest.txt",
+        "sha256": "5d9d2a18c0e339f1bc303059e661c51c7e43cb1ec06505e93a281832924d02d3",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.assessment.AssessmentToolsOperationsReportTest.txt",
+        "sha256": "6ce9621c0108441fecdcbbec7853b736e1011f742592e1611a67978495ffd0cf",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.assessment.AssessmentToolsScoreAvailabilityTest.txt",
+        "sha256": "e56b77b0f2381fbeca0b3c6da9eb0f98cf28f6312ecc0a9540a0e34eda6fedb4",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientLifecycleTest.txt",
+        "sha256": "187f857f79f51f55d76f0ee88d62149eed68673024bc63e8375e419c8bced3a3",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientSecurityTest.txt",
+        "sha256": "d2994ef81550f8c3fad64f2d26b364ac8b7fa01809c96f8091177a6f0507f14b",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientUrlsTest.txt",
+        "sha256": "b8115af61d58c56b55003089d12f0c1bb40927e38222a5d3caa4a82a52e2f0b1",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricWindowTest.txt",
+        "sha256": "7c733018b63e55c498187c3e2c6615564b6fa87e67e24f92ba5d75622930e1f2",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsCredentialIsolationTest.txt",
+        "sha256": "63aa6b72ed48b4feb3ea6f015db4736e5ed5c3b7ea6f356f75d0e5b385861227",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsProviderFailureTest.txt",
+        "sha256": "f91f813b94231e3cb49a9de3c9ea48999ef0ae3954802c5701e73d9cb7795ea9",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryBoundsTest.txt",
+        "sha256": "3d648281254e305727f7c1bf37c2e7da07b2f64716c5c6ea294b878588ce6389",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryBuilderTest.txt",
+        "sha256": "748d1f29afd1823e3ae2d190540f4a28650a55a45725ce4726d94d5199026d82",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryContextIsolationTest.txt",
+        "sha256": "0facdeb3c56acba20bbac1b1bc9f37621473754ee3fa679ad3dda3ef8fb680db",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.PromQlEscaperTest.txt",
+        "sha256": "471c7c242af648acdb53029756b906504494b66e7a81abc00f9f14bcb220e67d",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.prometheus.PrometheusApiClientTest.txt",
+        "sha256": "827b370ea9cb2b0ce79f30c86c9550238893369c1d43ab9d577c3bbdba06996f",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.AssessmentRepositoryTest.txt",
+        "sha256": "956e1fa237c5a32eb58bc9cb1c5f80623648a7fe732350f016d4642e1a7247af",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.AuditRepositoryTest.txt",
+        "sha256": "d3a845b313702749b004a10b246e94cde117938afb1b16fa858b3eae78c81dc7",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.FindingRepositoryTest.txt",
+        "sha256": "558e2c438a853fa799df059ebacd154bded1c7c2c22dc7399d4f7e61d53a2ed8",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.HealthCheckRepositoryTest.txt",
+        "sha256": "6f9f9eb4161e48e7cdbd009581e05ba90cdaa5248bac8b29bddf0a4fef9f56ca",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.MultiTargetPersistenceIsolationTest.txt",
+        "sha256": "7bbf6b8ac1ebfe6941d96d915cb900d4e988dd8dc5ca06392d40c925b6624bdd",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.SecretLeakagePersistenceTest.txt",
+        "sha256": "7c7e8eea43e6db4ddb97efbd08c53daf58cace580172ef8789cd717aea7bb0b4",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.SnapshotRepositoryTest.txt",
+        "sha256": "855b709c67c3a79f19618b2b6b8b780643dd05d38a3a7f187ae9dc14ba76b43e",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.TargetRepositoryTest.txt",
+        "sha256": "a76dfff3cc5c48fee5211c1cc244d304106b7b6ab42742f1fcc8fbdeb2579cc6",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.mapper.AssessmentPersistenceMapperTest.txt",
+        "sha256": "b165735bfb14f7db5938916f56b9ab3703c4aa2cceead4a75824a2558c8351c9",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.mapper.ChangePersistenceMapperTest.txt",
+        "sha256": "8b717405a140c0e1c431ce8974ac21af644cccc1253ae0a553b75d9042db2c20",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.AuthenticatedBoundaryTest.txt",
+        "sha256": "abbda10f6679ab9301b6d8dc341f7d641fa5878a9114483d5f0fd8c666aecf5d",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.SensitiveDataFilterTest.txt",
+        "sha256": "ec5a887c29f6d0632d8eeca1567dd3bdd9339087e6d2c4593eaf792767f308e2",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.ToolAuthorizationChangeTest.txt",
+        "sha256": "c28a6f6e25ed313412d304a3ee628d0a6e93cd885c8a10ab564ef052225b3a43",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.ClientServiceTest.txt",
+        "sha256": "631f928c93edad2d84d6fddd6ac9c83889d6bdad3882b3e29da6326d8b91e198",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.MultiTargetIsolationTest.txt",
+        "sha256": "78b34513e2987af8d1d2009d551bb29597b5a6b8bfe81861ba531fbaa89b95eb",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.RealmServiceTest.txt",
+        "sha256": "fa383e225de1fdb94876677c8a4ba779f5fda7dc2803d7071d47fa81913cb67f",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.UserServiceTest.txt",
+        "sha256": "46047717f8b5bed39da83e47d0ec30fb4c803b896b6b3dc24124f57ef7fb461f",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ChangeManagementServiceTest.txt",
+        "sha256": "f2b3fd6db48417359c04b36eff9cdea3f93a7b187f2c5fb5a777a4e8d6d60077",
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ChangePolicyAndRiskTest.txt",
+        "sha256": "b1532b91a947111e40a96fbfe7c534c0409e24b7b1cf28cc16d7450047c4e116",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientConfigChangeSupportTest.txt",
+        "sha256": "4703763a82478c37bfed6d5cf5cdb518641f6ee90f1539e41ffe2ee8793539ce",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientLifecycleChangeSupportTest.txt",
+        "sha256": "b461f98c1fcc5a3168c13331d42b12b0291b24dfaca4b075a81626a9dfa9dba6",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientSecuritySettingsChangeSupportTest.txt",
+        "sha256": "83c7fafde9772f59c774e2ebc465563661934a9df81039a4c05f6c1fcf7b6bc3",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientUrlSettingsChangeSupportTest.txt",
+        "sha256": "64f0c08d905a37ce2cd7e64aaf5a4485fcf6184c0f268501be516feb75b977e3",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.BundledRuleCatalogRevisionTest.txt",
+        "sha256": "35507599c7d454cca697f8a7b9b9fd5033af4bd214adedf0cd4d5ff296bdac02",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.FleetScoreAvailabilityTest.txt",
+        "sha256": "62d998c21e06a6ee35bb4e8239f18d8e131d3f589c3b7a6457bff4b1998bb752",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationCandidateCollectorTest.txt",
+        "sha256": "766fc75eb8d61362d3455038baeb88ee2f0458ab8ce4a16592dd3e98645a3369",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationNetworkingCollectorTest.txt",
+        "sha256": "feacc9e0aaf3566f7cb414f41e798f0b920cc4e1cffd6ede598ecb6debbef131",
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationOnboardingServiceTest.txt",
+        "sha256": "fa3f5c28268f7851c4648647eccb309485c46db39392fe8f97f4c43eb77f0317",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryServiceMockTest.txt",
+        "sha256": "2765cc18a8d61c89ae3ca521a5fe3df5589de608e9338a6afdbbcf9e04442a97",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.MultiTargetMetricsIsolationTest.txt",
+        "sha256": "44b597a30f6928efee90636d36c8d048c69dbbd047f5248ad89d145a4acb26eb",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.OperationsReportServiceTest.txt",
+        "sha256": "a9f84c98e7309af53118685b0efbfb5e1f587cdd97b6eaf39893cf6e04cd5f49",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.ReportInventoryProjectionTest.txt",
+        "sha256": "fafd0821333c104b1e617dc580e0429cddd27aac2ab312d129aa2375d64fb834",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.SnapshotServiceTest.txt",
+        "sha256": "fb0572057adca8a5a788b3ecffcc2c4d5c565ab0e461dfa7a178af10917d728f",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.TargetOverviewSignalsTest.txt",
+        "sha256": "7a7709375d4e41f83e00681532c1cb76310dcfa415c26519675a9eebc7b9ce9f",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.InstallationConfigMappingTest.txt",
+        "sha256": "eb9168725fa5c4af3be7b3684b3a17e68775cff58bb3dfd11a24c0c687830c9b",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.KubernetesInstallationBindingTest.txt",
+        "sha256": "aa1025803c7ae035a245d84ce2e5332b317b83bc7b8a53132917247f951aa06a",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.ManagedInstallationBootstrapTest.txt",
+        "sha256": "b9bcf683addb685f63fc5861a5f2dd7cda5bfa70d7c98f34e73ce16892577fa2",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetAuthorizationTest.txt",
+        "sha256": "35d6ecc266eb93a098a7def51ce7e86adb8494b27297958ea1ddb145293ada2b",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetRegistryTest.txt",
+        "sha256": "047d275957dbea5fef319b4d5f88bca2c520e52c84b0ceab3e5f9c12c4c1be02",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetResolverTest.txt",
+        "sha256": "06dd254963a61df20cb78a1b7abae7c1a7f7dc554a91c02652aeceeb17f1fbd4",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetSanitizationTest.txt",
+        "sha256": "7907d53f266cb4e562b8c8036bfe82743021fb950c60d187ea35c89373a40296",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "failsafeReports": [
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.ControlledClientChangeIT.txt",
+        "sha256": "ddc321e266928f719834036bc35710150ccd06347ebc3dbeaddd4638b4e06235",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 4
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.KeycloakCommunity26_6IT.txt",
+        "sha256": "9da52ad185fc2cd99211c78198b069d58e9b92dd6e45f6c031043a40f2eb6e04",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.KeycloakCommunity26_7IT.txt",
+        "sha256": "a2bfbe20ea1d1a5a0862ad22756732f8245711df886a07aa8ff8986487caa0de",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.PrometheusMetricsIT.txt",
+        "sha256": "032c66bdb9f10b8c693dbc9ee878b6fb6df4d131d122ea93f79aa3904d4d6bba",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.Rhbk26_6IT.txt",
+        "sha256": "8452e09016e1330170494f93fc2b583166e9c3b67bb73023e693b291e94b5661",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 2
+      }
+    ]
+  },
+  "retainedAuditArtifacts": [
+    {
+      "path": "docs/development/evidence/h1-dependency-fix-npm-audit-all-2026-09-18.json",
+      "sha256": "c88f7e3d9d14f0155ad5e0968ff56fadaeb47e08fcbc15733ca8377b61063256",
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 11,
+          "dev": 221,
+          "optional": 53,
+          "peer": 8,
+          "peerOptional": 0,
+          "total": 231
+        }
+      }
+    },
+    {
+      "path": "docs/development/evidence/h1-dependency-fix-npm-audit-runtime-2026-09-18.json",
+      "sha256": "c88f7e3d9d14f0155ad5e0968ff56fadaeb47e08fcbc15733ca8377b61063256",
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0,
+          "total": 0
+        },
+        "dependencies": {
+          "prod": 11,
+          "dev": 221,
+          "optional": 53,
+          "peer": 8,
+          "peerOptional": 0,
+          "total": 231
+        }
+      }
+    }
+  ],
+  "uiPackages": {
+    "node_modules/@adobe/css-tools": {
+      "version": "4.5.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@asamuzakjp/css-color": {
+      "version": "3.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@asamuzakjp/css-color/node_modules/lru-cache": {
+      "version": "10.4.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/code-frame": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/compat-data": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/core": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/generator": {
+      "version": "7.29.8",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-compilation-targets": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-globals": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-module-imports": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-module-transforms": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-plugin-utils": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-string-parser": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-validator-identifier": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helper-validator-option": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/helpers": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/parser": {
+      "version": "7.29.8",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/plugin-transform-react-jsx-self": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/plugin-transform-react-jsx-source": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/runtime": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/template": {
+      "version": "7.29.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/traverse": {
+      "version": "7.29.8",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@babel/types": {
+      "version": "7.29.8",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@csstools/color-helpers": {
+      "version": "5.1.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@csstools/css-calc": {
+      "version": "2.1.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@csstools/css-color-parser": {
+      "version": "3.1.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@csstools/css-parser-algorithms": {
+      "version": "3.0.5",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@csstools/css-tokenizer": {
+      "version": "3.0.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/aix-ppc64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/android-arm": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/android-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/android-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/darwin-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/darwin-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/freebsd-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/freebsd-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-arm": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-ia32": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-loong64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-mips64el": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-ppc64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-riscv64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-s390x": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/linux-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/netbsd-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/netbsd-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/openbsd-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/openbsd-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/openharmony-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/sunos-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/win32-arm64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/win32-ia32": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@esbuild/win32-x64": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@jridgewell/gen-mapping": {
+      "version": "0.3.13",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@jridgewell/remapping": {
+      "version": "2.3.5",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@jridgewell/resolve-uri": {
+      "version": "3.1.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@jridgewell/sourcemap-codec": {
+      "version": "1.5.5",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@jridgewell/trace-mapping": {
+      "version": "0.3.31",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@napi-rs/lzma-linux-x64-gnu": {
+      "version": "1.5.1",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rolldown/pluginutils": {
+      "version": "1.0.0-rc.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-android-arm-eabi": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-android-arm64": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-darwin-arm64": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-darwin-x64": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-freebsd-arm64": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-freebsd-x64": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-arm-gnueabihf": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-arm-musleabihf": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-arm64-gnu": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-arm64-musl": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-loong64-gnu": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-loong64-musl": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-ppc64-gnu": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-ppc64-musl": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-riscv64-gnu": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-riscv64-musl": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-s390x-gnu": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-x64-gnu": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-linux-x64-musl": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-openbsd-x64": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-openharmony-arm64": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-win32-arm64-msvc": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-win32-ia32-msvc": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-win32-x64-gnu": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@rollup/rollup-win32-x64-msvc": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/@standard-schema/spec": {
+      "version": "1.1.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@testing-library/dom": {
+      "version": "10.4.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@testing-library/jest-dom": {
+      "version": "6.9.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@testing-library/jest-dom/node_modules/dom-accessibility-api": {
+      "version": "0.6.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@testing-library/react": {
+      "version": "16.3.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@testing-library/user-event": {
+      "version": "14.6.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/aria-query": {
+      "version": "5.0.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/babel__core": {
+      "version": "7.20.5",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/babel__generator": {
+      "version": "7.27.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/babel__template": {
+      "version": "7.4.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/babel__traverse": {
+      "version": "7.28.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/chai": {
+      "version": "5.2.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/deep-eql": {
+      "version": "4.0.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/estree": {
+      "version": "1.0.9",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/prop-types": {
+      "version": "15.7.15",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/react": {
+      "version": "18.3.31",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@types/react-dom": {
+      "version": "18.3.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitejs/plugin-react": {
+      "version": "5.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitest/expect": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitest/mocker": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitest/pretty-format": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitest/runner": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitest/snapshot": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitest/spy": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/@vitest/utils": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/agent-base": {
+      "version": "7.1.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/ansi-regex": {
+      "version": "5.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/ansi-styles": {
+      "version": "5.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/aria-query": {
+      "version": "5.3.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/assertion-error": {
+      "version": "2.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/asynckit": {
+      "version": "0.4.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/baseline-browser-mapping": {
+      "version": "2.11.12",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/browserslist": {
+      "version": "4.28.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/call-bind-apply-helpers": {
+      "version": "1.0.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/caniuse-lite": {
+      "version": "1.0.30001809",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/chai": {
+      "version": "6.2.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/combined-stream": {
+      "version": "1.0.8",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/convert-source-map": {
+      "version": "2.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/cookie": {
+      "version": "1.1.1",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/css.escape": {
+      "version": "1.5.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/cssstyle": {
+      "version": "4.6.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/cssstyle/node_modules/rrweb-cssom": {
+      "version": "0.8.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/csstype": {
+      "version": "3.2.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/data-urls": {
+      "version": "5.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/debug": {
+      "version": "4.4.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/decimal.js": {
+      "version": "10.6.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/delayed-stream": {
+      "version": "1.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/dequal": {
+      "version": "2.0.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/dom-accessibility-api": {
+      "version": "0.5.16",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/dunder-proto": {
+      "version": "1.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/electron-to-chromium": {
+      "version": "1.5.402",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/entities": {
+      "version": "6.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/es-define-property": {
+      "version": "1.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/es-errors": {
+      "version": "1.3.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/es-module-lexer": {
+      "version": "2.3.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/es-object-atoms": {
+      "version": "1.1.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/es-set-tostringtag": {
+      "version": "2.1.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/esbuild": {
+      "version": "0.28.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/escalade": {
+      "version": "3.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/estree-walker": {
+      "version": "3.0.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/expect-type": {
+      "version": "1.4.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/fdir": {
+      "version": "6.5.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/form-data": {
+      "version": "4.0.6",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/fsevents": {
+      "version": "2.3.3",
+      "dev": true,
+      "optional": true,
+      "devOptional": false
+    },
+    "node_modules/function-bind": {
+      "version": "1.1.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/gensync": {
+      "version": "1.0.0-beta.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/get-intrinsic": {
+      "version": "1.3.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/get-proto": {
+      "version": "1.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/gopd": {
+      "version": "1.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/has-symbols": {
+      "version": "1.1.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/has-tostringtag": {
+      "version": "1.0.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/hasown": {
+      "version": "2.0.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/html-encoding-sniffer": {
+      "version": "4.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/http-proxy-agent": {
+      "version": "7.0.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/https-proxy-agent": {
+      "version": "7.0.6",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/iconv-lite": {
+      "version": "0.6.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/indent-string": {
+      "version": "4.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/is-potential-custom-element-name": {
+      "version": "1.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/js-tokens": {
+      "version": "4.0.0",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/jsdom": {
+      "version": "25.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/jsesc": {
+      "version": "3.1.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/json5": {
+      "version": "2.2.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/keycloak-js": {
+      "version": "26.2.4",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/loose-envify": {
+      "version": "1.4.0",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/lru-cache": {
+      "version": "5.1.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/lz-string": {
+      "version": "1.5.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/magic-string": {
+      "version": "0.30.21",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/math-intrinsics": {
+      "version": "1.1.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/mime-db": {
+      "version": "1.52.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/mime-types": {
+      "version": "2.1.35",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/min-indent": {
+      "version": "1.0.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/ms": {
+      "version": "2.1.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/nanoid": {
+      "version": "3.3.18",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/node-releases": {
+      "version": "2.0.53",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/nwsapi": {
+      "version": "2.2.24",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/obug": {
+      "version": "2.2.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/parse5": {
+      "version": "7.3.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/pathe": {
+      "version": "2.0.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/picocolors": {
+      "version": "1.1.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/picomatch": {
+      "version": "4.0.7",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/postcss": {
+      "version": "8.5.26",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/pretty-format": {
+      "version": "27.5.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/punycode": {
+      "version": "2.3.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/react": {
+      "version": "18.3.1",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/react-dom": {
+      "version": "18.3.1",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/react-is": {
+      "version": "17.0.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/react-refresh": {
+      "version": "0.18.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/react-router": {
+      "version": "7.18.4",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/react-router-dom": {
+      "version": "7.18.4",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/redent": {
+      "version": "3.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/rollup": {
+      "version": "4.62.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/rrweb-cssom": {
+      "version": "0.7.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/safer-buffer": {
+      "version": "2.1.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/saxes": {
+      "version": "6.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/scheduler": {
+      "version": "0.23.2",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/semver": {
+      "version": "6.3.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/set-cookie-parser": {
+      "version": "2.7.2",
+      "dev": false,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/siginfo": {
+      "version": "2.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/source-map-js": {
+      "version": "1.2.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/stackback": {
+      "version": "0.0.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/std-env": {
+      "version": "4.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/strip-indent": {
+      "version": "3.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/symbol-tree": {
+      "version": "3.2.4",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tinybench": {
+      "version": "2.9.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tinyexec": {
+      "version": "1.3.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tinyglobby": {
+      "version": "0.2.17",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tinyrainbow": {
+      "version": "3.1.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tldts": {
+      "version": "6.1.86",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tldts-core": {
+      "version": "6.1.86",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tough-cookie": {
+      "version": "5.1.2",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/tr46": {
+      "version": "5.1.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/typescript": {
+      "version": "5.9.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/update-browserslist-db": {
+      "version": "1.3.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/vite": {
+      "version": "7.3.6",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/vitest": {
+      "version": "4.1.11",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/w3c-xmlserializer": {
+      "version": "5.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/webidl-conversions": {
+      "version": "7.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/whatwg-encoding": {
+      "version": "3.1.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/whatwg-mimetype": {
+      "version": "4.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/whatwg-url": {
+      "version": "14.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/why-is-node-running": {
+      "version": "2.3.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/ws": {
+      "version": "8.21.3",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/xml-name-validator": {
+      "version": "5.0.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/xmlchars": {
+      "version": "2.2.0",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    },
+    "node_modules/yallist": {
+      "version": "3.1.1",
+      "dev": true,
+      "optional": false,
+      "devOptional": false
+    }
+  },
+  "packagedJars": [
+    {
+      "path": "target/quarkus-app/lib/boot/io.quarkus.quarkus-bootstrap-runner-3.39.4.jar",
+      "sha256": "c5ac30042832480fa77e1f76823f3f41fc76d7b7591bbae9a9d7caaff5c98ba2"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.quarkus.quarkus-classloader-commons-3.39.4.jar",
+      "sha256": "4b5753bd6574803e4f5cc3d90fa3744e444095c5a17b0c225a11d8cca28afd8f"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.quarkus.quarkus-development-mode-spi-3.39.4.jar",
+      "sha256": "f9334d8f428a1c6479ae5a0f1d5b9f0dd05f624fedece5d132d9aceb1b8779c3"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.quarkus.quarkus-value-registry-3.39.4.jar",
+      "sha256": "4712fc9e791d12bf5fc92479487c12eedb98fbece5165ae1673e7655e6537422"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.quarkus.quarkus-vertx-latebound-mdc-provider-3.39.4.jar",
+      "sha256": "fdaa836fb8eef176744142ed882fa4e32c307f755511aaafd01d13d2a0c6a592"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-constraint-2.19.0.jar",
+      "sha256": "4454a2f32caeadb47cf6f0565c667f64c21facbee959cf15bcfc8ec8755c471a"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-cpu-2.19.0.jar",
+      "sha256": "845825ee711b0e0511c2cd12430680b767c6ee69e60d6b32bb90befd52420927"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-expression-2.19.0.jar",
+      "sha256": "27863f0441acd0b003536f63ddfd40f9f8c02f16d97d1fd1e9f616d683541aaa"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-function-2.19.0.jar",
+      "sha256": "c78f2661e82821d3ac7153b88bec4aaec375e041aae261832e5e5f4ac17f4800"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-io-2.19.0.jar",
+      "sha256": "33d549ed88eb279926706a894459f8fc4ad8a23b1eb01b01b4c72d3e723da877"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-net-2.19.0.jar",
+      "sha256": "f3d1be529e43214df263f29703dec41bc9b8d1bd0a4af8678166814ae2da5a96"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-os-2.19.0.jar",
+      "sha256": "ac12ba8e86119ebd0a3b14d1053a3b6a4722f63978e9c718fb1ffcbbd4e3a3b5"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/io.smallrye.common.smallrye-common-ref-2.19.0.jar",
+      "sha256": "56b3173ab124b82559fe6f16bfcbefbe7f904c0e53d2507bb2e3606b43d6d1de"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/org.crac.crac-1.5.0.jar",
+      "sha256": "f4426e1641c8f0fa2f025a4cd7c40c285abaf265930e6717adfcaef03d034850"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/org.jboss.logging.jboss-logging-3.6.3.Final.jar",
+      "sha256": "7c12ee575508f81e22b1db9334b969d0ec54ef0fd1dcba24eeab1a44235fc366"
+    },
+    {
+      "path": "target/quarkus-app/lib/boot/org.jboss.logmanager.jboss-logmanager-3.2.2.Final.jar",
+      "sha256": "91d3d76c1e41d403cd717026cd6e8c4495068cb3a4a06461d9d984920fbb856c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.aayushatharva.brotli4j.brotli4j-1.23.0.jar",
+      "sha256": "5fcf13ad78d07319cc507465dcf61cbc3efee9f45c9ae1c42a9902414696bc0b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.aayushatharva.brotli4j.native-osx-aarch64-1.23.0.jar",
+      "sha256": "be3bc53688dbaff26d9d554301837de2bfa9ec09090b64d1ebf1fb6b23c28e61"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.aayushatharva.brotli4j.service-1.23.0.jar",
+      "sha256": "7f298d44dbb7688419f0179ee1dfa0e4436633272b05d38a5faf3a2b8d08697b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.cronutils.cron-utils-9.2.1.jar",
+      "sha256": "02af0e8b2fe93c9fa6eecf97b53b39faae14c5b996356edb132e9fe620013744"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.classmate-1.7.1.jar",
+      "sha256": "cc3299e5df4fc24180e69477c890d07d38db79dd2decc0ef20e74a986897c0a1"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.core.jackson-annotations-2.22.jar",
+      "sha256": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.core.jackson-core-2.22.2.jar",
+      "sha256": "ff167a6317be15895706c26668f45b898efe40ab8780970658210fe1393d52a6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.core.jackson-databind-2.22.2.jar",
+      "sha256": "d0da14c12b16b5d54719aa172d83b542ff4abeb8b0fb7db476fde8ceece760ca"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.dataformat.jackson-dataformat-yaml-2.22.2.jar",
+      "sha256": "f5e52c7d8914f23c5fcc00d0afbef77e20557228a6200e184bb61f69ab03fc44"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.datatype.jackson-datatype-jdk8-2.22.2.jar",
+      "sha256": "5a767cc4bcb04034497422551ad5005b3affa3c8d691bda26d1e7f473485dc15"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.datatype.jackson-datatype-jsr310-2.22.2.jar",
+      "sha256": "9df71cc7fb3781fd0bed6c05eebbfa8b39292a49f5619e76fdd0d889f64c8f33"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.jakarta.rs.jackson-jakarta-rs-base-2.22.2.jar",
+      "sha256": "98c330671a0354c735e05be1a367cbdb724bb8e738f19835d1a3e095740250b4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.jakarta.rs.jackson-jakarta-rs-json-provider-2.22.2.jar",
+      "sha256": "e240f805c812f840d2b2a67fb706fc14420b5004b9bb88c36aeb09840ea122d3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.jakarta.rs.jackson-jakarta-rs-yaml-provider-2.22.2.jar",
+      "sha256": "e19ea136f66a4ed8ab99021da492298cc8e49b05aa9afbdcc8adcf481955a80a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.module.jackson-module-jakarta-xmlbind-annotations-2.22.2.jar",
+      "sha256": "e5f7efb6086f5036ae4c64d3c2059cf193a980099d7079d562006275c60badb7"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.fasterxml.jackson.module.jackson-module-parameter-names-2.22.2.jar",
+      "sha256": "d9a09a3a3ea34ec16e730207d04230cf144bd98bf8c6f366f363b40f6b61cc01"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.github.ben-manes.caffeine.caffeine-3.2.4.jar",
+      "sha256": "9d9d2cfd681fd9272ded3d27c9930db12f89f732345975aa113ebc223bbf1224"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.github.ben-manes.caffeine.jcache-3.2.4.jar",
+      "sha256": "4413eb044d9f37f89aa1067295e10041721d5b8ec79ded16480d36573efb415a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.github.java-json-tools.btf-1.3.jar",
+      "sha256": "67c3e462eb50807f4e0a5f4dee304bbf17cd986a42ee5eb0b2f4c9bf64d130d9"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.github.java-json-tools.jackson-coreutils-2.0.jar",
+      "sha256": "16b3aabd3a9eb25655dda433e35f9bd9c7c1aa7991427702f5f11f000813dbb0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.github.java-json-tools.json-patch-1.13.jar",
+      "sha256": "1f794d256965b53ef37e70b55505e2ed00ddc0184d44e2e8e1fdce5a3cacc7de"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.github.java-json-tools.msg-simple-1.2.jar",
+      "sha256": "bef4111b993a5b3e6148d8f585621cceac2a1889cdbc34448b11632e0d8a9a8f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.github.victools.jsonschema-generator-4.38.0.jar",
+      "sha256": "ade4aeb301db4028ac6bcba016c31405677e37aae6eebaf13c99de3fdb3531b4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.google.api.grpc.proto-google-common-protos-2.71.0.jar",
+      "sha256": "f6d1c6281b44c93bf5a43c2687dd6b7011c15399edb2edc89d1248c4379fea42"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.google.code.gson.gson-2.14.0.jar",
+      "sha256": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.google.errorprone.error_prone_annotations-2.49.0.jar",
+      "sha256": "3b1003e51b8ae56fdbd7c71073e81d1683b97e6c4dff5a9151164d59b769d13c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.google.guava.failureaccess-1.0.1.jar",
+      "sha256": "a171ee4c734dd2da837e4b16be9df4661afab72a41adaf31eb84dfdaf936ca26"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.google.guava.guava-33.6.0-jre.jar",
+      "sha256": "dc573e1fca4fd5454f4a5fd3d7da2df03002876a4175bafc14a95980dd7713b3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.google.j2objc.j2objc-annotations-2.8.jar",
+      "sha256": "f02a95fa1a5e95edb3ed859fd0fb7df709d121a35290eff8b74dce2ab7f4d6ed"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.google.protobuf.protobuf-java-4.35.0.jar",
+      "sha256": "400621a8f0aac52fab7ec88f492edd356f5a4355caa8f92028f217a8b5e4ac3b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.sun.istack.istack-commons-runtime-4.1.2.jar",
+      "sha256": "7fd6792361f4dd00f8c56af4a20cecc0066deea4a8f3dec38348af23fc2296ee"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.sun.istack.istack-commons-tools-4.1.2.jar",
+      "sha256": "85b4fe7ad6fdfc64a586133f039d3de7b51db2c8111a1aa98a267891e27f386f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.sun.xml.bind.external.relaxng-datatype-4.0.9.jar",
+      "sha256": "89933721c2dc654049ebea84a33e2f3d36e918e5871ccb6f08df1960779c5cb9"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.sun.xml.bind.external.rngom-4.0.9.jar",
+      "sha256": "b3daa8902535f33ff90d66c2c327b95b3827f0b36a31f9a2c1094d7b82263e1b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.sun.xml.dtd-parser.dtd-parser-1.5.1.jar",
+      "sha256": "fd07c1b528e8649e956bd4c759a63badb79e8076260b5c23bdf37f2b11d06711"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/com.typesafe.config-1.4.7.jar",
+      "sha256": "85ae590d22465136e8776bf692d89b81486556bacd2c48aa0281f0c9c54fc044"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/commons-codec.commons-codec-1.22.1.jar",
+      "sha256": "78a5d732fbd715e2d10bd7150d2f8030bae57267f8aacc5c88f642cb6c2e5d3f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/commons-io.commons-io-2.22.0.jar",
+      "sha256": "2b9a7b1f726fb86216dbd2c8321eabe0221dbd5b1be81c18e1cb53811b104758"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.agroal.agroal-api-3.2.1.jar",
+      "sha256": "2a22fb1b0a0fce6b4890700257a9e7e57d80cf6752529cea6e4bd818cdbd64d3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.agroal.agroal-narayana-3.2.1.jar",
+      "sha256": "0ab1d55b666a5ca667dfd6bed0e14b73a9be579bf9488234281973a541b71332"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.agroal.agroal-pool-3.2.1.jar",
+      "sha256": "ea61be29058a92f5598e77279b1bb5e94d04490a137ca6629051668df6eedaf3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-client-7.8.0.jar",
+      "sha256": "3c2484349d905aa3f6fdd4df89ff012aca0465ef92a198cf3510fd2ef128eaa3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-client-api-7.8.0.jar",
+      "sha256": "4f5bbef3af774a1b3af66a38a7945fe4a1e8ec480623373f7c4924882bce590a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-httpclient-vertx-7.8.0.jar",
+      "sha256": "65188a709e903357b10e8997218342267689bffddcd625e218b9886aa0c828b3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-admissionregistration-7.8.0.jar",
+      "sha256": "d30cf17a70676425fbed71d79012824e2136bb98c4c61ead5130ec381351a7c2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-apiextensions-7.8.0.jar",
+      "sha256": "0c6e3a2b1852f93574b30ecf860cd5d5ea4c76c9a02ab805bc5770ef11ad80d1"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-apps-7.8.0.jar",
+      "sha256": "4333e22bc8df4afdedf8a3d828dc566a2d36a58a4aeff85bc253361cb6e21000"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-autoscaling-7.8.0.jar",
+      "sha256": "3363b5e84aab09df81fa9e55642800ea5a87df8c3efb5947dc6ff00ae9773873"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-batch-7.8.0.jar",
+      "sha256": "533aa3d50b13de336a80ff8ec2c9fcba785b6e87e0158528db55461f5c44c134"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-certificates-7.8.0.jar",
+      "sha256": "266a0bba0ff42c1d0293039f97a26450c3487de45399cbf06872a5c21608e56c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-common-7.8.0.jar",
+      "sha256": "dac81405663f854ae8363f964d94586e7be78993a04d930f13e445e32dbcd044"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-coordination-7.8.0.jar",
+      "sha256": "9063d642b122be1e01a040572be7ed2b66178bcde12c05106efab6e990f2ce79"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-core-7.8.0.jar",
+      "sha256": "59a252e065c8014d017845f47c9856263a4b99556743638e8b5f65f33b5a4843"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-discovery-7.8.0.jar",
+      "sha256": "50b0d55b99c7021c7e0bcc1173f61ddfff6298ba599abe9fcf98a18a027b6496"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-events-7.8.0.jar",
+      "sha256": "9304ccea370e170f10ac6414a79e521dd3c6a4c19db19e93f08bf2abe1a3ee01"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-extensions-7.8.0.jar",
+      "sha256": "44f64d7461d639d5d8a502d128f4b7a0e06afda5418b8692da3cd941ff6bc495"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-flowcontrol-7.8.0.jar",
+      "sha256": "7e6da9792f58b5c28bbbae56c828ad4d94f5b4e9957e3cd1a79d835bd0a3c705"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-gatewayapi-7.8.0.jar",
+      "sha256": "a6094843d3e05ef8a1b0ecc9ac31469bea488276107a6d39455a0216bba29d43"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-metrics-7.8.0.jar",
+      "sha256": "b9956add4b7a2d59d662d5770b310945c5c934e1bf5b70abe937d2e126bedc7e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-networking-7.8.0.jar",
+      "sha256": "dfb1f65bc647832b5a9da7420aeedda16695418cfe969cb16ac1622e85549c02"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-node-7.8.0.jar",
+      "sha256": "b12535e117a1bca025148b6e459b5b1e100e09d12e83256100aa2dcbcfab1b79"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-policy-7.8.0.jar",
+      "sha256": "ad4a5dd0e36f07fcd65876d3c27917253ef01667341f650c0b96aedc0f3af781"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-rbac-7.8.0.jar",
+      "sha256": "53dfbd4b19b70ef45e732cd31ed03b1af0f098298e18c9abce9dffe796f4bc9e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-resource-7.8.0.jar",
+      "sha256": "39e273d603170460bd50379c8108e7deb17fbd63f6f5e186ecb5a626e2dff596"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-scheduling-7.8.0.jar",
+      "sha256": "1f638e1c566bea7c1ca55424bdd65578bb9537a443e1ae07b5dc0a32e47af8dc"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.kubernetes-model-storageclass-7.8.0.jar",
+      "sha256": "24b04fe918dc92810059c542cea7330fdc8a3a8536580afc42648e57f66a7403"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-client-7.8.0.jar",
+      "sha256": "363f79ce15a8401b4ecd3237105f4dec682070f1a762af35a62e26027f7cd598"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-client-api-7.8.0.jar",
+      "sha256": "67a91d45e85d05587d2f7f2e3cea1530a7c230748343dd0edb7b1be0e9ce5a47"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-7.8.0.jar",
+      "sha256": "1caee96b4d00d1187c1b27a4bcf1a3695be4a326592825a7ad51c08b8646bd97"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-autoscaling-7.8.0.jar",
+      "sha256": "a0bed4838a34bb5a7c1c3e3ca45896a6bc7aa7f8d8e5a5312f41a89b444f485c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-config-7.8.0.jar",
+      "sha256": "d4a7f811f532bb70e86761a37c156e0c5e678225d2b100777ab305ceadfcc693"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-console-7.8.0.jar",
+      "sha256": "644554fe6c6f80d5eedad31c7633db5c3d075be4179ce5ee8d53d75b92e46ede"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-hive-7.8.0.jar",
+      "sha256": "ea12c99ecfd4060a6c9bf60417b0bed3603c8abf557d725aecb46b9bfd7c6096"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-installer-7.8.0.jar",
+      "sha256": "596c887df90d091fcc73bb5b8322797cc6ff2741e5cd03711db1b0cc74557ff7"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-machine-7.8.0.jar",
+      "sha256": "745de06d5612d245e7776550fbdd0556ccab9e62c0911022386fe283fbf4e580"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-machineconfiguration-7.8.0.jar",
+      "sha256": "98f19077ed05764130486570891d80086a7904a37584de556d2eb4804b149561"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-miscellaneous-7.8.0.jar",
+      "sha256": "ea3c94ad4922ebe37bd555af7fd5d436287aa5a3a4dcb292b451e5186f47f6d9"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-monitoring-7.8.0.jar",
+      "sha256": "de859a1a3760dcdf7158bea4cc0857b210295e004cba8373aa451332060f140e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-operator-7.8.0.jar",
+      "sha256": "06ceb9a7cece6219ee8c22962e9c7393e33dd092a19e5a68d0367e931d3e8b01"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-operatorhub-7.8.0.jar",
+      "sha256": "0aa75ecface2e76af7e1265715d5567a0df3e451ade260aa6e73595df1f04c39"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-storageversionmigrator-7.8.0.jar",
+      "sha256": "3f148ab534357007cf9dea38618d156e8f1ecf3dd62393646c0d55a825047a11"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-tuned-7.8.0.jar",
+      "sha256": "93cabf2dcb2294e3b32e61f67d2c8a057c677127d9396e42e29d2eb7fddca9e1"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.openshift-model-whereabouts-7.8.0.jar",
+      "sha256": "7d5adea67d2b10503710878f8545e90aba4bfb64c86c14bde241fa32caed7d27"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.fabric8.zjsonpatch-7.8.0.jar",
+      "sha256": "bc335f8550a7390ccbc78976b07a45ecc2eff746e0c479bab67f2527d097e248"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-api-1.81.0.jar",
+      "sha256": "3e6a659ba3edcdac730c857b27725e2e4d985c2241055e8326eb4fe0f9573d53"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-context-1.81.0.jar",
+      "sha256": "05de695306f90ded01d41b083b7500eb13dc53763097ac8c5b0264842df06679"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-core-1.81.0.jar",
+      "sha256": "3ffe1a91dedf0603269ce597469bf82f93477b12968a9e0d80fbd407e5ba6e99"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-netty-1.81.0.jar",
+      "sha256": "d76542efc61631ff23dcf0790edfe5bb02eea286d4f974a80f3d2be38cb90cd0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-protobuf-1.81.0.jar",
+      "sha256": "d274af74b76a7846194e0279708d48900c19070f069241a4034bacd42918df1d"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-protobuf-lite-1.81.0.jar",
+      "sha256": "1bf6294b09925cc6aa82b1fd8750650010e45e0c88972670bdc3135c74aaab4c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-stub-1.81.0.jar",
+      "sha256": "963e75cc63c3659ee8e4cb956436cefdd511761f4e85a674caeeb3052744e39d"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.grpc.grpc-util-1.81.0.jar",
+      "sha256": "5ef3f554329ebc18b7ca65de15289acf723a26b8c0bd4e502f41e41abe5a347f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.micrometer.micrometer-commons-1.17.1.jar",
+      "sha256": "f2cee6ef046e72eec8128474c7f58c6217173b45ae373c30de0289f2a56ab0fd"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.micrometer.micrometer-core-1.17.1.jar",
+      "sha256": "9ca47dfa831409b40253c8dc98c17b9d3e050ebbde4d1543c5521dca2b95ad56"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.micrometer.micrometer-observation-1.17.1.jar",
+      "sha256": "eb34f0cd84a879393ae5c21160fc06385ccdc74f36a4d1e31b199f59acfdaf71"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.micrometer.micrometer-registry-prometheus-simpleclient-1.17.1.jar",
+      "sha256": "06cb870d217e1a65cd42d4f98f23eea4fd5d32d35f75f5f48b27484747626daa"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-buffer-4.1.138.Final.jar",
+      "sha256": "5bef3ea2b9e80c5e8d03151ca1609bd75fd1e264863bf3e2f8d538392c0f2c38"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-codec-4.1.138.Final.jar",
+      "sha256": "21b9b7717da9ed7034c7a9ef4fcea4a08825e8f52d775da4d898364edf99327f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-codec-dns-4.1.138.Final.jar",
+      "sha256": "715d8ba984fde2c9ffc35917c8c1dfdea6b10f0460922f4f6f587c92db8f4ef1"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-codec-haproxy-4.1.138.Final.jar",
+      "sha256": "56cc45103a0d24329e3065305c802360beb0c921318222142c333059421f3964"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-codec-http-4.1.138.Final.jar",
+      "sha256": "7d9000e53c8e37504be42b8dd7b646a7d1c73ad2cf801527fe3c6301880fe06f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-codec-http2-4.1.138.Final.jar",
+      "sha256": "c7521231535c252903d9e424e162f789b5b55b0b0799628ea466a9b3daf49dae"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-codec-socks-4.1.138.Final.jar",
+      "sha256": "bc15ad96188a6eee2d0c5f7f8e443fa916fa30e74a65e220b1ac0a04574dda87"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-common-4.1.138.Final.jar",
+      "sha256": "b4ebb8fa44cd5790731928a83fd0f25a530e41c407c093bef4a0196db30b693f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-handler-4.1.138.Final.jar",
+      "sha256": "a79fb814e029db17da82baea25a0340172af2c59f107fd20b394c1fa28680f21"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-handler-proxy-4.1.138.Final.jar",
+      "sha256": "fd26635e06af15b2dd3f7502a195dc19fcd451264948a8707fb26f60e4d510b9"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-resolver-4.1.138.Final.jar",
+      "sha256": "50c338a0e5c9997513e738f0fcb47d579a9e8852d317ba367f5d141e210187c0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-resolver-dns-4.1.138.Final.jar",
+      "sha256": "a636815e5bcc9501a7d2c9bdba8b058811ddec5d0c76ec58fc6a165f4facf21c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-tcnative-classes-2.0.84.Final.jar",
+      "sha256": "7a4437abf98b0cec053af4443fe321177d2cfccfec7bcad4e7d8b75571bbec4d"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-transport-4.1.138.Final.jar",
+      "sha256": "6c064c1cae4d410b920abfc07959a49db1b4778a9547614373e97d31cab0cad6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.netty.netty-transport-native-unix-common-4.1.138.Final.jar",
+      "sha256": "8d1ada8f185d6f6da4cd79f9daeef39f1db49908cfec8bc2a1fb602458aa2341"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.instrumentation.opentelemetry-instrumentation-annotations-2.28.1.jar",
+      "sha256": "76f3be2f490cf846c4a0fae03e5ec21fbcdc6d5617c54b1e0b4f8c8768f0cea4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.instrumentation.opentelemetry-instrumentation-annotations-support-2.28.1-alpha.jar",
+      "sha256": "725a6f9c201fc3f30c09bc84416501378908d764b88ca84a4e5caacb118e9bc2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.instrumentation.opentelemetry-instrumentation-api-2.28.1.jar",
+      "sha256": "f4f82a26dc391cd8b9db32046aa6fe01e2d53d9f1f31fc7c7f47ee21b77f2a62"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.instrumentation.opentelemetry-instrumentation-api-incubator-2.28.1-alpha.jar",
+      "sha256": "78ad66aba5c5de53634205775bd44095e17232cf2b247622d0a9e6bf20293f1c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.instrumentation.opentelemetry-jdbc-2.28.1-alpha.jar",
+      "sha256": "7b03a3edbe77f93f5b5e762e62c6f54ecc2c92c4e02bbcb481f830bc6acda805"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.instrumentation.opentelemetry-runtime-telemetry-2.28.1-alpha.jar",
+      "sha256": "98254e3b412e8fdf72e6fc3b631d6eef31ad01739422d82e8b1573e3694e57a2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-api-1.62.0.jar",
+      "sha256": "d58143928c049233653e6bf1282ff8a767ebdd5e6a82b3f336158c30e40b431d"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-api-incubator-1.62.0-alpha.jar",
+      "sha256": "6b8dbe21aea973896555c65e94de694ff73f788bdf47c712f8b2267a57b5d0d8"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-common-1.62.0.jar",
+      "sha256": "d6310bebde67d65c1519696728d8604005315ed08ab14071956fc0826fd71815"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-context-1.62.0.jar",
+      "sha256": "8ec86c3609222b9b6307bf40154c1f1c288d1f18ada0155409e7797adbdbe517"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-exporter-common-1.62.0.jar",
+      "sha256": "50f84b5b58048f69bd684ec874413944209995e01c177200555c151dabfe1ec9"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-exporter-otlp-1.62.0.jar",
+      "sha256": "174d1cdb554496ca42c4a7dc8b6e5bf17edaac04c27529ffa05d66e13c3eab29"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-exporter-otlp-common-1.62.0.jar",
+      "sha256": "79eaaaf044df15209ee1461b668f7c93547734a793d6cf6ad5e57290d3f8c0ea"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-sdk-1.62.0.jar",
+      "sha256": "99d421ea0e5a1ca8e45cb67f1d5db7f0e8a718dd55eeb86c1323597e1f10aed3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-sdk-common-1.62.0.jar",
+      "sha256": "bf9d13df9a50e49a5db664ba8ebfad79f73f03219d2ac6f6709d432f6896eba0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-sdk-extension-autoconfigure-1.62.0.jar",
+      "sha256": "4165984bdc3261486918a55815ae57d5e75ba08730d1e1ccf97908720659b619"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-sdk-extension-autoconfigure-spi-1.62.0.jar",
+      "sha256": "220c22bcf420faae59b7225c789f572eaa22e7af2304d55508aaf2a3efcfecf8"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-sdk-logs-1.62.0.jar",
+      "sha256": "51c94329bc8e335ed79027d29d49c075c11b91b39e48679edf590e784a392406"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-sdk-metrics-1.62.0.jar",
+      "sha256": "50b057fbf063f6801f623212f4b51b6a3fefc77837314a1316b2f54894c8b5d4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.opentelemetry-sdk-trace-1.62.0.jar",
+      "sha256": "fb6c0953b229a6da1db813135ae11a621bf9da56b7356c1e93049ed4b088c232"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.semconv.opentelemetry-semconv-1.41.1.jar",
+      "sha256": "636ad7dac093d22fb84bf8d928ef836694f2d63c92d72b3df21b86002e8becef"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.opentelemetry.semconv.opentelemetry-semconv-incubating-1.40.0-alpha.jar",
+      "sha256": "b73e725e970e3120670d3e64b8ff058fba495b0e8040b259b50dd38e030380e4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.perfmark.perfmark-api-0.27.0.jar",
+      "sha256": "c7b478503ec524e55df19b424d46d27c8a68aeb801664fadd4f069b71f52d0f6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.prometheus.simpleclient-0.16.0.jar",
+      "sha256": "22c374f237f7bc4fdb1f0ec2da379c0ba00e69ad2ffe8b6ade543d73062d377f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.prometheus.simpleclient_common-0.16.0.jar",
+      "sha256": "eba6ec26ce7e40cbb8725e05fb83247a9f4f44945b9e7522e3375dde67b9f059"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.prometheus.simpleclient_tracer_common-0.16.0.jar",
+      "sha256": "e84a784ac8e24f182ee62da80b6b5c8140774b75bfa4bf9cc3d3b8390db625f6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.prometheus.simpleclient_tracer_otel-0.16.0.jar",
+      "sha256": "a2a84c59bef3796bb7f9c6f2ae8b7de8b905313ef28180ac3de7ff61dd68df3f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.prometheus.simpleclient_tracer_otel_agent-0.16.0.jar",
+      "sha256": "7ad2bb40df74a772d9f5445a3d03579b49d6b37a47d5e90f6cf3f59ecf41ad06"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkiverse.mcp.quarkus-mcp-server-core-1.13.2.jar",
+      "sha256": "a619731fbf2fae06ba8db7033d6bb17524db0766319002975d951e28d4100dc4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkiverse.mcp.quarkus-mcp-server-http-1.13.2.jar",
+      "sha256": "0ee017bc8f70e246413e3df86158067174dd4ff099860f10a26a6e3118791406"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkiverse.mcp.quarkus-mcp-server-sse-client-1.13.2.jar",
+      "sha256": "ff566d926a7bc8cd5d4fef4dc32aa9b0b8ac2e714686d00867c13f2ad58b2952"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.arc.arc-3.39.4.jar",
+      "sha256": "619df8083242f203e3e5665bee62cc8367373de3f5c51d55e0bb73d79a73d161"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-agroal-3.39.4.jar",
+      "sha256": "220434af0da2a3cc7b4638eb907744ce39bc7d8c6a356db39bc4f515f080e6c0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-arc-3.39.4.jar",
+      "sha256": "bcdcbe5efb46a2cf5814677408b25235986d045b5f7b8b509715b140272cf540"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-caffeine-3.39.4.jar",
+      "sha256": "3f4145e3e325440e9f32c5c20648b98a2d481b60eec13df6db44c5dbb6503d3f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-core-3.39.4.jar",
+      "sha256": "35ec7a88c84d57833013cad24f4874ba8c1a7678c9f4127f9956fa2b8286326c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-credentials-3.39.4.jar",
+      "sha256": "11c3d2e0ec80066ddd5e61cbd87589302941abae44785bc090d3fca0dcb96a38"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-datasource-3.39.4.jar",
+      "sha256": "1defe3a5c603989258ed11e17895b37c37a7aa0517355b0383968e01ffd14bf2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-datasource-common-3.39.4.jar",
+      "sha256": "a7dc5f8d24a5ac28f3a60d6b1e8e0a57fc9259a3890c6e817132e64222a2533a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-devservices-3.39.4.jar",
+      "sha256": "c5d0f0e465d2e9d0fd40bec9990320bc3ca3628e45536cc25056530434cbb6cf"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-flyway-3.39.4.jar",
+      "sha256": "165b4aa300676d678e8cc1456082395704e789560f6b07c7584b977c14203ff2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-flyway-postgresql-3.39.4.jar",
+      "sha256": "f823ccd6a9a1c5bf33708b087a7bec4b7398f9bd435b7bb54fa835003034beb3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-fs-util-1.4.2.jar",
+      "sha256": "a6034133b21de4e3aee4bc9e250f8416abfbdc0c86e6e0737f766415c3866169"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-grpc-common-3.39.4.jar",
+      "sha256": "bee39373f791696689a9de030d781ecf4213383c12ffe6cba0ebbf0ee4f1be52"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-hibernate-orm-3.39.4.jar",
+      "sha256": "c99ab7d3797993fe2cca0c2fc4055952898b09006e1c92e072e3ede081e126d9"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-hibernate-orm-panache-3.39.4.jar",
+      "sha256": "891dcf211098a39f60014fa49bb317bc98ca95560faf67595bfb0e6c91065157"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-hibernate-orm-panache-common-3.39.4.jar",
+      "sha256": "ff11a24820ef52be1be2119d594c4d824b5c89db21bd126bd9c49985e15b2e6e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-hibernate-validator-3.39.4.jar",
+      "sha256": "b0e21b383ef2f91e00def62223621016378284928ef0904a08c50451b8a2f25f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-jackson-3.39.4.jar",
+      "sha256": "b63198273cdcd68b0c8c1546b2526074b68f5cab229e200096419aa9c78f2cd6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-jdbc-postgresql-3.39.4.jar",
+      "sha256": "a139ad24e33071d42c74905b8c0161217ed380e55b2e86813670d701d34e61bc"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-jsonp-3.39.4.jar",
+      "sha256": "6e422ce3e5a30d52fc20b985128f2462717a3edac19f7d5dd8678da4270a5220"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-micrometer-3.39.4.jar",
+      "sha256": "231ef30a5d15cfa3c3cb93f50f805f655e291cade57e6b9c9cef9b8fb4e38299"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-micrometer-registry-prometheus-3.39.4.jar",
+      "sha256": "6d2aa28cd9829b0985b2294c9918bb1ce4bf26049ac8f1c11f62fca2fa342dc2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-mutiny-3.39.4.jar",
+      "sha256": "dd788e5af2a109d4c6d769784fb4803c2125f63cae2e365e5aad5c3ae9971021"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-narayana-jta-3.39.4.jar",
+      "sha256": "11ef3798061ee8618472560982bf3cdd8b895f5de826b0c9c03939823f88186e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-netty-3.39.4.jar",
+      "sha256": "93441a70d2492eefadb321aa239952203efe4608c2b651ea3f68448faffc449b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-oidc-3.39.4.jar",
+      "sha256": "78710f85a60d3171237313763fae0a9ffc77750fe597869ad3cd3efe510a873f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-oidc-common-3.39.4.jar",
+      "sha256": "7ea11ffaac43d0dfa53ffe3ce821b2f88a6d85586c50225c9806a8168ce143d7"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-opentelemetry-3.39.4.jar",
+      "sha256": "2a0662bc201f9acdcefac90849d72bd26a17ed7df54b7a6ea48e8e265cbcd2dd"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-panache-common-3.39.4.jar",
+      "sha256": "f75bc92137735c50bdd6329ef11eba1fbd27e2d52f9dfb5425ec8171fd922fad"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-panache-hibernate-common-3.39.4.jar",
+      "sha256": "d8c68e9296db8c5b3ec31833cb9ea34963bcdf305c9a1c04ba90a39e470c66e0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-proxy-registry-3.39.4.jar",
+      "sha256": "d5528987290673b4d203ecc0ad47af3663d2a903f98d291f588c7af1b624fa2e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-rest-3.39.4.jar",
+      "sha256": "18f9518800622f8cacaf063f0420a6e1f81c8028635a6b189fdbd61544430318"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-rest-common-3.39.4.jar",
+      "sha256": "cb5c665ff9cfaf1d248a028c240c86f9b3e751db050a6a50067d335a672c0eeb"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-rest-jackson-3.39.4.jar",
+      "sha256": "a7af232d2046442fca6d1745dcc4df4464727b9f895c0ad99c4fb7de6c48d520"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-rest-jackson-common-3.39.4.jar",
+      "sha256": "9e256694214b3fcd383f1b7b54f2a60fbfc26f2420995d87e2b1e8a33ce7e003"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-scheduler-3.39.4.jar",
+      "sha256": "949bc02e36b32d3e303e0172f7617437b45baf6e46cba21288212c26f1942dc0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-scheduler-api-3.39.4.jar",
+      "sha256": "b4c1badea5b1462d68cc33805557ac15688efde38a3ad7d40b47ba1fbc55c673"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-scheduler-common-3.39.4.jar",
+      "sha256": "f6d2cbd9b9514a19d523cec842a7da8ebf01ac04e62fa74fd3743944b461f19c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-scheduler-kotlin-3.39.4.jar",
+      "sha256": "3f54f4c19db9bcf1996359fcc240527265bea982b361550ca1ecbab2b37da57e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-scheduler-spi-3.39.4.jar",
+      "sha256": "b05d31fb74ed3c5cd36ceb9470f84b38b01c7777e608b51425eb3354b1db01a0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-security-3.39.4.jar",
+      "sha256": "896059dc45775250b5692b40baccef5701e715330fce3524efefd263adf6bd6a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-security-runtime-spi-3.39.4.jar",
+      "sha256": "3551317e194d58375b5f0a9e783195cac9eba6229571c6b35d7644540472fd16"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-smallrye-context-propagation-3.39.4.jar",
+      "sha256": "a67219288801870b5d2e8e52dd681306ded0ff935003ccb9d3296108eb7e5657"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-smallrye-fault-tolerance-3.39.4.jar",
+      "sha256": "6d8cb187d4c76a62bb59363e1266831f717655ec0ba89d3251a34e2ee27de4b2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-smallrye-health-3.39.4.jar",
+      "sha256": "a54dae4e30528d7baadaef59e1aaa6ef8d897816a448114624cf752911abebb6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-smallrye-jwt-build-3.39.4.jar",
+      "sha256": "cd7730bdef34afe094d22af278ff55e017bad57337522f641d03a25d0d189093"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-smallrye-openapi-3.39.4.jar",
+      "sha256": "96c8c66bea3ed2de3b15b80bd14aa90c9dd782857208dacc09871333aae95644"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-swagger-ui-3.39.4.jar",
+      "sha256": "11afec3b6dfc548136b5dd8639032a5ab3bbd5ac5989f42aa9984e2ebc425623"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-tls-registry-3.39.4.jar",
+      "sha256": "78cc58f47326cd6c1c128f47ccbfc0fac605d85268dc8b207d487a5f67941795"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-tls-registry-spi-3.39.4.jar",
+      "sha256": "ce9732aa251a5a419c301649d49db665603e5f08516f69fce5ea7dafe527ec7a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-transaction-annotations-3.39.4.jar",
+      "sha256": "b522fc9cabaa19cfd791225a23bd1501bbe201e3fed364ed9f3ec71279e9d3a2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-vertx-3.39.4.jar",
+      "sha256": "ebfdf2ab851277a0693faa8b6e8e98b681c85cc77f7e1b2a8f1823dcf08ed190"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-vertx-http-3.39.4.jar",
+      "sha256": "44f081403f52c7830cbc8f08af080c7345dfb644a01fb9eb97828efa4520a255"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-virtual-threads-3.39.4.jar",
+      "sha256": "7020ee784cbb824e1554670c255f9c5f40ae039657d877043f6e3400cc6e6dbb"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.quarkus-websockets-next-spi-3.39.4.jar",
+      "sha256": "ab9af974fd2cebda189effa6c07705e466afab3cf564c236bd8cbff7ce7cfc1f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.resteasy.reactive.resteasy-reactive-3.39.4.jar",
+      "sha256": "bc8578bc7eb664a69c299b19d9243d8fe040233772ce1bbf252003f16e063879"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.resteasy.reactive.resteasy-reactive-common-3.39.4.jar",
+      "sha256": "bb514d68b1c167c6dfd86bc87dba964ab0366ef0e75a0eeef6da5280ff8f25e2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.resteasy.reactive.resteasy-reactive-common-types-3.39.4.jar",
+      "sha256": "8f6103a46dbd60037b78b8acd10b00ad2841f49e2014a79a79b280feb868b969"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.resteasy.reactive.resteasy-reactive-jackson-3.39.4.jar",
+      "sha256": "9a4e9eadce5a6bd17f877d31ba8199cebc7193646232a8a1ea00de8fd3d38f98"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.resteasy.reactive.resteasy-reactive-vertx-3.39.4.jar",
+      "sha256": "45ccef7b417af3f93db67fb63a6abf4992af8db9554fcdf2c28f78aa3eb52e9a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.security.quarkus-security-2.3.2.jar",
+      "sha256": "9176a0e5b88d7b29ab28b5137d5702d44a248da3d7e7fa80f1b89d4ec64f929a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.quarkus.vertx.utils.quarkus-vertx-utils-3.39.4.jar",
+      "sha256": "12e587ac1d1a77be0dc9568b74b4cb3b82c9061ff589b40663535aa5a7e5d345"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.certs.smallrye-private-key-pem-parser-0.9.4.jar",
+      "sha256": "2444ab1430505d1a8a9f6c9797fba60e14948bfe27cf8c98ae012c37bf768c15"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.common.smallrye-common-annotation-2.19.0.jar",
+      "sha256": "a29ef5d8ed9e306ed683a4d680bb1c03f89c41196aa0a41c95eb0dda8e81e346"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.common.smallrye-common-classloader-2.19.0.jar",
+      "sha256": "868c3fcb738281b2b360ba706b9074b674ee6c697d971a52bd77f4099ba2fd5c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.common.smallrye-common-search-2.19.0.jar",
+      "sha256": "973738a728d8efac3c0ab75d3a54236ce5f9c435b4b4a2f9bc0f16a0c46001ff"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.common.smallrye-common-vertx-context-2.19.0.jar",
+      "sha256": "2c3d3326bab62064e7120ad6c1e4f99e267176b2efd74a44b3ab2cd5aa5c69d6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.config.smallrye-config-3.17.2.jar",
+      "sha256": "d93d4fec79674f67391c44fc995c61209ef72e816b0fc40ffd631ab883310c14"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.config.smallrye-config-common-3.17.2.jar",
+      "sha256": "ebbb7b03044580440f63788cb743664749e7169b8eb382b3cfc44a4fb328bb85"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.config.smallrye-config-core-3.17.2.jar",
+      "sha256": "092050099d3144bcc64b33165b3c2b7d25a519808d3c7618a6e1c1debcc0d832"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.config.smallrye-config-validator-3.17.2.jar",
+      "sha256": "0fa1b7810d7c9877107ce325e3ab448fd73d991b630daaceeeae41d935ce873b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.jandex-3.6.0.jar",
+      "sha256": "246c038ac0190fbe43e4a218344345f332b7a12543d499b47fa64b05f060a2a1"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.mutiny-3.3.0.jar",
+      "sha256": "468035abda56638307e8dad7d4be3bd818b05725f0559140b32e087be017b83f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.mutiny-smallrye-context-propagation-3.3.0.jar",
+      "sha256": "e7b20ad3a01d0b0944dfbf86538392621ef38e87e6c69722902fc5bc9af674ff"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.mutiny-zero-flow-adapters-1.2.1.jar",
+      "sha256": "623dc619ec3866c6ce6365ed46cd948fe1b6cae93d64006249294ef8a941d943"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-auth-common-3.23.1.jar",
+      "sha256": "d4defd33cf294ac695d7817b764f52626d7690d0bee944ba4b84ffa02278faab"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-bridge-common-3.23.1.jar",
+      "sha256": "8b14169047ddbb2e5da91de00b37d62ff8b2ca49ae4553a0742660c50fe91065"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-core-3.23.1.jar",
+      "sha256": "dc5578295b8e5dc10f9fd8028ecb3ac3ed8b2ccc54b8b80172181188f577372e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-runtime-3.23.1.jar",
+      "sha256": "ab996413864654f8977a4459154d36b093dabd661e8d17c3854d2ca20616bf8c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-uri-template-3.23.1.jar",
+      "sha256": "95b798fd11f3d199593388c85aea6f9ffbae178a2d48444d9d79b4ca3714fa57"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-web-3.23.1.jar",
+      "sha256": "106413b6575604c1eff68a1ad6bbe890d635a7c55ee198858ce4bd8012189da0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-web-client-3.23.1.jar",
+      "sha256": "ce59066b0653d52bf3efe52d8d9dfaff7e00838d33c0009676d18e586da0dcf8"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-mutiny-vertx-web-common-3.23.1.jar",
+      "sha256": "05e78bf89604a2653ede8cdad2f540aa63e5e97d1304188a86769db9a57e7558"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-reactive-converter-api-3.0.3.jar",
+      "sha256": "8f47b3cbdef72c5875836011beb02f485918febbb73c15d51738c566eb669253"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.reactive.smallrye-reactive-converter-mutiny-3.0.3.jar",
+      "sha256": "5255e5e77d38b0bc166511c3ce7af3a97cf1edeaa19d2946102f929d99273111"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-context-propagation-2.3.0.jar",
+      "sha256": "bc7d83a626d92d223c9f479c24c80e09df4c801781134ace9d826803b8f8eaff"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-context-propagation-api-2.3.0.jar",
+      "sha256": "da0bc273588cefb478e98c4e137f65cc394a54253e35684d5d917060fdc4147c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-context-propagation-jta-2.3.0.jar",
+      "sha256": "40fdf6411e8cd7cdb493d1fdcf884d9304b72db58bc4efd077dfc960f8f1684a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-context-propagation-storage-2.3.0.jar",
+      "sha256": "0fb685500b833b819c934147f0d2f0ab00397df196442aa3fa0b1a6d962dedd0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-6.11.2.jar",
+      "sha256": "f0081b7e167d61970240bab57651a784cbb1b9d79ec786e9ad3ac349f3dfeaee"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-api-6.11.2.jar",
+      "sha256": "72bc0ddffd4018797ea8501ac4eb5919f5a8c411a544a35eb19ce79f7ea7fc01"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-apiimpl-6.11.2.jar",
+      "sha256": "ad755d808d0a7225b513356e5a7fe2f804ef0def85893772c6aacfe57a8dc500"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-autoconfig-core-6.11.2.jar",
+      "sha256": "11936cb9c681d95f96ce175312205ebfef03ddf3d6df5a2860c2a4c21dab5f5b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-context-propagation-6.11.2.jar",
+      "sha256": "8ef7ecc170c2d81661e2170c67410c10d160aad53ed9a53b1ea892ec11734c6d"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-core-6.11.2.jar",
+      "sha256": "44e3b5d3a2bb5352cd4cda0ec0db0bc6747cdfb52ecc6c07fe7d36e4682b954c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-mutiny-6.11.2.jar",
+      "sha256": "25685b69c7e130c9cf9dfda166a370523b23c14bce41f0d84f1af9eb8f8f61cf"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-fault-tolerance-vertx-6.11.2.jar",
+      "sha256": "6682d773118ef04fa5a05f3b59d481189593b21f8f7e62e6e70968ff79d35235"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-health-4.3.0.jar",
+      "sha256": "7c87ac1db8410ffc286a00e8eadeb60992c7edfa300178ebab0ecfd0781d3ec4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-health-api-4.3.0.jar",
+      "sha256": "a91809158320220877f436a9365ad61f98e0cfe53fa62d95d3eb5a88535dbc67"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-health-provided-checks-4.3.0.jar",
+      "sha256": "5ee4c0a40df05ff06216b6761f45d6f9d4caa96cf55345da4be16fd8d89dc863"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-jwt-4.6.3.jar",
+      "sha256": "963cf3188e20434fc4763221c51fd557284611c8749d83db41ba13c1ffeb9aef"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-jwt-build-4.6.3.jar",
+      "sha256": "f5e97ab1098ce89f8fff898578a7a81d51637d62da6f7b45cf6cd3674584faa0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-jwt-common-4.6.3.jar",
+      "sha256": "27afa6caa3e5d20cfe5c349544c5ec86876dabed2a0cb6f06a8b2a00bca70f97"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-open-api-core-4.3.5.jar",
+      "sha256": "50111cab30ebbe56764eb540691966da68b93b8b757c1de07c078ba50f3f5153"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.smallrye.smallrye-open-api-model-4.3.5.jar",
+      "sha256": "b2125cce1bb711ed486d4f274d8bf57460168c3c26da244a1401cfcd9cb0d169"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-auth-common-4.5.34.jar",
+      "sha256": "2fc9f280b2193718db2bde020e8ca9107eff2a78d27389b7c4db63f72980c4de"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-bridge-common-4.5.34.jar",
+      "sha256": "b57384bda3c9ebb78cc734ddf0d83bd6b55335ceb259e41d315854f9b737318a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-codegen-4.5.34.jar",
+      "sha256": "64f815df240092bf7bbdd2dfbc922bce7f1e41375f17a93622567a36e40702ea"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-core-4.5.34.jar",
+      "sha256": "750ec27491f9eea3df24e3a85670a0b1998827bb729ec95b2d9d3dbbfdf8792c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-grpc-4.5.34.jar",
+      "sha256": "cca98680ca84726528bf5bf8c505a78b5f76707c20a184f111a215d0ba06c80c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-grpc-client-4.5.34.jar",
+      "sha256": "66baf997c13199b16930863c665d87e903838cf655849f3ad5d4ed79061a4ec2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-grpc-common-4.5.34.jar",
+      "sha256": "cb7a5ba8259ff01531c9305382c3fc02c485a3eb0b6dfba1157bda43d8e11886"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-grpc-server-4.5.34.jar",
+      "sha256": "6d630ffc20612d41a25c1cb8ef734a3743b06b0c740e2f8d319473fe2f504549"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-uri-template-4.5.34.jar",
+      "sha256": "d303e9f044347bc350241dfb2150f05d3b93d6c7f56c74757861ca582e8f62df"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-web-4.5.34.jar",
+      "sha256": "14ae3cadbac1d0794cbf5e66fdb3cc61611235ac05f57bfdb65d9c21a6b97add"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-web-client-4.5.34.jar",
+      "sha256": "1cc978b8a2f5f0b6dcb5e717f1174750eca10aa844fe17f579183c5f69cfdfa7"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/io.vertx.vertx-web-common-4.5.34.jar",
+      "sha256": "378371867305e73cddcea7027217d9a9fddbd18e57de74021824cb2bf1962019"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.activation.jakarta.activation-api-2.1.4.jar",
+      "sha256": "c9db52100ce6c8aac95cc39075f95720d2e561b11f8051b81c121ad4effd7004"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.annotation.jakarta.annotation-api-3.0.0.jar",
+      "sha256": "b01f55552284cfb149411e64eabca75e942d26d2e1786b32914250e4330afaa2"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.el.jakarta.el-api-6.0.1.jar",
+      "sha256": "7e84b5bed49de32b79cc5e85d90b6f5adb1a953ac67283adbb41c1e297f9c605"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.enterprise.jakarta.enterprise.cdi-api-4.1.0.jar",
+      "sha256": "c42c808f17925129a0800f618febe050d966e181a4c7384c8a5e7a0283d68699"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.enterprise.jakarta.enterprise.lang-model-4.1.0.jar",
+      "sha256": "bb56f571f60d2862b2387d5468fe8f5540f8094727283ed991f89082708095ee"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.inject.jakarta.inject-api-2.0.1.jar",
+      "sha256": "f7dc98062fccf14126abb751b64fab12c312566e8cbdc8483598bffcea93af7c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.interceptor.jakarta.interceptor-api-2.2.0.jar",
+      "sha256": "d240d72b4dd38a2e431c804079810010cb97903678fa5f987fb7434878b04398"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.json.jakarta.json-api-2.1.3.jar",
+      "sha256": "bc934142805ea1d794f1440563965a3861a2a9fb7414ecd3fe44f26500734414"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.mail.jakarta.mail-api-2.1.5.jar",
+      "sha256": "aa493753acb7a8c45ba8f4c9cf1230a74e20237056dd5b5c8bc86c583e8cfa0e"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.persistence.jakarta.persistence-api-3.2.0.jar",
+      "sha256": "be8a26b0e75c84c1b7600f759256fbc68d60333d89ec0ce3f784fc3ffa09aa8c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.resource.jakarta.resource-api-2.1.0.jar",
+      "sha256": "4d26ad86a5f72cd2f9c4a31cc4524f7bf3ec0ff74416f081f8642b7ce8041067"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.servlet.jakarta.servlet-api-6.0.0.jar",
+      "sha256": "c034eb1afb158987dbb53a5fea0cadf611c8dae8daadd59c44d9d5ab70129cef"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.transaction.jakarta.transaction-api-2.0.1.jar",
+      "sha256": "50c0a7c760c13ae6c042acf182b28f0047413db95b4636fb8879bcffab5ba875"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.validation.jakarta.validation-api-3.1.1.jar",
+      "sha256": "63ce00156388c365f3ac1be71fcfaf114682fc0c452020b5df6e7ec236e142ab"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.ws.rs.jakarta.ws.rs-api-3.1.0.jar",
+      "sha256": "6b3b3628b8b4aedda0d24c3354335e985497d8ef3c510b8f3028e920d5b8663d"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/jakarta.xml.bind.jakarta.xml.bind-api-4.0.5.jar",
+      "sha256": "5e489b6c874c4119e003ff1403db523ee3a8959ec499f3de29e77245efccf216"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/javax.cache.cache-api-1.1.1.jar",
+      "sha256": "9f34e007edfa82a7b2a2e1b969477dcf5099ce7f4f926fb54ce7e27c4a0cd54b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.antlr.antlr4-runtime-4.13.2.jar",
+      "sha256": "dd3e8a13a2d669bf84fb8d834de35ce4875f27157698d206241ec8488aadcaf7"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.apache.httpcomponents.httpclient-4.5.14.jar",
+      "sha256": "c8bc7e1c51a6d4ce72f40d2ebbabf1c4b68bfe76e732104b04381b493478e9d6"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.apache.httpcomponents.httpcore-4.4.16.jar",
+      "sha256": "6c9b3dd142a09dc468e23ad39aad6f75a0f2b85125104469f026e52a474e464f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.apache.james.apache-mime4j-core-0.8.12.jar",
+      "sha256": "b2180c13b97ade21edb5f52581ade0a6f82b5084bb9ca5bdf83584deb6225a69"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.apache.james.apache-mime4j-dom-0.8.12.jar",
+      "sha256": "d8de21f9091a0109bdfe68d323f2a5ffb326922f8493f88b1203a04a69198940"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.apache.james.apache-mime4j-storage-0.8.12.jar",
+      "sha256": "6f115a7b5a8e3299b085a62e8be236d2f9f06ce3bf72bce7fad0fccf9d0ef692"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.bitbucket.b_c.jose4j-0.9.6.jar",
+      "sha256": "7314af50cde9c99e8eaf43eee617a23edcc6bb43036221064355094999d837ef"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.angus.angus-activation-2.0.3.jar",
+      "sha256": "a6bd35c538cf90fff941ad6258c40c08fca0b5c9c3f536c657114f27ce0527a7"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.angus.angus-mail-2.0.5.jar",
+      "sha256": "b4d8c30d35f455def6c7a05fe595a1e62ea2b80cac3efec1e9ccf4118b23168a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.microprofile.config.microprofile-config-api-3.1.1.jar",
+      "sha256": "0d4eaa7e17730e153b1e0613104a989af7d7a0d4ba4d19c84c71862bff993773"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.microprofile.context-propagation.microprofile-context-propagation-api-1.3.jar",
+      "sha256": "69ccc04487e87779d4970aa50c673cc34a9df080c1c0e8d8eab2e8b46f825cf4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.microprofile.fault-tolerance.microprofile-fault-tolerance-api-4.1.2.jar",
+      "sha256": "76c351922cbac8098e28bdc0431513992ff2468f24eb3b2e8f4ce500d460dfcc"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.microprofile.health.microprofile-health-api-4.0.1.jar",
+      "sha256": "b89ca4b6c4f7a044250d31c0673f6bc221e40fd669fc5871dbad5e5a0769ca47"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.microprofile.jwt.microprofile-jwt-auth-api-2.1.jar",
+      "sha256": "e81a237ecb81e4f360ed5e7928d42bf3eedd1d73fe3a343d65ed1578f5169bad"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.microprofile.openapi.microprofile-openapi-api-4.1.1.jar",
+      "sha256": "1e333f5bd206245e7a4d0a3dd5f2bab1820fc3b950b77e96008fcdb7b77d9150"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.eclipse.parsson.parsson-1.1.9.jar",
+      "sha256": "03dc4dc834a928730d52a50952de0f30c35e0daf048889132be19ee1e5053a6c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.flywaydb.flyway-core-12.0.0.jar",
+      "sha256": "b87be1aa085fd9fa09ce1ae97499635f57194d0cdb0b608d7c265668f487cea3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.flywaydb.flyway-database-postgresql-12.0.0.jar",
+      "sha256": "bae270541161a00084e3f94e2ce69a32b1983e5d7e6e76ce40e9b237a29969e4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.expressly.expressly-6.0.0.jar",
+      "sha256": "86ee67c7040278bac5204b571f738b8b859f014ceb5f896bd935bacbdaf33cb9"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.jaxb.codemodel-4.0.9.jar",
+      "sha256": "12c9ba587b85af187a71b25c531c9929bd1a53da334d102e485468a493a1f1d7"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.jaxb.jaxb-core-4.0.9.jar",
+      "sha256": "6b014df25d22c8446cc2df0a378c5b2137747f197a731d99eb24c756b26f7e8d"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.jaxb.jaxb-jxc-4.0.9.jar",
+      "sha256": "95b954f4c3e915790eb4dd2a62ce34ef88606fc78244cc94ed8ce479719c7f88"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.jaxb.jaxb-runtime-4.0.9.jar",
+      "sha256": "93e09b7316b6af68d6e2083e4c297daf28e8957f45d725077af812c0b12c39ab"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.jaxb.jaxb-xjc-4.0.9.jar",
+      "sha256": "5556b3d06a4af1bbcd9d68ef80dbaa04bdc686c246c89b3d98db4acf7f8faf90"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.jaxb.txw2-4.0.9.jar",
+      "sha256": "d6343e5945d87266ca4e8974a0a2a876e1bd147a00fb65ed3f2e1a3a00f3a82a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.glassfish.jaxb.xsom-4.0.9.jar",
+      "sha256": "be584192033acb7424e0edb283e18f83ae681a46c9e3218fb4377f4df870ed07"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.hdrhistogram.HdrHistogram-2.2.2.jar",
+      "sha256": "22d1d4316c4ec13a68b559e98c8256d69071593731da96136640f864fa14fad8"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.hibernate.models.hibernate-models-1.1.2.jar",
+      "sha256": "d683d70e2592b23c5f2fbc3510d2e087aa61f2ac399a9090b941a1a42d3f3a98"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.hibernate.orm.hibernate-core-7.4.7.Final.jar",
+      "sha256": "c7c3a3ee3da472e1f8ec2dfb7cca86eec0e1a753f43b916e6bc9914e16f62e67"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.hibernate.orm.hibernate-graalvm-7.4.7.Final.jar",
+      "sha256": "c2338cf99575503f4bcc9b6912f0b062c36e462a6ae7b8bcd9e47f1d8a00b1a3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.hibernate.orm.hibernate-jcache-7.4.7.Final.jar",
+      "sha256": "60cd9e5fe8fd398e451ec0af5a2295735936b011d17d7c639b62d9cf64dea796"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.hibernate.validator.hibernate-validator-9.1.3.Final.jar",
+      "sha256": "0497ebbe23fafe4180b74bd0b96a67eee8556552decc4d3c120c1dc737a2b5fb"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.jboss-transaction-spi-8.0.0.Final.jar",
+      "sha256": "07e4e62ceae075a8c11a715d89b19992c879f505b48be6b2727f5be798562ae1"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.logging.commons-logging-jboss-logging-2.0.0.Final.jar",
+      "sha256": "ce4088809c7512228cb34b54686223dec45532b97366a36830f82926b58a4c6c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.narayana.jta.narayana-jta-7.3.4.Final.jar",
+      "sha256": "af32436a56b806adefc448d356c99a8c3ad27599a060814227fe535ed146380a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.narayana.jts.narayana-jts-integration-7.3.4.Final.jar",
+      "sha256": "bebc3292b7a024e3d55fdb4ec14f7bab70a8bb3c066b6705f722dae313086bd3"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-client-6.2.18.Final.jar",
+      "sha256": "047b502bdd27ff2d9021b3065acdcc44ca70f24adc9d0f419f1fc06eed5649f0"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-client-api-6.2.18.Final.jar",
+      "sha256": "222194096a53be40c48768be0cfb7eae26bd59f0823432f687d136e7cd175662"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-core-6.2.18.Final.jar",
+      "sha256": "880fc9eac7f26ceb0b5af39d632f234b8cf3d8ea45ae7190cf1785c67f965e09"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-core-spi-6.2.18.Final.jar",
+      "sha256": "d17fd53ba3e413fde4010ebea2642549cff3b2dc6bca6a74396bbf9699b245c4"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-jackson2-provider-6.2.18.Final.jar",
+      "sha256": "1139f9e9d02aeb65e7d41c6a49831a9b1e1c1e03e45e94aa8def9dce968ac860"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-jaxb-provider-6.2.18.Final.jar",
+      "sha256": "83ca4a734500bd463fed37977c5976f2a5cc2a841456e309ae5e10f3cbc86750"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-multipart-provider-6.2.18.Final.jar",
+      "sha256": "767f778eca78ca8c97dd89fe82b9c300f67b204caee388bde87309950c9e938b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.resteasy.resteasy-tracing-api-2.0.2.Final.jar",
+      "sha256": "04a98b41c1e0ebdd745de51202671ba32573eaad997edc255bd83b3971cb380a"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.slf4j.slf4j-jboss-logmanager-2.0.2.Final.jar",
+      "sha256": "ba469a975e9d1e79f34a8baa1a0afa8b01bbd8cf080537c0e0899476d31db84b"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jboss.threads.jboss-threads-3.9.2.jar",
+      "sha256": "ac0fd044686122014143267d3688245852ca07c6c4474320c9172062a5af6634"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jctools.jctools-core-4.0.5.jar",
+      "sha256": "d65e5f38bcd0984e26f87187687f1f70dd52740c4d5e046f8d104e01ab5db95f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.jspecify.jspecify-1.0.0.jar",
+      "sha256": "1fad6e6be7557781e4d33729d49ae1cdc8fdda6fe477bb0cc68ce351eafdfbab"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.keycloak.keycloak-admin-client-26.0.12.jar",
+      "sha256": "bbf4ced33a1b6255d1a58c29fc1962be48f29ed7fdccf576ed84c0bba8491579"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.keycloak.keycloak-client-common-synced-26.0.12.jar",
+      "sha256": "2d6e28bdeabbd0f5c26f6fd80cb87cd31fc0a50a711d23e7bdf851021e49d73c"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.latencyutils.LatencyUtils-2.0.3.jar",
+      "sha256": "a32a9ffa06b2f4e01c5360f8f9df7bc5d9454a5d373cd8f361347fa5a57165ec"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.osgi.org.osgi.namespace.extender-1.0.1.jar",
+      "sha256": "93d798bde7fa760961408c8a10a965ca7ba1dbf98a3a706c86d8290f528ad519"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.osgi.org.osgi.service.component.annotations-1.5.1.jar",
+      "sha256": "42c080de090896f45d2a4e980a261d5b6addeee07ec4b201f01de95ab562b448"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.osgi.org.osgi.util.function-1.0.0.jar",
+      "sha256": "4ff9329012c01a0c69c05721a6bd0b910d40a0d32108284e59c1a6215cee7a43"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.osgi.org.osgi.util.promise-1.0.0.jar",
+      "sha256": "7d619c925716f21ae17654529543d00ea56810784040f6ed8c6d6f901526ee67"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.osgi.osgi.annotation-8.1.0.jar",
+      "sha256": "68afeb86a5322675d4dfe3df5863c7d8a37b34c18e3a8e41553f1ab3ac15d78f"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.postgresql.postgresql-42.7.13.jar",
+      "sha256": "6e0e4cc2d8cae902084f8a2b18728b073a6fd9d1f87c9d8bff8f298c18185b93"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.reactivestreams.reactive-streams-1.0.4.jar",
+      "sha256": "f75ca597789b3dac58f61857b9ac2e1034a68fa672db35055a8fb4509e325f28"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.slf4j.slf4j-api-2.0.18.jar",
+      "sha256": "44508fd1576500688c790b190acdd16fec4f8c79a3e0b900afd70503cf055f55"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.snakeyaml.snakeyaml-engine-3.0.1.jar",
+      "sha256": "0b638c8806112215e02e58e95cbd9e9a69d4bd540991f47553d053919994cc94"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.wildfly.common.wildfly-common-2.0.1.jar",
+      "sha256": "fa4a710db7ae3e598a5f41639eb54e9f7b09de5fd0f58f56bd6070f21d956374"
+    },
+    {
+      "path": "target/quarkus-app/lib/main/org.yaml.snakeyaml-2.4.jar",
+      "sha256": "ef779af5d29a9dde8cc70ce0341f5c6f7735e23edff9685ceaa9d35359b7bb7f"
+    }
+  ]
+}

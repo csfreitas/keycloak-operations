@@ -16,6 +16,8 @@ Before deployment:
 
 The ConfigMap registers `presentation-rhbk` and disables inherited localhost lab targets. It explicitly grants only `READ,ASSESS` on that target to `ops-assessor`; it does not grant planning, approval, or write permissions. Use a fresh dedicated platform database for this configuration template, or reconcile preexisting target registrations explicitly: the composite registry can contain records seeded by an earlier configuration.
 
-The Web UI manifests are separate. Their image must include the intended auth configuration and validated token acquisition/forwarding. The current UI's OIDC-ready hooks are not proof of a completed browser login flow; validate that flow before treating the UI route as presentation-ready. Direct authenticated MCP/API usage can be validated independently.
+The Web UI manifests are separate. Their image must include the intended build-time auth configuration. OIDC/PKCE token acquisition, refresh and forwarding are implemented; full browser/IdP acceptance is still open. Validate that flow before treating the UI route as presentation-ready. Direct authenticated MCP/API usage can be validated independently.
+
+Infrastructure access is explicitly opt-in through `presentation-cluster.in-cluster=true`, not ambient kubeconfig. Set the approved cluster identifier and all four installation fields from the exact root resource, or perform separately authorized existing-target confirmation. The template intentionally leaves binding placeholders commented; workload inventory stays BINDING_REQUIRED until configured. Discovery/confirmation permissions are not included in the read-only presentation role. Follow [D2 acceptance](../../docs/milestones/d2-rhbk-openshift.md); never use an unrelated cluster.
 
 Never substitute `local-lab` for `oidc` to work around a cluster authentication problem. See [the identity model](../../docs/identity-model.md) for grants, lab boundaries, and limitations.

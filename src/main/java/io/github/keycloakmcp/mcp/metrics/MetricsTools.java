@@ -9,15 +9,15 @@ import io.github.keycloakmcp.audit.AuditService;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.metrics.MetricsStatusView;
 import io.github.keycloakmcp.domain.metrics.PerformanceSummary;
+import io.github.keycloakmcp.mcp.McpToolErrorProjector;
 import io.github.keycloakmcp.observability.McpMetrics;
 import io.github.keycloakmcp.observability.metrics.MetricCategory;
 import io.github.keycloakmcp.observability.metrics.SemanticMetricResult;
-import io.github.keycloakmcp.security.SensitiveDataFilter;
+import io.github.keycloakmcp.security.ReadMetadataProjection;
 import io.github.keycloakmcp.security.ToolAuthorization;
 import io.github.keycloakmcp.service.platform.MetricsService;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
-import io.quarkiverse.mcp.server.ToolCallException;
 import jakarta.inject.Inject;
 
 /**
@@ -33,7 +33,7 @@ public class MetricsTools {
     MetricsService metricsService;
 
     @Inject
-    SensitiveDataFilter sensitiveDataFilter;
+    ReadMetadataProjection readProjection;
 
     @Inject
     AuditService auditService;
@@ -43,6 +43,9 @@ public class MetricsTools {
 
     @Inject
     ToolAuthorization toolAuthorization;
+
+    @Inject
+    McpToolErrorProjector errorProjector;
 
     @Tool(
             name = "keycloak_get_metrics_status",
@@ -57,7 +60,7 @@ public class MetricsTools {
             compact.put("metricsType", status.metricsType());
             compact.put("configured", status.configured());
             compact.put("message", status.message());
-            return sensitiveDataFilter.redact(compact);
+            return readProjection.project(compact, "targetId");
         });
     }
 
@@ -70,7 +73,7 @@ public class MetricsTools {
             @ToolArg(description = "Metric window (default 5m)", defaultValue = "") String window) {
         return invoke("keycloak_get_performance_summary", targetId, () -> {
             PerformanceSummary summary = metricsService.summary(targetId, blankToNull(window));
-            return sensitiveDataFilter.redact(compactSummary(summary));
+            return readProjection.project(compactSummary(summary), "targetId");
         });
     }
 
@@ -86,7 +89,7 @@ public class MetricsTools {
             MetricCategory cat = parseCategory(category);
             List<SemanticMetricResult> results =
                     metricsService.category(targetId, cat, blankToNull(window));
-            return sensitiveDataFilter.redact(results.stream().map(MetricsTools::compactResult).toList());
+            return results.stream().map(MetricsTools::compactResult).map(readProjection::project).toList();
         });
     }
 
@@ -98,12 +101,8 @@ public class MetricsTools {
             T result = action.call();
             success = true;
             return result;
-        } catch (McpException e) {
-            throw new ToolCallException(e.getError().code() + ": " + e.getMessage());
-        } catch (ToolCallException e) {
-            throw e;
         } catch (Exception e) {
-            throw new ToolCallException("INTERNAL_ERROR: " + e.getMessage());
+            throw errorProjector.project(e);
         } finally {
             long duration = System.currentTimeMillis() - start;
             metrics.recordToolInvocation(toolName, duration, success);

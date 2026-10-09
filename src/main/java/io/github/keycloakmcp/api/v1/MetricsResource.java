@@ -8,7 +8,7 @@ import io.github.keycloakmcp.domain.metrics.MetricsStatusView;
 import io.github.keycloakmcp.domain.metrics.PerformanceSummary;
 import io.github.keycloakmcp.observability.metrics.MetricCategory;
 import io.github.keycloakmcp.observability.metrics.SemanticMetricResult;
-import io.github.keycloakmcp.security.SensitiveDataFilter;
+import io.github.keycloakmcp.security.ReadMetadataProjection;
 import io.github.keycloakmcp.service.platform.MetricsService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -29,19 +29,19 @@ public class MetricsResource {
     MetricsService metricsService;
 
     @Inject
-    SensitiveDataFilter sensitiveDataFilter;
+    ReadMetadataProjection readProjection;
 
     @GET
     @Path("/status")
     public MetricsStatusView status(@PathParam("targetId") String targetId) {
-        return sensitiveDataFilter.redact(metricsService.status(targetId));
+        return readProjection.project(metricsService.status(targetId), "targetId");
     }
 
     @GET
     @Path("/summary")
     public PerformanceSummary summary(
             @PathParam("targetId") String targetId, @QueryParam("window") String window) {
-        return sensitiveDataFilter.redact(metricsService.summary(targetId, window));
+        return readProjection.project(metricsService.summary(targetId, window), "targetId");
     }
 
     @GET
@@ -135,7 +135,8 @@ public class MetricsResource {
     }
 
     private List<SemanticMetricResult> category(String targetId, MetricCategory category, String window) {
-        return sensitiveDataFilter.redact(metricsService.category(targetId, category, window));
+        return metricsService.category(targetId, category, window).stream()
+                .map(result -> readProjection.project(result, "targetId")).toList();
     }
 
     private static MetricCategory parseCategory(String raw) {

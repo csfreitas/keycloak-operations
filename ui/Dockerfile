@@ -1,7 +1,7 @@
 # Multi-stage production image for Fleet Operations Console static assets.
 # Browser → nginx → (same-origin /api proxy OR separate backend Route).
 # This image has NO Kubernetes, Prometheus, or Keycloak credentials.
-FROM node:20-alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci

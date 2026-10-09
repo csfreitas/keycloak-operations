@@ -1,0 +1,258 @@
+{
+  "capturedAt": "2026-09-18T21:08:43.384Z",
+  "scope": "Unsigned local authorized recovery evidence. Prior failures retained; no new Maven/UI/metrics/installation/real-cluster run.",
+  "sourceManifest": {
+    "path": "docs/development/evidence/h1-admin-boundaries-source-2026-09-18.json",
+    "sha256": "b0364146eac6053972896526fafe9e458ba347a02356e45de6bf1e7e3037803d",
+    "aggregateSha256": "11ba9bf7fda4320263784fde565f87dbb6d3730eab0af21cf85aba00bd0be417"
+  },
+  "priorEvidence": [
+    {
+      "path": "docs/development/evidence/h1-admin-boundaries-tests-2026-09-18.json",
+      "sha256": "03171e10adf265c1cc718bd66bf632b5682c9341fae0dfb9456731e1e62de636"
+    },
+    {
+      "path": "docs/development/evidence/h1-admin-boundaries-runs-2026-09-18.json",
+      "sha256": "d2d745a4834a367657f057e280af64573014bc7b040a24f9415b37106e4e9fc1"
+    }
+  ],
+  "unchangedVerification": {
+    "sourceFiles": 571,
+    "testReferences": 117,
+    "runArtifactReferences": 10,
+    "mismatches": []
+  },
+  "logs": {
+    "hardStop": {
+      "path": "/private/tmp/kcops-podman-authorized-hardstop-20260918.log",
+      "sha256": "a323ecde6051f1bcd1a132bd1166dc2c027535b5f00185ba94f7f096914695ba"
+    },
+    "firstStart": {
+      "path": "/private/tmp/kcops-podman-authorized-start-20260918.log",
+      "sha256": "6845b997fa1fcdcc2e23580ca97a406d262bcd01b3445e17d1421e1816a0b590"
+    },
+    "secondStart": {
+      "path": "/private/tmp/kcops-podman-authorized-start2-20260918.log",
+      "sha256": "3afd8e7b73e8ea3fb1fd567612da01ad7f0a9bfe3e3e7d5f5328e73de4da95da"
+    },
+    "ownership": {
+      "path": "/private/tmp/kcops-podman-recovered-containers-20260918.jsonl",
+      "sha256": "98b4517129df5ffaf14d4639d6d98a6af28f995496ed90ae89f092689757ea28"
+    },
+    "network": {
+      "path": "/private/tmp/kcops-podman-recovered-network-20260918.json",
+      "sha256": "d8ebdae3325641ed52aa3489267c625256fa31cc508b7cb285b52a9de1a5a296"
+    },
+    "cleanup": {
+      "path": "/private/tmp/kcops-podman-recovery-cleanup-20260918.log",
+      "sha256": "1674131b9a30d763fac92776e469fcc538ee8601dbb0ef35e5f64cf38d981938"
+    },
+    "defaultRun": {
+      "path": "/private/tmp/kcops-podman-recovered-default-20260918.log",
+      "sha256": "ba4906dce40b44b4d3dab3408f39ccb9002f2d9f6e177303f99e46d5d7f3487a"
+    },
+    "rerunOwnership": {
+      "path": "/private/tmp/kcops-podman-rerun-containers-20260918.jsonl",
+      "sha256": "2132c7ffa2e4e6a974861e8715e6a7713621fae9f097a718387439245bd8f68b"
+    },
+    "rerunNetwork": {
+      "path": "/private/tmp/kcops-podman-rerun-network-20260918.json",
+      "sha256": "559a2aeaf900e824860e9830b8fd0d7db6c40815b1edf7b2414ecf82d83c729a"
+    },
+    "rerunCleanupRetry": {
+      "path": "/private/tmp/kcops-podman-rerun-cleanup-retry-20260918.log",
+      "sha256": "92fb30c7115c6037598ddd543a9c773297cd291904648aa335d7dd06931cd53d"
+    },
+    "finalInventory": {
+      "path": "/private/tmp/kcops-podman-recovered-final-inventory-20260918.log",
+      "sha256": "78a77aa0015fcc169656d383839d1c5b6730addef0253cf8868a184b9cd5b2b6"
+    },
+    "ports": {
+      "path": "/private/tmp/kcops-podman-recovered-final-ports-20260918.json",
+      "sha256": "89a4548dd8de8ca97297528c30268bd5f1ba0dcbade047c8c1e40adbae6db737"
+    }
+  },
+  "observedOperations": {
+    "hardStop": {
+      "authorizedExplicitly": true,
+      "callerExit": 0,
+      "httpStatus": 202,
+      "stoppedStateConfirmed": true
+    },
+    "firstStart": {
+      "callerExit": 0,
+      "verification": "VM stopped and SSH endpoint refused connection; not a successful recovery"
+    },
+    "staleHelper": {
+      "pid": 2204,
+      "machine": "podman-machine-default",
+      "action": "TERM after confirming exact VM stopped"
+    },
+    "secondStart": {
+      "detachedLaunchPid": 23422,
+      "launchCallerExit": 0,
+      "finalCliExit": null,
+      "verification": "Startup success log, running machine and successful Podman inventory"
+    },
+    "oldLabCleanup": {
+      "exit": 0,
+      "removedContainerIds": [
+        "68fd2c63cc15b2bb9bf99e5b5c32eb0dbc4144107d552b7c719219ab2b5eda98",
+        "fdc1805a56239b21ede3838a8970dcfbbb51a2e7ec3282f159b450a19f6be59a",
+        "de1195a0cc353582ae38f1f5eb6976a6a209bbb47c22c80ac7038254e0bbd2b8",
+        "cc7336567c2c2227e380197076a9c60e11dd5748bbaaa81f2018de0301f3c660"
+      ],
+      "removedNetworkId": "0b66e5449e0c822b782b5f1f1990187cc5a12dbd546f555ad8522c4893e7ac00"
+    },
+    "defaultRerun": {
+      "command": "bash scripts/validate-identity-lab.sh",
+      "observedRunnerExit": 1,
+      "checksPassed": 70,
+      "jwtScanPassed": true,
+      "cleanupFailure": "ssh: handshake failed: EOF"
+    },
+    "separateRerunCleanup": {
+      "observedExit": 0,
+      "removedContainerIds": [
+        "79f3ba4ba0d38d2fe9c48fbd6891a08d7e1f9de39dbdb22acd11bdf1d70f53f1",
+        "935dfce6f4bd8040872323283575c1d9aa7167b3a7e6515d9ee1e7de560baf5c",
+        "969221dceedc673fd38c7216e9c637c0ba29ab7da5f22b406fcdef69d6f591d4",
+        "edf38c51a766d6f27ecae946f893ef401b6437d51d188b1e19d576fe676dd823"
+      ],
+      "removedNetworkId": "abdd2602c2d09ddf74b5e05f0f25a5261afd08d54ee39c4f8847d09b651f878d"
+    }
+  },
+  "defaultRunExcerpts": [
+    "Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.",
+    "PASS: no compact JWT found in local lab logs",
+    "Cannot connect to Podman. Please verify your connection to the Linux system using `podman system connection list`, or try `podman machine init` and `podman machine start` to manage a new Linux VM",
+    "Error: unable to connect to Podman socket: failed to connect: ssh: handshake failed: EOF",
+    "Local diagnostic logs: /private/tmp/kcops-identity.3BLMvm"
+  ],
+  "finalInventory": {
+    "capturedAt": "2026-09-18T21:08:20.474Z",
+    "machine": [
+      {
+        "name": "podman-machine-default",
+        "state": "running",
+        "sshPort": 62342,
+        "resources": {
+          "CPUs": 4,
+          "DiskSize": 93,
+          "Memory": 8192,
+          "USBs": []
+        }
+      }
+    ],
+    "containers": [],
+    "volumes": [],
+    "networks": [
+      {
+        "id": "2f259bab93aaaaa2542ba43ef33eb990d0999ee1b9924b557b7be53c0b7a1bb9",
+        "name": "podman"
+      }
+    ],
+    "images": [
+      {
+        "id": "cc689d358fe6a6c02fbe1dcd9f6c08f89e80f4276f3ea80c70e1170b0367332a",
+        "names": [
+          "quay.io/keycloak/keycloak:26.7.1"
+        ]
+      },
+      {
+        "id": "02ad0fee02aedf51870d43f109a106a7a8f36930ce9b467ee755254470f227d8",
+        "names": [
+          "docker.io/library/postgres:16"
+        ]
+      },
+      {
+        "id": "e7affbc8b40957a8d8ad32c2c3568be54b450085f59526ca8b070c763a6dbc0b",
+        "names": [
+          "registry.redhat.io/rhbk/keycloak-rhel9:26.6"
+        ]
+      },
+      {
+        "id": "f59c592ea6d90ba2e6c236355083e204d52e13eb8bd39d90c0770f71b90e4dd8",
+        "names": [
+          "docker.io/prom/prometheus:v2.55.1"
+        ]
+      }
+    ]
+  },
+  "fixturePortsAndLock": {
+    "checks": [
+      {
+        "port": 15432,
+        "bindable": true
+      },
+      {
+        "port": 18080,
+        "bindable": true
+      },
+      {
+        "port": 18180,
+        "bindable": true
+      },
+      {
+        "port": 18280,
+        "bindable": true
+      },
+      {
+        "port": 18081,
+        "bindable": true
+      },
+      {
+        "port": 18082,
+        "bindable": true
+      },
+      {
+        "port": 19001,
+        "bindable": true
+      },
+      {
+        "port": 19002,
+        "bindable": true
+      },
+      {
+        "port": 18300,
+        "bindable": true
+      },
+      {
+        "port": 18490,
+        "bindable": true
+      },
+      {
+        "port": 18590,
+        "bindable": true
+      }
+    ],
+    "lockAbsent": true
+  },
+  "artifacts": [
+    {
+      "path": "target/quarkus-app/quarkus-run.jar",
+      "sha256": "091aff9fb173b19ddac1558392281c5f46adb8ac4936247ef062af741145ab01"
+    },
+    {
+      "path": "target/quarkus-app/app/keycloak-operations-mcp-0.8.1-SNAPSHOT.jar",
+      "sha256": "572cce4c8b01e2cd8c4030b454b07123c58687ac9b9a9228cacfd89927feae86"
+    },
+    {
+      "path": "target/quarkus-app/quarkus-app-dependencies.txt",
+      "sha256": "74af1297f6bd06812ff42e8914c83ef7a59b28a0fa2e6337701936609ea232e7"
+    }
+  ],
+  "versions": {
+    "java": "21.0.10 via per-command jenv",
+    "node": "25.6.1 standalone scripts",
+    "backend": "0.8.1-SNAPSHOT",
+    "ui": "0.8.1-dev.0",
+    "report": "1.1",
+    "migrations": "V1-V10"
+  },
+  "limits": [
+    "Original VM freeze root cause not established",
+    "Successful recovery is not general data-integrity certification",
+    "H1/D1 and real-cluster acceptance remain open"
+  ]
+}

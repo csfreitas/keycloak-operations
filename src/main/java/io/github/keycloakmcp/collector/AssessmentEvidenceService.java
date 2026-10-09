@@ -6,6 +6,7 @@ import java.util.List;
 import org.jboss.logging.Logger;
 
 import io.github.keycloakmcp.assessment.engine.Evidence;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.collector.infrastructure.InfrastructureEvidenceCollector;
 import io.github.keycloakmcp.collector.keycloak.KeycloakEvidenceCollector;
 import io.github.keycloakmcp.collector.metrics.MetricsEvidenceCollector;
@@ -27,6 +28,9 @@ public class AssessmentEvidenceService {
     private final InfrastructureEvidenceCollector infrastructureEvidenceCollector;
     private final MetricsEvidenceCollector metricsEvidenceCollector;
 
+    @org.eclipse.microprofile.config.inject.ConfigProperty(name = "collection.operation-timeout-ms", defaultValue = "30000")
+    long collectionTimeoutMs = CollectionBudget.DEFAULT_TIMEOUT_MS;
+
     @Inject
     public AssessmentEvidenceService(
             KeycloakEvidenceCollector keycloakEvidenceCollector,
@@ -41,6 +45,12 @@ public class AssessmentEvidenceService {
         if (target == null) {
             throw McpException.invalidArgument("target must not be null");
         }
+        try (var scope = CollectionBudget.open(target.id().value(), collectionTimeoutMs)) {
+            return collectWithinBudget(target);
+        }
+    }
+
+    private EvidenceCollectionResult collectWithinBudget(Target target) {
         List<Evidence> evidence = new ArrayList<>();
         List<String> failedSources = new ArrayList<>();
         List<String> collectedSources = new ArrayList<>();
@@ -66,9 +76,13 @@ public class AssessmentEvidenceService {
                 java.time.Instant.now()));
         collectedSources.add("target");
 
-        if (evidence.stream().anyMatch(e -> "keycloak.collection.complete".equals(e.key())
-                && Boolean.FALSE.equals(e.value()))) {
-            partialSources.add("keycloak");
+        for (String source : List.of("keycloak", "infrastructure", "metrics")) {
+            if (evidence.stream().anyMatch(e -> source.equals(e.source())
+                    && target.id().value().equals(e.targetId())
+                    && (source + ".collection.complete").equals(e.key())
+                    && !Boolean.TRUE.equals(e.value()))) {
+                partialSources.add(source);
+            }
         }
         return new EvidenceCollectionResult(
                 List.copyOf(evidence),
@@ -84,15 +98,25 @@ public class AssessmentEvidenceService {
             List<String> collectedSources,
             List<String> failedSources) {
         try {
+            CollectionBudget.checkpoint(target.id().value());
             List<Evidence> collected = collector.collect(target);
             if (collected == null || collected.isEmpty()) {
+                failedSources.add(collector.source());
+                return;
+            }
+            // Only a collector's explicit partial contract may retain its validated prefix
+            // after expiry. A late, unmarked successful response is not trustworthy completion.
+            if (CollectionBudget.current().exhausted() && collected.stream().noneMatch(e ->
+                    target.id().value().equals(e.targetId()) && collector.source().equals(e.source())
+                    && (collector.source() + ".collection.complete").equals(e.key())
+                    && Boolean.FALSE.equals(e.value()))) {
                 failedSources.add(collector.source());
                 return;
             }
             evidence.addAll(collected);
             collectedSources.add(collector.source());
         } catch (RuntimeException e) {
-            LOG.warnf(e, "Evidence collection failed for source=%s target=%s",
+            LOG.warnf("Evidence collection failed for source=%s target=%s",
                     collector.source(), target.id().value());
             failedSources.add(collector.source());
         }

@@ -1,0 +1,24 @@
+{
+  "id": "keycloak-operations-readonly",
+  "version": "0.2.1",
+  "status": "LOCAL_PROTOTYPE",
+  "reportSchemaVersion": "1.1",
+  "findingDetailsVersion": "1.0",
+  "maxPacketBytes": 262144,
+  "explanationLimits": {
+    "maxItemsPerCategory": 20,
+    "maxTextUtf16Units": 1000,
+    "minReferencesPerItem": 1,
+    "maxReferencesPerItem": 10
+  },
+  "requiredPermissions": ["READ", "ASSESS"],
+  "allowedTools": ["keycloak_generate_operations_report"],
+  "maxToolCallsPerCollection": 1,
+  "allowedMetricsWindows": ["5m", "15m", "1h"],
+  "defaultMetricsWindow": "5m",
+  "modelProvider": null,
+  "externalDisclosureEnabled": false,
+  "instructions": "INSTRUCTIONS.md",
+  "contract": "core.mjs",
+  "evaluationScope": "Deterministic contract tests, not model behavior or semantic correctness"
+}

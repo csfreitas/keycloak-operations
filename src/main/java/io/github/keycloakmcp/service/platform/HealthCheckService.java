@@ -92,7 +92,8 @@ public class HealthCheckService {
         summary.put("resultCount", results.size());
         summary.put("overallStatus", overall.name());
         summary.put("components", runResult.componentStatuses());
-        run.summary = sensitiveDataFilter.redact(summary);
+        // Metadata is projected only after the engine has determined statuses/counts.
+        run.summary = sensitiveDataFilter.redactMetadata(summary);
         run.startedAt = runResult.startedAt() == null ? Instant.now() : runResult.startedAt();
         run.completedAt = runResult.completedAt() == null ? Instant.now() : runResult.completedAt();
         run.createdAt = Instant.now();
@@ -138,7 +139,7 @@ public class HealthCheckService {
                 run.completedAt,
                 run.createdAt,
                 components,
-                run.summary == null ? Map.of() : Map.copyOf(run.summary));
+                run.summary == null ? Map.of() : sensitiveDataFilter.redactMetadata(run.summary));
     }
 
     public Optional<HealthCheckDetail> latestDetail(String targetId) {
@@ -152,12 +153,12 @@ public class HealthCheckService {
         entity.id = UUID.randomUUID().toString();
         entity.healthCheckId = runId;
         entity.targetId = targetId;
-        entity.checkName = component.name();
+        entity.checkName = sensitiveDataFilter.redactString(component.name());
         entity.status = component.status() == null ? HealthStatus.UNKNOWN.name() : component.status().name();
         entity.message = sensitiveDataFilter.redactString(component.message());
         entity.details = component.details() == null
                 ? null
-                : sensitiveDataFilter.redact(new HashMap<>(component.details()));
+                : sensitiveDataFilter.redactMetadata(component.details());
         entity.durationMs = component.durationMs();
         entity.createdAt = Instant.now();
         return entity;
@@ -165,11 +166,11 @@ public class HealthCheckService {
 
     private HealthComponentView toComponentView(HealthCheckResultEntity entity) {
         return new HealthComponentView(
-                entity.checkName,
+                sensitiveDataFilter.redactString(entity.checkName),
                 parseStatus(entity.status),
-                entity.message,
+                sensitiveDataFilter.redactString(entity.message),
                 entity.durationMs,
-                entity.details == null ? Map.of() : Map.copyOf(entity.details));
+                entity.details == null ? Map.of() : sensitiveDataFilter.redactMetadata(entity.details));
     }
 
     private static HealthStatus parseStatus(String status) {

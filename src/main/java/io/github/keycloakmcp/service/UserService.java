@@ -45,7 +45,7 @@ public class UserService {
             Target target = resolve(targetId);
             List<UserSummary> users = adminApi.searchUsers(target, realm, search, first, max).stream()
                     .map(KeycloakRepresentationMapper::toUserSummary)
-                    .map(summary -> sensitiveDataFilter.redact(summary))
+                    .map(summary -> sensitiveDataFilter.redactMetadata(summary))
                     .toList();
             success = true;
             return users;
@@ -60,7 +60,7 @@ public class UserService {
         boolean success = false;
         try {
             Target target = resolve(targetId);
-            UserDetails details = sensitiveDataFilter.redact(
+            UserDetails details = sensitiveDataFilter.redactMetadata(
                     KeycloakRepresentationMapper.toUserDetails(adminApi.getUser(target, realm, userId)));
             success = true;
             return details;

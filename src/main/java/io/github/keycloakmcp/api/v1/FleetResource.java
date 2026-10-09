@@ -3,7 +3,7 @@ package io.github.keycloakmcp.api.v1;
 import java.util.List;
 
 import io.github.keycloakmcp.domain.platform.FleetItem;
-import io.github.keycloakmcp.security.SensitiveDataFilter;
+import io.github.keycloakmcp.security.ReadMetadataProjection;
 import io.github.keycloakmcp.service.platform.FleetService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -19,10 +19,10 @@ public class FleetResource {
     FleetService fleetService;
 
     @Inject
-    SensitiveDataFilter sensitiveDataFilter;
+    ReadMetadataProjection readProjection;
 
     @GET
     public List<FleetItem> fleet() {
-        return sensitiveDataFilter.redact(fleetService.fleet());
+        return fleetService.fleet().stream().map(item -> readProjection.project(item, "targetId")).toList();
     }
 }

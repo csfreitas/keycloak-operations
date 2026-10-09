@@ -45,7 +45,9 @@ public class AuditEventPersister {
                     source, tool, targetId, operation, status, durationMs, traceId, params, metadata);
             auditRepository.persist(entity);
         } catch (RuntimeException e) {
-            LOG.warnf(e, "Failed to persist audit event tool=%s targetId=%s", tool, targetId);
+            // Database failures may include bound values or nested provider diagnostics.
+            // Operational audit remains best-effort; required binding audit is separate.
+            LOG.warn("Failed to persist operational audit event");
         }
     }
 }

@@ -17,16 +17,7 @@ public record RangeMetricSummary(
     }
 
     public static RangeMetricSummary fromInstant(SemanticMetricResult instant) {
-        if (instant == null) {
-            return notAvailable("No result");
-        }
-        return new RangeMetricSummary(
-                instant.value(),
-                instant.value(),
-                instant.value(),
-                instant.availability(),
-                instant.reason(),
-                instant.seriesCount(),
-                instant.value() == null ? 0 : 1);
+        // A current sample cannot establish an average/maximum over a requested window.
+        return notAvailable("Temporal metrics unavailable; an instant sample is not a range summary");
     }
 }

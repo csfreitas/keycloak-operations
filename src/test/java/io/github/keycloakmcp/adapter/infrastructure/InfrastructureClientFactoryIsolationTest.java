@@ -60,6 +60,9 @@ class InfrastructureClientFactoryIsolationTest {
         assertThat(clientA.get().namespace()).isEqualTo("ns-a");
         assertThat(clientB.get().namespace()).isEqualTo("ns-b");
         assertThat(clientA.get()).isNotSameAs(clientB.get());
+        assertThat(clientA.get().kubernetes().getConfiguration().getOauthToken()).isEqualTo("token-a");
+        assertThat(clientB.get().kubernetes().getConfiguration().getOauthToken()).isEqualTo("token-b");
+        assertThat(factory.resolve(targetA).orElseThrow()).isSameAs(clientA.get());
     }
 
     @Test
@@ -75,6 +78,21 @@ class InfrastructureClientFactoryIsolationTest {
                 null,
                 java.util.Map.of());
         assertThat(factory.resolve(target)).isEmpty();
+    }
+
+    @Test
+    void missingCredentialReferenceDoesNotCreateAnAmbientClient() {
+        assertThat(factory.resolve(target("missing-ref", "ns", null))).isEmpty();
+        org.mockito.Mockito.verifyNoInteractions(credentialProvider);
+    }
+
+    @Test
+    void tokenRotationInvalidatesCachedClient() {
+        when(credentialProvider.getInfrastructureCredentials("rotating"))
+                .thenReturn(InfrastructureCredentials.token("fixture", server.url("/"), null, true))
+                .thenReturn(InfrastructureCredentials.token("fixture-rotated", server.url("/"), null, true));
+        Target target = target("rotation", "ns", "rotating");
+        assertThat(factory.resolve(target).orElseThrow()).isNotSameAs(factory.resolve(target).orElseThrow());
     }
 
     private static Target target(String id, String namespace, String credentialRef) {

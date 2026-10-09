@@ -8,5 +8,18 @@ public record InfrastructureTargetConfiguration(
         InfrastructureType type,
         String clusterId,
         String namespace,
-        String credentialRef) {
+        String credentialRef,
+        KubernetesInstallationBinding installation) {
+
+    public InfrastructureTargetConfiguration(InfrastructureType type, String clusterId, String namespace, String credentialRef) {
+        this(type, clusterId, namespace, credentialRef, null);
+    }
+
+    public InfrastructureTargetConfiguration {
+        if (installation != null && ((type != InfrastructureType.KUBERNETES && type != InfrastructureType.OPENSHIFT)
+                || clusterId == null || clusterId.isBlank() || namespace == null || namespace.isBlank()
+                || credentialRef == null || credentialRef.isBlank())) {
+            throw new IllegalArgumentException("An installation requires explicit cluster identity, namespace and credentials");
+        }
+    }
 }

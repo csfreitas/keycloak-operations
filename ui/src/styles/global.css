@@ -55,6 +55,48 @@ input, select, textarea {
   font-size: inherit;
 }
 
+.configuration-page {
+  padding: var(--space-4) var(--space-6);
+  max-width: 70rem;
+  overflow-wrap: anywhere;
+}
+
+.configuration-selector {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.configuration-selector select {
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-3);
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.configuration-page :is(select, button):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.configuration-summary, .configuration-results {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.configuration-summary .btn {
+  justify-self: start;
+}
+
+.configuration-caption {
+  text-align: left;
+  padding: var(--space-3);
+}
+
 code, pre, kbd {
   font-family: var(--font-mono);
 }

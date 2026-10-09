@@ -60,6 +60,7 @@ class MetricsCredentialIsolationTest {
     @Test
     void targetRequestsUseOnlyOwnCredential() {
         MetricsConfig config = mock(MetricsConfig.class);
+        when(config.operationTimeoutMs()).thenReturn(30000);
         when(config.maxRange()).thenReturn("24h");
         when(config.maxSeries()).thenReturn(500);
         when(config.maxPoints()).thenReturn(1000);

@@ -1,0 +1,65 @@
+H1 inventory evidence and temporal metrics — selected runs — 2026-09-18
+Unsigned local evidence; selected summary lines, not immutable provenance or complete raw logs.
+Backend: JENV_VERSION=21 jenv exec mvn clean verify.
+Labs, sequentially: bash scripts/validate-identity-lab.sh --metrics; bash scripts/validate-installation-lab.sh; bash scripts/validate-identity-lab.sh.
+Java21.0.10 via per-command jenv; Maven3.9.12. Standalone lab checkers used existing Node25.6.1; no UI Node25 support claim and no global runtime change.
+All successful lab exits include owned-resource cleanup and compact-JWT log scan.
+No UI/browser rerun, opt-in Maven IT, GitHub CI, image build or actual cluster access.
+
+Baseline backend
+Observed process exit: 0
+Raw local log: /private/tmp/kcops-h1-evidence-baseline-20260918.log
+SHA-256: 0352bc9e65de3cd3c4b767068e52d6067af5813398c1fc838fbda60fd2e021ab
+[INFO] Tests run: 496, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T15:14:42-03:00
+
+Interim backend (new test setup errors)
+Observed process exit: 1
+Raw local log: /private/tmp/kcops-h1-evidence-verify-20260918.log
+SHA-256: 77b7b67a7385b01b65b7c63f0040ebb2077f554152159e9e4eaa581378861bba
+[ERROR] Tests run: 561, Failures: 0, Errors: 3, Skipped: 0
+[INFO] BUILD FAILURE
+[INFO] Finished at: 2026-09-18T15:21:47-03:00
+
+Final backend
+Observed process exit: 0
+Raw local log: /private/tmp/kcops-h1-evidence-verify-final-20260918.log
+SHA-256: 5617d62f4d41d08305a3bef065dd044ed7ba7a81d0dec82e411bb1fb13ba40f6
+[INFO] Tests run: 561, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T15:23:35-03:00
+
+Identity + metrics
+Observed process exit: 0
+Raw local log: /private/tmp/kcops-h1-evidence-metrics-20260918.log
+SHA-256: 58ac8867be36472aefd197f7b5c664ffc713b2edd3705c3de5e31da6815666c6
+Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.aGc8Jc
+
+Installation with synthetic cluster
+Observed process exit: 0
+Raw local log: /private/tmp/kcops-h1-evidence-installation-20260918.log
+SHA-256: df05ad25fe39e69709687ea0ba9583e62d61d54bf8d79ba39fa1d9a0b0c2752b
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+Local installation diagnostic logs: /private/tmp/kcops-installation.mdRvQw
+
+Default identity without metrics
+Observed process exit: 0
+Raw local log: /private/tmp/kcops-h1-evidence-identity-20260918.log
+SHA-256: 18ff0e9b40ea2d525b2f7adbc7e6b9273d8562da06172b9144de87c2d5ade00b
+Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.QQZUml
+
+
+Final hygiene verified after all exits:
+0 Podman containers, 0 volumes; default podman network only.
+Preserved images: quay.io/keycloak/keycloak:26.7.1; docker.io/library/postgres:16; registry.redhat.io/rhbk/keycloak-rhel9:26.6; docker.io/prom/prometheus:v2.55.1.
+No listeners on TCP 15432,18080,18180,18280,18081,18082,19001,19002,18300,18490,18590.
+Shared /private/tmp/kcops-identity-lab.lock absent.
+Only runner-owned resources and disposable tmpfs state removed; no global prune. Reusable images/caches and diagnostic evidence retained.

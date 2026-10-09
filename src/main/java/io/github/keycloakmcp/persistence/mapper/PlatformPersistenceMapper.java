@@ -13,10 +13,15 @@ import io.github.keycloakmcp.domain.platform.TriggerType;
 import io.github.keycloakmcp.persistence.entity.AuditEventEntity;
 import io.github.keycloakmcp.persistence.entity.EnvironmentSnapshotEntity;
 import io.github.keycloakmcp.persistence.entity.HealthCheckRunEntity;
+import io.github.keycloakmcp.security.SensitiveDataFilter;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class PlatformPersistenceMapper {
+
+    @Inject
+    SensitiveDataFilter sensitiveDataFilter;
 
     public HealthCheckSummary toHealthSummary(HealthCheckRunEntity entity) {
         return new HealthCheckSummary(
@@ -38,13 +43,13 @@ public class PlatformPersistenceMapper {
                 entity.id,
                 entity.traceId,
                 parseAuditSource(entity.source),
-                entity.tool,
+                sensitiveDataFilter.redactString(entity.tool),
                 entity.targetId,
-                entity.operation,
+                sensitiveDataFilter.redactString(entity.operation),
                 entity.status,
                 entity.durationMs,
                 entity.createdAt,
-                entity.metadata);
+                sensitiveDataFilter.redactMetadata(entity.metadata));
     }
 
     public AuditEventEntity newAuditEvent(
@@ -61,13 +66,15 @@ public class PlatformPersistenceMapper {
         entity.id = UUID.randomUUID().toString();
         entity.traceId = traceId;
         entity.source = source == null ? AuditSource.SYSTEM.name() : source.name();
-        entity.tool = tool;
+        entity.tool = sensitiveDataFilter.redactString(tool);
         entity.targetId = targetId;
-        entity.operation = operation;
+        entity.operation = sensitiveDataFilter.redactString(operation);
         entity.status = status == null ? "UNKNOWN" : status;
         entity.durationMs = durationMs;
-        entity.params = params;
-        entity.metadata = metadata;
+        // Only free-form payloads are lossy projections; correlation/scope identifiers
+        // above remain exact so filtering cannot move an event to a different target.
+        entity.params = sensitiveDataFilter.redactMetadata(params);
+        entity.metadata = sensitiveDataFilter.redactMetadata(metadata);
         entity.createdAt = Instant.now();
         return entity;
     }

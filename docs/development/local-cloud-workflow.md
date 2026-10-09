@@ -26,7 +26,7 @@ Before any task, read in this order:
 ```text
 Java 21
 Maven 3.9+
-Node.js 20+
+Node.js 24 LTS recommended (supported engines in ui/package.json)
 Docker or Podman
 curl and jq
 optional: oc and kubectl
@@ -60,13 +60,11 @@ RHBK integration additionally requires an authorized Red Hat registry/subscripti
 5. Run only explicitly provisioned opt-in integrations. Record every `RUN_*_IT` value and whether the test ran or skipped.
 6. Return the exact commit SHA, commands, summaries, failures, and skipped counts to the reviewing Work/PR.
 
-For the current 0.8.1 Slice 1 and Operations Report checkpoint, use the
-versioned procedure in
-[`local-validation-0.8.1-operations-report.md`](local-validation-0.8.1-operations-report.md).
+For current work, use [D1](../milestones/d1-local-workflow.md), [project state](../project-state.md) and the [latest local evidence](installation-onboarding-2026-09-11.md). The [0.8.1 Slice 1 procedure](local-validation-0.8.1-operations-report.md) is historical; its expected state is not the current acceptance baseline. Select Java 21 per command through jenv where used; do not alter the user's global Java selection.
 
 ## Handoff from local to cloud
 
-Push a focused branch or open a draft pull request. Do not copy credentials, kubeconfig, logs with tokens, customer names, or internal endpoints into prompts or Git. Update `docs/project-state.md` only with verified, reusable facts.
+With explicit publication authorization, push a focused branch or open a draft pull request; otherwise retain the local diff and handoff. Do not copy credentials, kubeconfig, logs with tokens, customer names, or internal endpoints into prompts or Git. Update `docs/project-state.md` only with verified, reusable facts.
 
 ## Context preservation
 

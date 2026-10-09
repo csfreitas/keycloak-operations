@@ -3,7 +3,7 @@ package io.github.keycloakmcp.api.v1;
 import java.util.List;
 
 import io.github.keycloakmcp.domain.platform.TargetOverview;
-import io.github.keycloakmcp.security.SensitiveDataFilter;
+import io.github.keycloakmcp.security.ReadMetadataProjection;
 import io.github.keycloakmcp.service.platform.TargetOverviewService;
 import io.github.keycloakmcp.target.Target;
 import io.github.keycloakmcp.target.TargetAuthorizationService;
@@ -34,15 +34,16 @@ public class TargetResource {
     TargetOverviewService targetOverviewService;
 
     @Inject
-    SensitiveDataFilter sensitiveDataFilter;
+    ReadMetadataProjection readProjection;
 
     @GET
     public List<?> list() {
         targetAuthorization.assertSession();
-        return sensitiveDataFilter.redact(targetRegistry.list().stream()
+        return targetRegistry.list().stream()
                 .filter(t -> targetAuthorization.isAllowed(t, TargetPermission.READ))
                 .map(this::toStatus)
-                .toList());
+                .map(status -> readProjection.project(status, "id", "installation"))
+                .toList();
     }
 
     @GET
@@ -50,14 +51,14 @@ public class TargetResource {
     public Object get(@PathParam("targetId") String targetId) {
         Target target = targetResolver.require(targetId);
         targetAuthorization.assertAllowed(target, TargetPermission.READ);
-        return sensitiveDataFilter.redact(toStatus(target));
+        return readProjection.project(toStatus(target), "id", "installation");
     }
 
     @GET
     @Path("/{targetId}/status")
     public Object status(@PathParam("targetId") String targetId) {
         TargetOverview overview = targetOverviewService.overview(targetId);
-        return sensitiveDataFilter.redact(overview);
+        return readProjection.overview(overview);
     }
 
     private java.util.Map<String, Object> toStatus(Target target) {
@@ -68,6 +69,8 @@ public class TargetResource {
                 "environment", target.environment().name(),
                 "enabled", target.enabled(),
                 "keycloakUrl", target.keycloak().url(),
-                "tags", target.tags());
+                "tags", target.tags(),
+                "installation", target.infrastructure() != null && target.infrastructure().installation() != null
+                        ? target.infrastructure().installation() : java.util.Map.of());
     }
 }

@@ -37,6 +37,7 @@ IDs are stable. Prefer adding a new ID over renumbering.
 | [non-functional-requirements.md](non-functional-requirements.md) | Isolation, resilience, bounds, testability |
 | [security-requirements.md](security-requirements.md) | Credentials, SSRF, PromQL, TLS, redaction |
 | [compatibility-requirements.md](compatibility-requirements.md) | Keycloak vs RHBK, capability detection, tested versions |
+| [roadmap-requirements.md](roadmap-requirements.md) | Approved future Operator installation, onboarding, evidence/documents, agent, IAM/alerts, governance, SPI and operational readiness |
 
 ## Relationship to other docs
 

@@ -1,0 +1,95 @@
+{
+  "capturedAt": "2026-09-18T20:39:01.045Z",
+  "scope": "Unsigned local retained excerpts; process exits were observed by the coordinator. Not complete logs or release attestation.",
+  "sourceAggregate": "11ba9bf7fda4320263784fde565f87dbb6d3730eab0af21cf85aba00bd0be417",
+  "java": "21.0.10 via per-command jenv",
+  "node": "25.6.1 for standalone lab scripts only; no UI rerun",
+  "runs": [
+    {
+      "path": "/private/tmp/kcops-h1-admin-boundaries-baseline-20260918.log",
+      "sha256": "8afed43c85457be379da9aaf586de1e35639349fc58e7554eac6a14871f327b6",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "[INFO] Tests run: 1050, Failures: 0, Errors: 0, Skipped: 0",
+        "[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-09-18T17:20:03-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-admin-boundaries-focused-20260918.log",
+      "sha256": "eaa30709e0d927c29090bd91fc9101a5f0bf59482671d22c1a183ddfa80ca65d",
+      "observedProcessExit": 1,
+      "excerpts": [
+        "[ERROR] Tests run: 245, Failures: 0, Errors: 1, Skipped: 0",
+        "[INFO] BUILD FAILURE",
+        "[INFO] Finished at: 2026-09-18T17:25:10-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-admin-boundaries-focused2-20260918.log",
+      "sha256": "e1af2c7e19b9697becdf017c3b7fef6fd190bc69263f02971fae986479d4a7f2",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "[INFO] Tests run: 252, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-09-18T17:28:28-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-admin-boundaries-verify-20260918.log",
+      "sha256": "cbd6dfe9ed7c977568125f53dda36718e2e846f8fbc72ab18eaa02c7bf37bb41",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "[INFO] Tests run: 1242, Failures: 0, Errors: 0, Skipped: 0",
+        "[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-09-18T17:32:26-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-admin-boundaries-metrics-20260918.log",
+      "sha256": "721d0ab0d8090edcbb98b20e4a33422c5e6920e049d710b7e460075d0c07fe30",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.",
+        "PASS: no compact JWT found in local lab logs",
+        "Local diagnostic logs: /private/tmp/kcops-identity.w4zome"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-admin-boundaries-installation-20260918.log",
+      "sha256": "8d70956a0a4b467a174c5ea528373b9bb0e04b3829916fd5ce5255777285fd41",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.",
+        "PASS: no compact JWT found in local lab logs",
+        "Local installation diagnostic logs: /private/tmp/kcops-installation.FA06ab"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-admin-boundaries-default-20260918.log",
+      "sha256": "850de1cbf54e5a2c73a8ffff61a46aa0d58edc139709984356a8a204a7219b21",
+      "observedProcessExit": 1,
+      "excerpts": [
+        "[DOMException [TimeoutError]: The operation was aborted due to timeout]",
+        "Terminated: 15",
+        "Local diagnostic logs: /private/tmp/kcops-identity.zr31NV"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "target/quarkus-app/quarkus-run.jar",
+      "sha256": "091aff9fb173b19ddac1558392281c5f46adb8ac4936247ef062af741145ab01"
+    },
+    {
+      "path": "target/quarkus-app/app/keycloak-operations-mcp-0.8.1-SNAPSHOT.jar",
+      "sha256": "572cce4c8b01e2cd8c4030b454b07123c58687ac9b9a9228cacfd89927feae86"
+    },
+    {
+      "path": "target/quarkus-app/quarkus-app-dependencies.txt",
+      "sha256": "74af1297f6bd06812ff42e8914c83ef7a59b28a0fa2e6337701936609ea232e7"
+    }
+  ]
+}

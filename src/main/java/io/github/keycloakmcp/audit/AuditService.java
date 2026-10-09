@@ -4,7 +4,9 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.jboss.logging.Logger;
 
@@ -19,6 +21,14 @@ import jakarta.inject.Inject;
 public class AuditService {
 
     private static final Logger LOG = Logger.getLogger(AuditService.class);
+    private static final Pattern CONFIGURATION_FINGERPRINT = Pattern.compile("[a-f0-9]{64}");
+    private static final Pattern CONFIGURATION_SCOPE = Pattern.compile("[a-z][a-z0-9-]{0,63}");
+    private static final Pattern CONFIGURATION_TARGET = Pattern.compile("[A-Za-z0-9._-]{1,128}");
+    private static final Pattern CONFIGURATION_OBSERVATION = Pattern.compile(
+            "[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}");
+    private static final Set<AuditSource> CONFIGURATION_SOURCES = Set.of(AuditSource.REST, AuditSource.MCP, AuditSource.WEB);
+    private static final Set<String> CONFIGURATION_STATUSES = Set.of(
+            "SUCCESS", "FAILURE", "DENIED", "UNAVAILABLE", "COMPLETE", "PARTIAL");
 
     private final SensitiveDataFilter sensitiveDataFilter;
     private final PlatformConfig platformConfig;
@@ -48,7 +58,8 @@ public class AuditService {
         String safeTool = sensitiveDataFilter.redactString(tool);
         String safeTarget = sensitiveDataFilter.redactString(targetId);
         String safeRealm = sensitiveDataFilter.redactString(realm);
-        String safeRequestId = requestId == null ? newRequestId() : requestId;
+        String correlationId = requestId == null ? newRequestId() : requestId;
+        String safeRequestId = sensitiveDataFilter.redactString(correlationId);
 
         LOG.infof(
                 "mcp_audit timestamp=%s requestId=%s tool=%s targetId=%s realm=%s durationMs=%d success=%s",
@@ -67,12 +78,12 @@ public class AuditService {
         record(
                 AuditSource.MCP,
                 safeTool,
-                safeTarget == null || safeTarget.isBlank() || "-".equals(safeTarget) ? null : safeTarget,
+                targetId == null || targetId.isBlank() || "-".equals(targetId) ? null : targetId,
                 safeTool,
                 success ? "SUCCESS" : "FAILURE",
                 durationMs,
                 params,
-                safeRequestId);
+                correlationId);
     }
 
     public void logToolInvocation(
@@ -131,12 +142,56 @@ public class AuditService {
                 Map.of("mode", resolveMode().name()));
     }
 
+    /**
+     * Attribution-only audit for restricted configuration reads. Callers supply validated,
+     * canonical fingerprints, never principal claims, source facts or provider diagnostics.
+     * These fixed metadata fields survive METADATA mode; persistence remains best-effort.
+     */
+    public void recordConfigurationRead(
+            AuditSource source,
+            String operation,
+            String targetId,
+            String scopeId,
+            String actorFingerprint,
+            String clientFingerprint,
+            String status,
+            long durationMs,
+            String observationId) {
+        String tool = switch (operation == null ? "" : operation) {
+            case "configuration-scopes" -> "keycloak_list_configuration_scopes";
+            case "configuration-read" -> "keycloak_read_configuration";
+            default -> null;
+        };
+        if (tool == null || source == null || !CONFIGURATION_SOURCES.contains(source)
+                || status == null || !CONFIGURATION_STATUSES.contains(status) || durationMs < 0
+                || !matches(CONFIGURATION_FINGERPRINT, actorFingerprint)
+                || !matches(CONFIGURATION_FINGERPRINT, clientFingerprint)
+                || scopeId != null && !matches(CONFIGURATION_SCOPE, scopeId)
+                || targetId != null && !matches(CONFIGURATION_TARGET, targetId)
+                || observationId != null && !matches(CONFIGURATION_OBSERVATION, observationId)) {
+            throw new IllegalArgumentException("Invalid configuration audit metadata");
+        }
+        if (!platformConfig.audit().enabled()) return;
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("schemaVersion", "1.0");
+        metadata.put("actorFingerprint", actorFingerprint);
+        metadata.put("clientFingerprint", clientFingerprint);
+        if (scopeId != null) metadata.put("scopeId", scopeId);
+        auditEventPersister.persist(source, tool, targetId, operation, status, durationMs,
+                observationId == null ? newRequestId() : observationId, null, Map.copyOf(metadata));
+    }
+
+    private static boolean matches(Pattern pattern, String value) {
+        return value != null && pattern.matcher(value).matches();
+    }
+
     private Map<String, Object> filterParams(Map<String, Object> params) {
         AuditMode mode = resolveMode();
         if (params == null || params.isEmpty() || mode == AuditMode.METADATA) {
             return null;
         }
-        return sensitiveDataFilter.redact(new HashMap<>(params));
+        return sensitiveDataFilter.redactMetadata(new HashMap<>(params));
     }
 
     private AuditMode resolveMode() {

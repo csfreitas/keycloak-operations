@@ -37,6 +37,21 @@ class TargetAuthorizationTest {
     }
 
     @Test
+    void discoveryAndBindingRequireDedicatedGrantsAndBindingRespectsReadOnly() {
+        authenticated("operator");
+        when(identity.hasRole("operator")).thenReturn(true);
+        grant("operator", Set.of("lab-a"), Set.of(TargetPermission.READ));
+        assertThat(authz.isAllowed(sample(true), TargetPermission.DISCOVER)).isFalse();
+        assertThat(authz.isAllowed(sample(true), TargetPermission.BIND)).isFalse();
+        grant("operator", Set.of("lab-a"), Set.of(TargetPermission.DISCOVER, TargetPermission.BIND));
+        assertThat(authz.isAllowed(sample(true), TargetPermission.DISCOVER)).isTrue();
+        assertThat(authz.isAllowed(sample(true), TargetPermission.BIND)).isFalse();
+        when(runtimeConfig.readOnly()).thenReturn(false);
+        assertThat(authz.isAllowed(sample(true), TargetPermission.BIND)).isTrue();
+        assertThat(authz.isAllowed(sample("lab-b", true), TargetPermission.BIND)).isFalse();
+    }
+
+    @Test
     void allowsReadAssessAndPlanOnEnabledTarget() {
         Target target = sample(true);
         authz.assertAllowed(target, TargetPermission.READ);

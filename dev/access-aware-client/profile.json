@@ -1,0 +1,26 @@
+{
+  "id": "keycloak-operations-scoped-configuration",
+  "version": "0.1.0",
+  "status": "OFFLINE_PROTOTYPE",
+  "observationSchemaVersion": "1.0",
+  "answerSchemaVersion": "0.1.0",
+  "allowedTools": ["keycloak_list_configuration_scopes", "keycloak_read_configuration"],
+  "limits": {
+    "maxScopes": 3,
+    "maxCatalogueScopes": 100,
+    "maxToolCalls": 4,
+    "maxConcurrentQuestions": 1,
+    "maxQuestionMs": 10000,
+    "maxResponseBytes": 65536,
+    "maxTotalResponseBytes": 131072,
+    "maxAnswerBytes": 65536,
+    "maxEvidenceAgeMs": 120000,
+    "maxFutureSkewMs": 5000,
+    "maxJsonDepth": 12,
+    "retries": 0,
+    "pagination": false
+  },
+  "modelProvider": null,
+  "externalDisclosureEnabled": false,
+  "historyEnabled": false
+}

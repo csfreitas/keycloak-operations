@@ -3,15 +3,14 @@ package io.github.keycloakmcp.mcp.role;
 import java.util.List;
 
 import io.github.keycloakmcp.audit.AuditService;
-import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.role.RoleDetails;
 import io.github.keycloakmcp.domain.role.RoleSummary;
+import io.github.keycloakmcp.mcp.McpToolErrorProjector;
 import io.github.keycloakmcp.observability.McpMetrics;
 import io.github.keycloakmcp.security.ToolAuthorization;
 import io.github.keycloakmcp.service.RoleService;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
-import io.quarkiverse.mcp.server.ToolCallException;
 import jakarta.inject.Inject;
 
 public class RoleTools {
@@ -31,6 +30,9 @@ public class RoleTools {
 
     @Inject
     ToolAuthorization toolAuthorization;
+
+    @Inject
+    McpToolErrorProjector errorProjector;
 
     @Tool(name = "keycloak_list_roles", description = "List realm roles on a registered target")
     public List<RoleSummary> keycloakListRoles(
@@ -61,12 +63,8 @@ public class RoleTools {
             T result = action.call();
             success = true;
             return result;
-        } catch (McpException e) {
-            throw new ToolCallException(e.getError().code() + ": " + e.getMessage());
-        } catch (ToolCallException e) {
-            throw e;
         } catch (Exception e) {
-            throw new ToolCallException("INTERNAL_ERROR: " + e.getMessage());
+            throw errorProjector.project(e);
         } finally {
             long duration = System.currentTimeMillis() - start;
             metrics.recordToolInvocation(toolName, duration, success);

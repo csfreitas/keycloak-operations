@@ -34,6 +34,15 @@ data:
     mcp.credentials.presentation-rhbk.client-secret=${KEYCLOAK_CLIENT_SECRET}
     mcp.targets.presentation-rhbk.infrastructure.type=OPENSHIFT
     mcp.targets.presentation-rhbk.infrastructure.namespace=${RHBK_NAMESPACE}
+    mcp.targets.presentation-rhbk.infrastructure.credential-ref=presentation-cluster
+    mcp.credentials.presentation-cluster.in-cluster=true
+    # Inventory remains BINDING_REQUIRED until an administrator confirms the exact root.
+    # Add all five properties together; never guess a UID or use a default installation.
+    # mcp.targets.presentation-rhbk.infrastructure.cluster-id=${RHBK_CLUSTER_ID}
+    # mcp.targets.presentation-rhbk.infrastructure.installation.api-version=${RHBK_INSTALLATION_API_VERSION}
+    # mcp.targets.presentation-rhbk.infrastructure.installation.kind=${RHBK_INSTALLATION_KIND}
+    # mcp.targets.presentation-rhbk.infrastructure.installation.name=${RHBK_INSTALLATION_NAME}
+    # mcp.targets.presentation-rhbk.infrastructure.installation.uid=${RHBK_INSTALLATION_UID}
     assessment.rules.path=rules
     assessment.default-profile=rhbk-openshift-production
     discovery.kubernetes.enabled=true

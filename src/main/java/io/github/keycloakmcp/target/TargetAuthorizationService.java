@@ -45,8 +45,8 @@ public class TargetAuthorizationService {
             throw McpException.targetDisabled(target.id().value());
         }
         switch (permission) {
-            case READ, ASSESS, PLAN -> { }
-            case APPROVE, WRITE, ADMIN -> {
+            case READ, DISCOVER, ASSESS, PLAN -> { }
+            case BIND, APPROVE, WRITE, ADMIN -> {
                 if (runtimeConfig.readOnly()) {
                     throw McpException.targetUnauthorized(target.id().value());
                 }

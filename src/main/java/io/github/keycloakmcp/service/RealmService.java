@@ -45,7 +45,7 @@ public class RealmService {
             Target target = resolve(targetId);
             List<RealmSummary> realms = adminApi.listRealms(target).stream()
                     .map(KeycloakRepresentationMapper::toRealmSummary)
-                    .map(summary -> sensitiveDataFilter.redact(summary))
+                    .map(summary -> sensitiveDataFilter.redactMetadata(summary))
                     .toList();
             success = true;
             return realms;
@@ -60,7 +60,7 @@ public class RealmService {
         boolean success = false;
         try {
             Target target = resolve(targetId);
-            RealmDetails details = sensitiveDataFilter.redact(
+            RealmDetails details = sensitiveDataFilter.redactMetadata(
                     KeycloakRepresentationMapper.toRealmDetails(adminApi.getRealm(target, realm)));
             success = true;
             return details;

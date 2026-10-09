@@ -3,7 +3,12 @@ package io.github.keycloakmcp.collector.keycloak;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +23,7 @@ import io.github.keycloakmcp.adapter.keycloak.KeycloakVersionDetector;
 import io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapter;
 import io.github.keycloakmcp.assessment.engine.EvidenceContext;
 import io.github.keycloakmcp.collector.AssessmentEvidenceService;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.collector.infrastructure.InfrastructureEvidenceCollector;
 import io.github.keycloakmcp.collector.metrics.MetricsEvidenceCollector;
 import io.github.keycloakmcp.config.AssessmentConfig;
@@ -51,6 +57,55 @@ class KeycloakEvidenceCollectorTest {
         when(admin.listRealms(target)).thenReturn(List.of(realm));
         when(admin.getRealm(target, "app")).thenReturn(realm);
         when(admin.listClients(target, "app", false)).thenReturn(List.of());
+    }
+
+    @Test
+    void invalidRealmListPreservesMetadataButDoesNotInventEmptyInventory() {
+        when(admin.listRealms(target)).thenThrow(McpException.evidenceCollectionFailed("provider-secret-canary", null));
+        var collected = service().collect(target);
+        var context = new EvidenceContext(collected.evidence());
+        assertThat(collected.partialSources()).containsExactly("keycloak");
+        assertThat(collected.failedSources()).isEmpty();
+        assertThat(context.get("keycloak.version")).contains("26.7.1");
+        assertThat(context.get("keycloak.collection.complete")).contains(false);
+        assertThat(context.hasKey("keycloak.realm.count")).isFalse();
+        assertThat(context.hasKey("keycloak.clients.total")).isFalse();
+        assertThat(collected.evidence().toString()).doesNotContain("provider-secret-canary");
+        verify(admin, never()).getRealm(target, "app");
+    }
+
+    @Test
+    void foreignRealmDetailCannotSupplyFavorableFactsForRequestedRealm() {
+        when(admin.getRealm(target, "app")).thenReturn(realm("foreign"));
+        var context = new EvidenceContext(collector.collect(target));
+        assertThat(context.get("keycloak.collection.complete")).contains(false);
+        assertThat(context.forSubject(io.github.keycloakmcp.assessment.engine.EvidenceSubject.realm("app"))
+                .hasKey("realm.bruteForceProtected")).isFalse();
+        assertThat(context.hasKey("keycloak.realms.sslRequired.noneCount")).isFalse();
+        verify(admin, never()).listClients(target, "app", false);
+    }
+
+    @Test
+    void providerRealmNamesAreNotEchoedIntoCollectorFailureLogs() {
+        String canary = "realm-secret-canary";
+        when(admin.listRealms(target)).thenReturn(List.of(realm(canary)));
+        when(admin.getRealm(target, canary)).thenThrow(new IllegalStateException("raw-error-canary"));
+        var logger = java.util.logging.Logger.getLogger(KeycloakEvidenceCollector.class.getName());
+        var records = new java.util.ArrayList<java.util.logging.LogRecord>();
+        var handler = new java.util.logging.Handler() {
+            @Override public void publish(java.util.logging.LogRecord record) { records.add(record); }
+            @Override public void flush() { }
+            @Override public void close() { }
+        };
+        logger.addHandler(handler);
+        try {
+            collector.collect(target);
+            assertThat(records).isNotEmpty().allSatisfy(record -> {
+                assertThat(record.getMessage()).doesNotContain(canary, "raw-error-canary");
+                assertThat(java.util.Arrays.deepToString(record.getParameters())).doesNotContain(canary, "raw-error-canary");
+                assertThat(record.getThrown()).isNull();
+            });
+        } finally { logger.removeHandler(handler); }
     }
 
     @Test
@@ -261,6 +316,89 @@ class KeycloakEvidenceCollectorTest {
         assertThat(context.get("realm.verifyEmail")).isEmpty();
         assertThat(context.get("realm.eventsEnabled")).isEmpty();
         assertThat(context.get("realm.rememberMe")).isEmpty();
+    }
+
+    @Test
+    void exhaustedBudgetDoesNotReadOrInventObservedZero() {
+        AtomicLong clock = new AtomicLong();
+        CollectionBudget budget = new CollectionBudget(Duration.ofMillis(10), clock::get);
+        clock.set(10_000_000);
+        try (var scope = CollectionBudget.open("test", budget)) {
+            var context = new EvidenceContext(collector.collect(target));
+            assertThat(context.get("keycloak.collection.complete")).contains(false);
+            assertThat(context.hasKey("keycloak.realm.count")).isFalse();
+            assertThat(context.hasKey("keycloak.collection.realmsDiscovered")).isFalse();
+            assertThat(context.hasKey("keycloak.clients.publicWithoutPkceS256")).isFalse();
+            assertThat(context.hasKey("keycloak.clients.publicWithoutPkceS256.clientIds")).isFalse();
+            assertThat(context.get("keycloak.collection.issues").orElseThrow().toString())
+                    .contains("OPERATION_BUDGET_EXCEEDED");
+        }
+        verifyNoInteractions(admin);
+    }
+
+    @Test
+    void lateRealmListRetainsEarlierVersionButNotLateCount() {
+        AtomicLong clock = new AtomicLong();
+        when(admin.listRealms(target)).thenAnswer(inv -> {
+            clock.set(10_000_000); return List.of(realm("late"));
+        });
+        try (var scope = CollectionBudget.open("test", new CollectionBudget(Duration.ofMillis(10), clock::get))) {
+            var context = new EvidenceContext(collector.collect(target));
+            assertThat(context.get("keycloak.version")).contains("26.7.1");
+            assertThat(context.get("keycloak.collection.complete")).contains(false);
+            assertThat(context.hasKey("keycloak.realm.count")).isFalse();
+            assertThat(context.hasKey("realm.name")).isFalse();
+        }
+        verify(admin, never()).getRealm(target, "late");
+    }
+
+    @Test
+    void abortRetainsEarlierObservedRiskAndStopsRemainingRealms() {
+        AtomicLong clock = new AtomicLong();
+        when(admin.listRealms(target)).thenReturn(List.of(realm("app"), realm("late"), realm("unread")));
+        when(admin.listClients(target, "app", false)).thenReturn(List.of(client("unsafe", null)));
+        when(admin.getRealm(target, "late")).thenAnswer(inv -> {
+            clock.set(10_000_000); return realm("late");
+        });
+        try (var scope = CollectionBudget.open("test", new CollectionBudget(Duration.ofMillis(10), clock::get))) {
+            var context = new EvidenceContext(collector.collect(target));
+            assertThat(context.get("keycloak.collection.complete")).contains(false);
+            assertThat(context.get("keycloak.clients.publicWithoutPkceS256")).contains(1);
+            assertThat(context.get("keycloak.clients.publicWithoutPkceS256.clientIds")).contains(List.of("app/unsafe"));
+            assertThat(context.forSubject(io.github.keycloakmcp.assessment.engine.EvidenceSubject.realm("late"))
+                    .hasKey("realm.bruteForceProtected")).isFalse();
+        }
+        verify(admin, never()).listClients(target, "late", false);
+        verify(admin, never()).getRealm(target, "unread");
+    }
+
+    @Test
+    void lateClientListIsNotAcceptedAsSafeOrUnsafeObservation() {
+        AtomicLong clock = new AtomicLong();
+        when(admin.listClients(target, "app", false)).thenAnswer(inv -> {
+            clock.set(10_000_000); return List.of(client("late-unsafe", null));
+        });
+        try (var scope = CollectionBudget.open("test", new CollectionBudget(Duration.ofMillis(10), clock::get))) {
+            var evidence = collector.collect(target);
+            var context = new EvidenceContext(evidence);
+            assertThat(context.get("keycloak.collection.complete")).contains(false);
+            assertThat(context.get("keycloak.collection.realmsCollected")).contains(1);
+            assertThat(context.hasKey("keycloak.clients.publicWithoutPkceS256")).isFalse();
+            assertThat(evidence.toString()).doesNotContain("late-unsafe");
+        }
+    }
+
+    @Test
+    void interruptedCollectionPreservesFlagAndDoesNotRead() {
+        try (var scope = CollectionBudget.open("test", 30_000)) {
+            Thread.currentThread().interrupt();
+            var context = new EvidenceContext(collector.collect(target));
+            assertThat(Thread.currentThread().isInterrupted()).isTrue();
+            assertThat(context.get("keycloak.collection.complete")).contains(false);
+            assertThat(context.get("keycloak.collection.issues").orElseThrow().toString())
+                    .contains("OPERATION_INTERRUPTED");
+        } finally { Thread.interrupted(); }
+        verifyNoInteractions(admin);
     }
 
     private AssessmentEvidenceService service() {

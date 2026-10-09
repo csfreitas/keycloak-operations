@@ -16,12 +16,16 @@ MCP tools and REST share the same application services. Change planning uses sem
 | Method | Path | Notes |
 |--------|------|-------|
 | GET | `/me` | Auth probe (`OPEN_LAB` or OIDC principal) |
+| POST | `/registry/targets/preflight` | [Administrative preflight 0.1.0](registry-preflight.md), disabled by default; local draft checks only, no registration/provider calls |
 | GET | `/targets` | List authorized targets |
 | GET | `/targets/{targetId}` | Target details (no secrets) |
 | GET | `/targets/{targetId}/status` | Status/overview alias |
-| GET | `/targets/{targetId}/environment` | Target-aware runtime discovery |
+| GET | `/targets/{targetId}/environment` | READ authorization before target-aware runtime discovery |
 | GET | `/targets/{targetId}/inventory` | Sanitized infrastructure inventory |
 | GET | `/targets/{targetId}/topology` | Pods-by-zone / pods-by-node |
+| GET | `/targets/{targetId}/installation` | Current binding/revision and caller capabilities; no live verification |
+| POST | `/targets/{targetId}/installation/discover` | Retained expiring candidates from the approved connection/namespace |
+| POST | `/targets/{targetId}/installation/confirm` | Confirm server-retained `runId` / `candidateId`; mandatory audit |
 | GET | `/targets/{targetId}/overview` | Overview DTO (persisted signals + snapshot fields) |
 | GET | `/fleet` | Fleet dashboard rows (persisted; no live N+1 metrics) |
 | POST | `/targets/{targetId}/assessments` | Run + persist assessment |
@@ -65,14 +69,42 @@ Response shape: `{ items, page, size, total }`.
 ## Errors
 
 `McpException` → JSON `{ "code", "message" }` with HTTP status mapped from `ErrorCode`.
+Its existing mapper filters recognizable credentials in the message, retains the
+code/status contract and does not include error details or cause chains. This is
+not a guarantee for every framework or arbitrary exception family. The new shared
+MCP error projector is a separate transport boundary; see [MCP errors](tools.md#error-shape).
+
+## Read-output trust boundary
+
+The [read-metadata slice](development/h1-read-metadata-2026-09-19.md) adds explicit
+lossy output copies for ordinary Admin read DTOs and selected target, environment,
+inventory/topology, overview and semantic-metrics responses. Recognizable
+credential text and sensitive metadata keys are filtered after collection;
+registered-target and declared provenance identifiers remain canonical. Typed
+counts remain counts. Raw collector observations and deterministic rule inputs
+are not replaced with these presentation copies, and historical reads do not
+rewrite stored evidence or its hashes.
+
+Filtering is not arbitrary-secret detection, and preserved identity text is not
+certified secret-free. It does not add permissions, change controlled mutation
+semantics, or generically mask installation identities. Installation confirmation
+and mandatory audit keep their separate exact-identity/transactional contracts.
+See the ledger for executed validation and residual limits; no H1 closure or live
+RHBK/OpenShift acceptance is implied.
 
 ## Authz
 
-Uses `TargetAuthorizationService` with `READ`, `ASSESS`, `PLAN`, `WRITE`, and `ADMIN`.
-Change planning requires `PLAN`; approve/reject/apply require `WRITE` (and global
-`mcp.read-only=false` for Keycloak mutations). Responses pass through `SensitiveDataFilter`.
+Uses `TargetAuthorizationService` with explicit `READ`, `DISCOVER`, `BIND`, `ASSESS`, `PLAN`, `APPROVE`, `WRITE` and `ADMIN` permissions. Planning requires PLAN; approve/reject require APPROVE; apply requires WRITE; read-back verification requires READ. Global read-only also blocks BIND, APPROVE, WRITE and ADMIN. Change lists require an authorized `targetId`. Output filtering follows the boundaries above and is not an authorization decision.
 
-Identity A OIDC is **optional**: enable Quarkus profile `oidc` and set `OIDC_*` env vars. Default lab mode leaves REST open (`OPEN_LAB` via `/me`).
+`GET /targets/{targetId}/environment` resolves the registered target and explicitly
+requires READ **before** runtime discovery, matching the MCP discovery boundary.
+It does not grant candidate discovery, installation confirmation or cluster writes.
+
+Packaged applications fail closed by default. Enable `oidc` with the intended issuer/audience and exact role/target grants. Only explicit `local-lab` and dev/test profiles allow unauthenticated local access; never expose them publicly. Caller-supplied actor/approver fields are compatibility metadata, not identity. See [identity model](identity-model.md).
+
+### Installation confirmation
+
+Existing persisted targets only: READ for state; READ + DISCOVER for candidates; READ + DISCOVER + BIND and global read-only disabled for confirmation. The confirmation body contains only `runId` and `candidateId`, never URLs, namespace, credentials or actor. Actor/target/expiry/revision/context/UID checks precede transactional binding, run consumption and mandatory audit. This is not a cluster write or a new target registration API. See [contract and limits](development/installation-onboarding-2026-09-11.md).
 
 ### Operations reports
 

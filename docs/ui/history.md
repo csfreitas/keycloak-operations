@@ -17,8 +17,10 @@ Timeline of operational change for a Target.
 
 All lists are paginated and filtered by `targetId` (multi-target isolation).
 
-## Interactions
+## Planned interactions (not current acceptance)
 
-- Pick two assessments → score / finding comparison (`ComparisonService`)
+- Pick two assessments → score / finding comparison (`ComparisonService` is currently an unsupported stub)
 - Pick two snapshots → environment change list (`EnvironmentChangeService`)
 - Filter audit by source (`MCP` / `WEB` / `REST` / `SCHEDULED` / `SYSTEM`), tool, status, time range
+
+The implemented screen lists assessments, health, snapshots and audit by target. Snapshot summary diff exists in `EnvironmentChangeService`, but full coverage-aware drift and report replay are separate [D3E](../milestones/d3e-evidence-replay.md)/[P1](../milestones/p1-iam-continuous-observability.md) deliveries. Planned filters/interactions above are not all current UI controls.

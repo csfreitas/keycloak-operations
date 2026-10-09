@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { ChangeRecord } from '../api/types';
 import {
@@ -15,41 +15,72 @@ import { ApiResponseError } from '../api/client';
 
 export function ChangeDetailPage() {
   const { changeId } = useParams<{ changeId: string }>();
+  // The route owns the entire view, including controls, before any effect runs.
+  return changeId ? <ChangeDetail key={changeId} changeId={changeId} /> : null;
+}
+
+function ChangeDetail({ changeId }: { changeId: string }) {
   const [change, setChange] = useState<ChangeRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ApiResponseError | Error | null>(null);
   const [busy, setBusy] = useState(false);
+  const active = useRef(false);
+  const generation = useRef(0);
+  const actionPending = useRef(false);
 
   const load = useCallback(async () => {
-    if (!changeId) return;
+    if (!active.current || actionPending.current) return;
+    const request = ++generation.current;
+    const current = () => active.current && generation.current === request;
+    setChange(null);
     setLoading(true);
     setError(null);
     try {
-      setChange(await fetchChange(changeId));
+      const result = await fetchChange(changeId);
+      if (!current()) return;
+      if (result.changeId !== changeId) throw new Error('Change response does not match the requested change.');
+      setChange(result);
     } catch (err) {
-      setError(err as Error);
+      if (current()) setError(err as Error);
     } finally {
-      setLoading(false);
+      if (current()) setLoading(false);
     }
   }, [changeId]);
 
   useEffect(() => {
+    active.current = true;
     void load();
+    return () => {
+      active.current = false;
+      generation.current++;
+    };
   }, [load]);
 
   async function run(action: () => Promise<ChangeRecord>) {
+    if (!active.current || actionPending.current || loading || !change) return;
+    const request = generation.current;
+    const current = () => active.current && generation.current === request;
+    // A ref closes the interval before React renders disabled controls.
+    actionPending.current = true;
     setBusy(true);
     setError(null);
     try {
-      setChange(await action());
+      const result = await action();
+      if (!current()) return;
+      if (result.changeId !== changeId || result.targetId !== change.targetId) {
+        throw new Error('Change response does not match the requested change and target.');
+      }
+      setChange(result);
     } catch (err) {
-      setError(err as Error);
+      if (current()) setError(err as Error);
     } finally {
-      setBusy(false);
+      if (current()) {
+        actionPending.current = false;
+        setBusy(false);
+      }
     }
   }
 
-  if (!changeId) return null;
   if (loading && !change) return <LoadingState message="Loading change…" />;
   if (error && !change) {
     return <ErrorState error={error} onRetry={load} title="Failed to load change" />;
@@ -83,7 +114,7 @@ export function ChangeDetailPage() {
               </button>
               <button
                 type="button"
-                className="btn"
+                className="btn btn--secondary"
                 disabled={busy}
                 onClick={() => void run(() => rejectChange(change.changeId, 'ui-operator', 'Rejected from UI'))}
               >
@@ -103,7 +134,7 @@ export function ChangeDetailPage() {
           )}
           <button
             type="button"
-            className="btn"
+            className="btn btn--secondary"
             disabled={busy}
             onClick={() => void run(() => verifyChange(change.changeId))}
           >

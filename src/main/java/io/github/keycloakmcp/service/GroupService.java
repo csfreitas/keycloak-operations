@@ -45,7 +45,7 @@ public class GroupService {
             Target target = resolve(targetId);
             List<GroupSummary> groups = adminApi.listGroups(target, realm, true, first, max).stream()
                     .map(KeycloakRepresentationMapper::toGroupSummary)
-                    .map(summary -> sensitiveDataFilter.redact(summary))
+                    .map(summary -> sensitiveDataFilter.redactMetadata(summary))
                     .toList();
             success = true;
             return groups;
@@ -60,7 +60,7 @@ public class GroupService {
         boolean success = false;
         try {
             Target target = resolve(targetId);
-            GroupDetails details = sensitiveDataFilter.redact(
+            GroupDetails details = sensitiveDataFilter.redactMetadata(
                     KeycloakRepresentationMapper.toGroupDetails(adminApi.getGroup(target, realm, groupId)));
             success = true;
             return details;

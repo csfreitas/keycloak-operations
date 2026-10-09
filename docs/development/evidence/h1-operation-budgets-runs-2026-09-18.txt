@@ -1,0 +1,87 @@
+H1 compound metrics operation budgets — retained run excerpts
+Captured: 2026-09-18T18:49:28.175Z
+Unsigned local evidence. Observed exit codes recorded from execution tools; excerpts are not complete raw logs.
+Java 21.0.10 via per-command jenv; Node25.6.1 only for standalone lab checkers; no new UI run.
+Source: docs/development/evidence/h1-operation-budgets-source-2026-09-18.json
+Final source aggregate: 954370e3714b7f2b0d16b49c33b848ae0099e5627ef5d60586c204b9ef2350c0
+
+Log: /private/tmp/kcops-h1-budgets-baseline-20260918.log
+SHA-256: 18dc499f3d75a3cffe406f6d3af8109a56991297b0da817c33efbafc94b4bf91
+Observed process exit: 0
+[INFO] Tests run: 561, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T15:32:24-03:00
+
+Log: /private/tmp/kcops-h1-budgets-verify-20260918.log
+SHA-256: 7375f974e77a95271054779ebbe9e48e69127d173e917494ae6f89996f02c6b2
+Observed process exit: 0
+[INFO] Tests run: 618, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T15:38:04-03:00
+
+Log: /private/tmp/kcops-h1-budgets-verify-final-20260918.log
+SHA-256: b387dfee30068b09c563186f14367f20ce67efc2388712e4860215f635336645
+Observed process exit: 0
+[INFO] Tests run: 619, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T15:40:22-03:00
+
+Log: /private/tmp/kcops-h1-budgets-verify-closure-20260918.log
+SHA-256: 37c8320bd045e3907e1284e8a408bcca8c5f477eb16dd10146f21006f2abd7b6
+Observed process exit: 0
+[INFO] Tests run: 622, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T15:44:28-03:00
+
+Log: /private/tmp/kcops-h1-budgets-metrics-20260918.log
+SHA-256: 8fd4eaa8a93110f1fa197a9059729e82d114f14a315e59d312360047f346d80d
+Observed process exit: 0
+Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.BDyvY8
+
+Log: /private/tmp/kcops-h1-budgets-installation-20260918.log
+SHA-256: 96e1c3ab1001671fa74a74b4413f54ee6aa9d71dc908483ed641785222e578f2
+Observed process exit: 0
+PASS 82: Synthetic cluster received only allowlisted reads, never writes or Secret requests
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+Local installation diagnostic logs: /private/tmp/kcops-installation.IMu1AW
+
+Log: /private/tmp/kcops-h1-budgets-metrics-final-20260918.log
+SHA-256: 140b1b87eee93a8a597cb88857e658cf2fbc53b31fa90ea8cc6019276267ec2a
+Observed process exit: 0
+Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.9i4q2L
+
+Log: /private/tmp/kcops-h1-budgets-installation-final-20260918.log
+SHA-256: 71ab3fb4a5f14286c203410c126aeb8825f528c84bd14dd8c4dce41e9c8aee1a
+Observed process exit: 0
+PASS 82: Synthetic cluster received only allowlisted reads, never writes or Secret requests
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+Local installation diagnostic logs: /private/tmp/kcops-installation.Mxsh6D
+
+Log: /private/tmp/kcops-h1-budgets-identity-final-20260918.log
+SHA-256: 92134309e9a14af323f450b5d68e8bfcc16df692c678b2fa4af37929c3130799
+Observed process exit: 0
+Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.anxPnW
+
+Final application package hashes:
+6ae087f390969995589a4a6b01242a44962043b11a6c31da961ad339a2cafa40  target/quarkus-app/quarkus-run.jar
+7b0fd1f23d3203d51dcac9669fab7eb9892604787c9e5b9137987f25a0ed1c61  target/quarkus-app/app/keycloak-operations-mcp-0.8.1-SNAPSHOT.jar
+
+Final independently checked local resource state:
+Podman containers: 0; volumes: 0; networks: default podman only.
+Preserved reusable images: quay.io/keycloak/keycloak:26.7.1, docker.io/library/postgres:16, registry.redhat.io/rhbk/keycloak-rhel9:26.6, docker.io/prom/prometheus:v2.55.1.
+All 11 fixture loopback ports were bindable: 15432,18080,18180,18280,18081,18082,19001,19002,18300,18490,18590.
+Shared fixture lock absent; disposable tmpfs data removed by owned cleanup; no global prune.
+545 source hashes and 100 final test-evidence references verified without mismatch.
+No commit/push/rebase/release, actual cluster, browser/UI rerun, CI or image build.

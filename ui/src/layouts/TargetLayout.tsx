@@ -17,6 +17,7 @@ const NAV_TABS: NavTab[] = [
   { path: 'report', label: 'Report' },
   { path: 'performance', label: 'Performance' },
   { path: 'infrastructure', label: 'Infrastructure' },
+  { path: 'installation', label: 'Installation' },
   { path: 'history', label: 'History' },
   { path: 'changes', label: 'Changes' },
 ];
@@ -95,7 +96,7 @@ function TargetLayoutInner({ targetId }: { targetId: string }) {
       )}
 
       <div className="page-content">
-        <Outlet context={{ targetId, overview }} />
+        {overview && !error && <Outlet context={{ targetId, overview }} />}
       </div>
     </div>
   );

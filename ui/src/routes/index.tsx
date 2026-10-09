@@ -7,10 +7,12 @@ import { HealthPage } from '../pages/HealthPage';
 import { AssessmentPage } from '../pages/AssessmentPage';
 import { PerformancePage } from '../pages/PerformancePage';
 import { InfrastructurePage } from '../pages/InfrastructurePage';
+import { InstallationPage } from '../pages/InstallationPage';
 import { HistoryPage } from '../pages/HistoryPage';
 import { ChangesPage } from '../pages/ChangesPage';
 import { ChangeDetailPage } from '../pages/ChangeDetailPage';
 import { OperationsReportPage } from '../pages/OperationsReportPage';
+import { ConfigurationPage } from '../pages/ConfigurationPage';
 
 /** Forces a full remount of TargetLayout when targetId changes. */
 function TargetLayoutWrapper() {
@@ -18,13 +20,14 @@ function TargetLayoutWrapper() {
   return <TargetLayout key={targetId} />;
 }
 
-export const router = createBrowserRouter([
+export const createAppRouter = () => createBrowserRouter([
   {
     path: '/',
     element: <AppLayout />,
     children: [
       { index: true, element: <Navigate to="/targets" replace /> },
       { path: 'targets', element: <FleetPage /> },
+      { path: 'configuration', element: <ConfigurationPage /> },
       { path: 'changes', element: <ChangesPage /> },
       { path: 'changes/:changeId', element: <ChangeDetailPage /> },
       {
@@ -38,6 +41,7 @@ export const router = createBrowserRouter([
           { path: 'report', element: <OperationsReportPage /> },
           { path: 'performance', element: <PerformancePage /> },
           { path: 'infrastructure', element: <InfrastructurePage /> },
+          { path: 'installation', element: <InstallationPage /> },
           { path: 'history', element: <HistoryPage /> },
           { path: 'changes', element: <ChangesPage /> },
         ],

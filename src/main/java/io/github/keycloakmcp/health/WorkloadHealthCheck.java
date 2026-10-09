@@ -34,11 +34,15 @@ public class WorkloadHealthCheck implements HealthCheck {
                     name(),
                     HealthStatus.UNKNOWN,
                     "No infrastructure configuration",
-                    Map.of("configured", false),
+                    Map.of("configured", false, "reasonCode", "NOT_CONFIGURED"),
                     System.currentTimeMillis() - start);
         }
         try {
             InfrastructureInventory inventory = inventoryService.collect(target.id().value());
+            if (InventoryHealthEvidence.unavailable(inventory, "infrastructure", "installation", "workload")
+                    || InventoryHealthEvidence.workloadUnavailable(inventory.keycloak())) {
+                return unknown(start, "EVIDENCE_UNAVAILABLE", "Workload evidence is incomplete; health is inconclusive");
+            }
             KeycloakWorkloadInfo workload = inventory.keycloak();
             Map<String, Object> details = new LinkedHashMap<>();
             details.put("deploymentMethod", workload.deploymentMethod() == null ? null : workload.deploymentMethod().name());
@@ -60,12 +64,12 @@ public class WorkloadHealthCheck implements HealthCheck {
             }
             return HealthComponentResult.of(name(), status, message, details, System.currentTimeMillis() - start);
         } catch (RuntimeException e) {
-            return HealthComponentResult.of(
-                    name(),
-                    HealthStatus.CRITICAL,
-                    e.getMessage() == null ? "Workload inventory failed" : e.getMessage(),
-                    Map.of(),
-                    System.currentTimeMillis() - start);
+            return unknown(start, "CHECK_FAILED", "Workload inventory failed; health is inconclusive");
         }
+    }
+
+    private HealthComponentResult unknown(long start, String reason, String message) {
+        return HealthComponentResult.of(name(), HealthStatus.UNKNOWN, message, Map.of("reasonCode", reason),
+                System.currentTimeMillis() - start);
     }
 }

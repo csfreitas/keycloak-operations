@@ -11,6 +11,7 @@ import io.github.keycloakmcp.target.TargetAuthorizationService;
 import io.github.keycloakmcp.target.TargetPermission;
 import io.github.keycloakmcp.target.TargetRegistry;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.common.annotation.Blocking;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -37,6 +38,7 @@ public class EventsResource {
     TargetRegistry targetRegistry;
 
     @GET
+    @Blocking // The initial target/grant snapshot reads the JDBC-backed registry.
     @Produces(MediaType.SERVER_SENT_EVENTS)
     @RestStreamElementType(MediaType.APPLICATION_JSON)
     public Multi<String> events() {

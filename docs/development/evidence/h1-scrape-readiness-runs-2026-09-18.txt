@@ -1,0 +1,80 @@
+H1 installation-associated scrape readiness — retained run excerpts
+Captured: 2026-09-18T19:13:16.459Z
+Unsigned local evidence. Exit codes observed from execution tools; excerpts are not complete raw logs.
+Java21.0.10 via per-command jenv; existing Node25.6.1 only for standalone lab scripts; no UI rerun.
+Final source aggregate: df49827c1ee6528a026b4b653e3e8785fdb75bb63d6c20d5f65191c397c1d418
+
+Log: /private/tmp/kcops-h1-scrape-baseline-20260918.log
+SHA-256: b37c89fffe6cab5e88dc8c272872ef57ffa35eb84a11ebbac57c886908e55c43
+Observed process exit: 0
+[INFO] Tests run: 622, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T15:53:58-03:00
+
+Log: /private/tmp/kcops-h1-scrape-focused-20260918.log
+SHA-256: 1b41fc2588a78ba261a154ea548d784d14792e49c19115c4bc6e7ec79f5e0986
+Observed process exit: 1
+[ERROR] COMPILATION ERROR : 
+  symbol:   method withNewMetadata()
+[INFO] BUILD FAILURE
+[INFO] Finished at: 2026-09-18T16:01:34-03:00
+[ERROR]   symbol:   method withNewMetadata()
+
+Log: /private/tmp/kcops-h1-scrape-focused-2-20260918.log
+SHA-256: c135bc966e16a17e1eb67ff70a0d07961738545d57fc7ad0223697d0ccb46689
+Observed process exit: 1
+[ERROR] COMPILATION ERROR : 
+  symbol:   variable DeploymentMethod
+[INFO] BUILD FAILURE
+[INFO] Finished at: 2026-09-18T16:04:24-03:00
+[ERROR]   symbol:   variable DeploymentMethod
+
+Log: /private/tmp/kcops-h1-scrape-focused-3-20260918.log
+SHA-256: aa77aa2d63dda6a35250a52cef684755a878154084bb2ccecf330a80cfd75b6a
+Observed process exit: 1
+[ERROR] Tests run: 159, Failures: 3, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+[INFO] Finished at: 2026-09-18T16:05:57-03:00
+
+Log: /private/tmp/kcops-h1-scrape-verify-20260918.log
+SHA-256: 58251946f1766851603dbe67adacb7a22eddcbc4c2aaa006c4e9a3547cf96b2f
+Observed process exit: 0
+[INFO] Tests run: 765, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T16:08:27-03:00
+
+Log: /private/tmp/kcops-h1-scrape-metrics-20260918.log
+SHA-256: 085f42fca3ba6b56bcc2eb4e403ac263da9f12330765e8a658c7661baf96c80e
+Observed process exit: 0
+Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.6zbUNg
+
+Log: /private/tmp/kcops-h1-scrape-installation-20260918.log
+SHA-256: 4180b371751281f676bd09ed82c50fd5e9f0e025dafc7b7a94a344e0eda71d2a
+Observed process exit: 0
+PASS 82: Synthetic cluster received only allowlisted reads, never writes or Secret requests
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+Local installation diagnostic logs: /private/tmp/kcops-installation.Z8KvtS
+
+Log: /private/tmp/kcops-h1-scrape-identity-20260918.log
+SHA-256: 7fd05f802385a794f8444b8a74dabddf79ee0e4ed9036637aae7f84aeeb87afa
+Observed process exit: 0
+Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.3NPA3Z
+
+Final application package hashes:
+3c4f1eb36ae2d7a89ae3d928e23afe4343770b3bc5fbc761ac8248c371ce159d  target/quarkus-app/quarkus-run.jar
+286292076737a02efa14b73d8feaa8419368bf695e948b74496f8d43b208555d  target/quarkus-app/app/keycloak-operations-mcp-0.8.1-SNAPSHOT.jar
+
+Final independently checked local resource state:
+Podman containers: 0; volumes: 0; networks: default podman only.
+Preserved preexisting images: quay.io/keycloak/keycloak:26.7.1 (cc689d358fe6), docker.io/library/postgres:16 (02ad0fee02ae), registry.redhat.io/rhbk/keycloak-rhel9:26.6 (e7affbc8b409), docker.io/prom/prometheus:v2.55.1 (f59c592ea6d9).
+All 11 fixture loopback ports bindable: 15432,18080,18180,18280,18081,18082,19001,19002,18300,18490,18590.
+Shared fixture lock absent; owned tmpfs database/TSDB state removed; no global prune.
+551 source inputs and 104 final test-evidence references matched recorded hashes.
+No commit/push/rebase/release, real cluster, new UI/browser acceptance, CI/image/native/STDIO execution.

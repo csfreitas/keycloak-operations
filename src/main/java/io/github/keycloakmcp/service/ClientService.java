@@ -45,7 +45,7 @@ public class ClientService {
             Target target = resolve(targetId);
             List<ClientSummary> clients = adminApi.listClients(target, realm, true).stream()
                     .map(KeycloakRepresentationMapper::toClientSummary)
-                    .map(summary -> sensitiveDataFilter.redact(summary))
+                    .map(summary -> sensitiveDataFilter.redactMetadata(summary))
                     .toList();
             success = true;
             return clients;
@@ -60,7 +60,7 @@ public class ClientService {
         boolean success = false;
         try {
             Target target = resolve(targetId);
-            ClientDetails details = sensitiveDataFilter.redact(
+            ClientDetails details = sensitiveDataFilter.redactMetadata(
                     KeycloakRepresentationMapper.toClientDetails(
                             adminApi.findClientByClientId(target, realm, clientId)));
             success = true;

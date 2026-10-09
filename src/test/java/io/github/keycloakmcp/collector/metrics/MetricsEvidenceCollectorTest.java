@@ -4,9 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +19,12 @@ import java.util.OptionalInt;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import io.github.keycloakmcp.assessment.engine.Evidence;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.config.PerformanceConfig;
 import io.github.keycloakmcp.domain.metrics.PerformanceSummary;
 import io.github.keycloakmcp.observability.metrics.MetricAvailability;
@@ -28,6 +36,8 @@ import io.github.keycloakmcp.observability.metrics.ServiceMonitorProbe;
 import io.github.keycloakmcp.service.platform.InventoryService;
 import io.github.keycloakmcp.service.platform.MetricsService;
 import io.github.keycloakmcp.target.KeycloakTargetConfiguration;
+import io.github.keycloakmcp.target.InfrastructureTargetConfiguration;
+import io.github.keycloakmcp.target.InfrastructureType;
 import io.github.keycloakmcp.target.ObservabilityTargetConfiguration;
 import io.github.keycloakmcp.target.Target;
 import io.github.keycloakmcp.target.TargetEnvironment;
@@ -72,6 +82,110 @@ class MetricsEvidenceCollectorTest {
     }
 
     @Test
+    void expiredParentDoesNotStartAnyCollection() {
+        var clock = new AtomicLong();
+        var budget = new CollectionBudget(Duration.ofMillis(100), clock::get);
+        clock.set(Duration.ofMillis(100).toNanos());
+        try (var scope = CollectionBudget.open("lab-a", budget)) {
+            assertThat(collected(targetWithInfrastructure())).containsExactly(
+                    Map.entry("metrics.collection.complete", false));
+        }
+        verifyNoInteractions(metricsService, availabilityService, inventoryService, serviceMonitorProbe);
+        assertThat(CollectionBudget.current()).isNull();
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void unmarkedLateSummaryOrExceptionCannotEstablishAnyEvidence(boolean throwsFailure) {
+        var clock = new AtomicLong();
+        var target = targetWithInfrastructure();
+        when(metricsService.summaryForAssessment(target)).thenAnswer(inv -> {
+            clock.set(Duration.ofMillis(100).toNanos());
+            if (throwsFailure) throw new IllegalStateException("private-provider-canary");
+            return completedSummary();
+        });
+        try (var scope = CollectionBudget.open("lab-a", new CollectionBudget(Duration.ofMillis(100), clock::get))) {
+            assertThat(collected(target)).containsExactly(Map.entry("metrics.collection.complete", false));
+        }
+        verifyNoInteractions(availabilityService, inventoryService, serviceMonitorProbe);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"availability", "inventory", "monitor"})
+    void followOnDeadlinePreservesSummaryButRejectsLateSourceAndStopsFanout(String phase) {
+        var clock = new AtomicLong();
+        var target = targetWithInfrastructure();
+        when(metricsService.summaryForAssessment(target)).thenReturn(completedSummary());
+        if (phase.equals("availability")) {
+            when(availabilityService.detect(target)).thenAnswer(inv -> {
+                clock.set(Duration.ofMillis(100).toNanos());
+                return emptySeries();
+            });
+        } else if (phase.equals("inventory")) {
+            when(inventoryService.collect("lab-a")).thenAnswer(inv -> {
+                clock.set(Duration.ofMillis(100).toNanos());
+                return null;
+            });
+        } else {
+            when(serviceMonitorProbe.probe(target)).thenAnswer(inv -> {
+                clock.set(Duration.ofMillis(100).toNanos());
+                return new ServiceMonitorProbe.Result(ScrapeReadiness.SCRAPE_HEALTHY, true, "30s", "10s", "safe");
+            });
+        }
+        try (var scope = CollectionBudget.open("lab-a", new CollectionBudget(Duration.ofMillis(100), clock::get))) {
+            var evidence = collected(target);
+            assertThat(evidence).containsEntry("metrics.collection.complete", false)
+                    .containsEntry("metrics.http.requestRate", 10.0)
+                    .containsEntry("metrics.cluster.size", 3.0)
+                    .doesNotContainKeys("metrics.scrape.readiness", "metrics.serviceMonitor.present",
+                            "metrics.cluster.readyReplicas", "metrics.cluster.sizeMismatch");
+            if (phase.equals("availability")) {
+                assertThat(evidence).doesNotContainKey("metrics.series.httpCount");
+                verifyNoInteractions(inventoryService, serviceMonitorProbe);
+            } else {
+                assertThat(evidence).containsEntry("metrics.series.httpCount", false);
+                verify(inventoryService).collect("lab-a");
+                if (phase.equals("inventory")) verifyNoInteractions(serviceMonitorProbe);
+            }
+            assertThat(CollectionBudget.current()).isSameAs(scope.budget());
+        }
+        assertThat(CollectionBudget.current()).isNull();
+    }
+
+    @Test
+    void interruptedFollowOnPreservesEarlierEvidenceAndInterruptFlag() {
+        var target = targetWithInfrastructure();
+        when(metricsService.summaryForAssessment(target)).thenReturn(completedSummary());
+        when(availabilityService.detect(target)).thenAnswer(inv -> {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("private-provider-canary");
+        });
+        try {
+            assertThat(collected(target)).containsEntry("metrics.collection.complete", false)
+                    .containsEntry("metrics.http.requestRate", 10.0)
+                    .doesNotContainKey("metrics.series.httpCount");
+            assertThat(Thread.currentThread().isInterrupted()).isTrue();
+            verifyNoInteractions(inventoryService, serviceMonitorProbe);
+            assertThat(CollectionBudget.current()).isNull();
+        } finally {
+            Thread.interrupted();
+        }
+    }
+
+    private Map<String, Object> collected(Target target) {
+        return collector.collect(target).stream()
+                .collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+    }
+
+    private static PerformanceSummary completedSummary() {
+        return new PerformanceSummary("lab-a", MetricWindow.W_15M, MetricsProviderStatus.AVAILABLE, "PROMETHEUS", Instant.now(),
+                new PerformanceSummary.Http(10.0, null, null, null, null, null, null, false, false),
+                PerformanceSummary.Database.empty(), PerformanceSummary.Jvm.empty(), PerformanceSummary.Cache.empty(),
+                new PerformanceSummary.Cluster(3.0), PerformanceSummary.Runtime.empty(),
+                Map.of("COLLECTION_BUDGET", MetricAvailability.AVAILABLE, "HTTP_BUCKET_SERIES", MetricAvailability.UNKNOWN));
+    }
+
+    @Test
     void emitsSloBooleansAndDoesNotCoerceMissingToZero() {
         Target target = target(new ObservabilityTargetConfiguration(
                 "PROMETHEUS", null, "http://localhost:9090", null, null, "NAMESPACE"));
@@ -87,7 +201,7 @@ class MetricsEvidenceCollectorTest {
                 PerformanceSummary.Cache.empty(),
                 new PerformanceSummary.Cluster(3.0),
                 PerformanceSummary.Runtime.empty(),
-                Map.of());
+                Map.of("DB_POOL_AWAITING_RANGE", MetricAvailability.AVAILABLE));
         when(metricsService.summaryForAssessment(target)).thenReturn(summary);
 
         List<Evidence> evidence = collector.collect(target);
@@ -175,7 +289,7 @@ class MetricsEvidenceCollectorTest {
                 PerformanceSummary.Cache.empty(),
                 PerformanceSummary.Cluster.empty(),
                 PerformanceSummary.Runtime.empty(),
-                Map.of());
+                Map.of("DB_POOL_AWAITING_RANGE", MetricAvailability.AVAILABLE));
         when(metricsService.summaryForAssessment(target)).thenReturn(summary);
 
         Map<String, Object> byKey = collector.collect(target).stream()
@@ -240,6 +354,204 @@ class MetricsEvidenceCollectorTest {
         assertThat(byKey.get("metrics.stale.present")).isEqualTo(true);
         assertThat(byKey.containsKey("metrics.slo.p99Exceeded")).isFalse();
         assertThat(byKey.containsKey("metrics.slo.errorRateExceeded")).isFalse();
+    }
+
+    @Test
+    void heapMeasurementsDoNotImplyPolicyUntilThresholdIsConfigured() {
+        Target target = target(new ObservabilityTargetConfiguration(
+                "PROMETHEUS", null, "http://localhost:9090", null, null, "NAMESPACE"));
+        when(metricsService.summaryForAssessment(target)).thenReturn(new PerformanceSummary(
+                "lab-a", MetricWindow.W_15M, MetricsProviderStatus.AVAILABLE, "PROMETHEUS", Instant.now(),
+                PerformanceSummary.Http.empty(), PerformanceSummary.Database.empty(),
+                new PerformanceSummary.Jvm(90.0, 100.0, 100.0, 0.9, null),
+                PerformanceSummary.Cache.empty(), PerformanceSummary.Cluster.empty(), PerformanceSummary.Runtime.empty(),
+                Map.of("JVM_HEAP_UTILIZATION", MetricAvailability.AVAILABLE)));
+        when(performanceConfig.heapUtilizationWarningPercent()).thenReturn(OptionalDouble.empty());
+        var absent = collector.collect(target).stream().collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+        assertThat(absent).containsEntry("metrics.jvm.heapUtilization", 0.9).doesNotContainKey("metrics.jvm.heapPressure");
+        when(performanceConfig.heapUtilizationWarningPercent()).thenReturn(OptionalDouble.of(85));
+        var configured = collector.collect(target).stream().collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+        assertThat(configured).containsEntry("metrics.jvm.heapPressure", true);
+        when(performanceConfig.heapUtilizationWarningPercent()).thenReturn(OptionalDouble.of(95));
+        var below = collector.collect(target).stream().collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+        assertThat(below).containsEntry("metrics.jvm.heapPressure", false);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = MetricAvailability.class, names = "AVAILABLE", mode = EnumSource.Mode.EXCLUDE)
+    void unavailableRangeNeverUsesInstantOrRetainedNumbersForSustainedFinding(MetricAvailability state) {
+        assertThat(databaseEvidence(25.0, 22.0, 30.0, Map.of("DB_POOL_AWAITING_RANGE", state)))
+                .doesNotContainKeys("metrics.db.awaitingWarning", "metrics.db.awaitingCritical")
+                .containsEntry("metrics.db.awaitingCurrent", 25.0);
+    }
+
+    @Test
+    void missingRangeMetadataNeverAdvertisesSustainedPassOrFailure() {
+        assertThat(databaseEvidence(0.0, 0.0, 0.0, Map.of()))
+                .doesNotContainKeys("metrics.db.awaitingWarning", "metrics.db.awaitingCritical");
+        assertThat(databaseEvidence(25.0, null, null, Map.of()))
+                .doesNotContainKeys("metrics.db.awaitingWarning", "metrics.db.awaitingCritical");
+    }
+
+    @Test
+    void invalidRangeNumbersDoNotProduceSustainedEvidence() {
+        for (Double[] values : List.of(new Double[]{null, 30.0}, new Double[]{22.0, null},
+                new Double[]{Double.NaN, 30.0}, new Double[]{22.0, Double.POSITIVE_INFINITY},
+                new Double[]{-1.0, 30.0}, new Double[]{30.0, 22.0})) {
+            assertThat(databaseEvidence(25.0, values[0], values[1],
+                    Map.of("DB_POOL_AWAITING_RANGE", MetricAvailability.AVAILABLE)))
+                    .doesNotContainKeys("metrics.db.awaitingWarning", "metrics.db.awaitingCritical");
+        }
+    }
+
+    @Test
+    void validatedZeroRangeStillProducesObservedNegativeFindings() {
+        assertThat(databaseEvidence(0.0, 0.0, 0.0, Map.of("DB_POOL_AWAITING_RANGE", MetricAvailability.AVAILABLE)))
+                .containsEntry("metrics.db.awaitingWarning", false)
+                .containsEntry("metrics.db.awaitingCritical", false);
+    }
+
+    @Test
+    void validatedRangeDoesNotDependOnSeparateInstantAvailability() {
+        assertThat(databaseEvidence(null, 22.0, 30.0, Map.of(
+                "DB_POOL_AWAITING_RANGE", MetricAvailability.AVAILABLE,
+                "DB_POOL_AWAITING", MetricAvailability.STALE)))
+                .containsEntry("metrics.db.awaitingCritical", true)
+                .containsEntry("metrics.db.awaitingWarning", false);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = MetricsProviderStatus.class, names = {"AVAILABLE", "DEGRADED"})
+    void abortedSummaryPreservesObservationsButSkipsAdditionalRemoteCollectionAndUnknownFlags(MetricsProviderStatus status) {
+        Target target = targetWithInfrastructure();
+        when(metricsService.summaryForAssessment(target)).thenReturn(new PerformanceSummary(
+                "lab-a", MetricWindow.W_15M, status, "PROMETHEUS", Instant.now(),
+                new PerformanceSummary.Http(10.0, 2.5, null, null, null, null, null, false, false),
+                PerformanceSummary.Database.empty(), new PerformanceSummary.Jvm(null, null, null, 0.9, null),
+                PerformanceSummary.Cache.empty(), new PerformanceSummary.Cluster(3.0), PerformanceSummary.Runtime.empty(),
+                Map.of("COLLECTION_BUDGET", MetricAvailability.NOT_AVAILABLE,
+                        "HTTP_BUCKET_SERIES", MetricAvailability.UNKNOWN,
+                        "HTTP_ERROR_RATE", MetricAvailability.AVAILABLE,
+                        "JVM_HEAP_UTILIZATION", MetricAvailability.AVAILABLE)));
+
+        Map<String, Object> evidence = collector.collect(target).stream()
+                .collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+
+        assertThat(evidence).containsEntry("metrics.collection.complete", false)
+                .containsEntry("metrics.http.requestRate", 10.0)
+                .containsEntry("metrics.slo.errorRateExceeded", true)
+                .containsEntry("metrics.jvm.heapPressure", true)
+                .containsEntry("metrics.cluster.size", 3.0)
+                .doesNotContainKeys("metrics.source.available", "metrics.http.histogram.available", "metrics.http.histogram.requiredButMissing",
+                        "metrics.http.noTrafficInWindow", "metrics.stale.present", "metrics.series.httpCount",
+                        "metrics.cluster.readyReplicas", "metrics.scrape.readiness");
+        verifyNoInteractions(availabilityService, inventoryService, serviceMonitorProbe);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = MetricsProviderStatus.class, names = {"AVAILABLE", "DEGRADED"})
+    void abortBeforeObservationsNeverClaimsSourceReachability(MetricsProviderStatus status) {
+        Target target = targetWithInfrastructure();
+        when(metricsService.summaryForAssessment(target)).thenReturn(new PerformanceSummary(
+                "lab-a", MetricWindow.W_15M, status, "PROMETHEUS", Instant.now(),
+                PerformanceSummary.Http.empty(), PerformanceSummary.Database.empty(), PerformanceSummary.Jvm.empty(),
+                PerformanceSummary.Cache.empty(), PerformanceSummary.Cluster.empty(), PerformanceSummary.Runtime.empty(),
+                Map.of("COLLECTION_BUDGET", MetricAvailability.NOT_AVAILABLE,
+                        "HTTP_BUCKET_SERIES", MetricAvailability.UNKNOWN)));
+
+        Map<String, Object> evidence = collector.collect(target).stream()
+                .collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+
+        assertThat(evidence).containsEntry("metrics.collection.complete", false)
+                .containsEntry("metrics.provider.status", status.name())
+                .doesNotContainKeys("metrics.source.available", "metrics.http.requestRate",
+                        "metrics.http.histogram.available", "metrics.stale.present");
+        verifyNoInteractions(availabilityService, inventoryService, serviceMonitorProbe);
+    }
+
+    @Test
+    void completedSummaryWithUnknownHistogramDoesNotTreatFailedPresenceProbeAsAbsent() {
+        Target target = target(new ObservabilityTargetConfiguration(
+                "PROMETHEUS", null, "http://localhost:9090", null, null, "NAMESPACE"));
+        when(metricsService.summaryForAssessment(target)).thenReturn(summaryWithHistogram(
+                Map.of("COLLECTION_BUDGET", MetricAvailability.AVAILABLE,
+                        "HTTP_BUCKET_SERIES", MetricAvailability.UNKNOWN), false));
+        when(availabilityService.detect(target)).thenReturn(Map.of(
+                MetricAvailabilityService.SeriesKey.HTTP_COUNT, false,
+                MetricAvailabilityService.SeriesKey.JVM_HEAP, true));
+
+        Map<String, Object> evidence = collector.collect(target).stream()
+                .collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+
+        assertThat(evidence).containsEntry("metrics.series.httpCount", false)
+                .containsEntry("metrics.series.jvmHeap", true)
+                .doesNotContainKeys("metrics.series.httpBucket", "metrics.series.agroal",
+                        "metrics.series.events", "metrics.series.cluster", "metrics.http.histogram.available",
+                        "metrics.http.histogram.requiredButMissing", "metrics.http.noTrafficInWindow");
+    }
+
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {false, true})
+    void observedHistogramPresenceSurvivesLaterAbort(boolean present) {
+        Target target = targetWithInfrastructure();
+        when(metricsService.summaryForAssessment(target)).thenReturn(summaryWithHistogram(
+                Map.of("COLLECTION_BUDGET", MetricAvailability.NOT_AVAILABLE,
+                        "HTTP_BUCKET_SERIES", MetricAvailability.AVAILABLE), present));
+
+        Map<String, Object> evidence = collector.collect(target).stream()
+                .collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
+
+        assertThat(evidence).containsEntry("metrics.collection.complete", false)
+                .containsEntry("metrics.http.histogram.available", present)
+                .containsEntry("metrics.http.histogram.requiredButMissing", !present)
+                .doesNotContainKeys("metrics.http.noTrafficInWindow", "metrics.slo.p99Exceeded");
+        verifyNoInteractions(availabilityService, inventoryService, serviceMonitorProbe);
+    }
+
+    @Test
+    void observedStaleMetricSurvivesAbortedCollection() {
+        Target target = targetWithInfrastructure();
+        when(metricsService.summaryForAssessment(target)).thenReturn(summaryWithHistogram(
+                Map.of("COLLECTION_BUDGET", MetricAvailability.NOT_AVAILABLE,
+                        "HTTP_BUCKET_SERIES", MetricAvailability.UNKNOWN,
+                        "HTTP_ERROR_RATE", MetricAvailability.STALE), false));
+        assertThat(collector.collect(target)).anySatisfy(evidence -> {
+            assertThat(evidence.key()).isEqualTo("metrics.stale.present");
+            assertThat(evidence.value()).isEqualTo(true);
+        });
+        verifyNoInteractions(availabilityService, inventoryService, serviceMonitorProbe);
+    }
+
+    private static PerformanceSummary summaryWithHistogram(Map<String, MetricAvailability> availability, boolean present) {
+        return new PerformanceSummary(
+                "lab-a", MetricWindow.W_15M, MetricsProviderStatus.AVAILABLE, "PROMETHEUS", Instant.now(),
+                new PerformanceSummary.Http(null, null, null, null, null, null, null, present, false),
+                PerformanceSummary.Database.empty(), PerformanceSummary.Jvm.empty(),
+                PerformanceSummary.Cache.empty(), PerformanceSummary.Cluster.empty(),
+                PerformanceSummary.Runtime.empty(), availability);
+    }
+
+    private static Target targetWithInfrastructure() {
+        Target base = target(new ObservabilityTargetConfiguration(
+                "PROMETHEUS", null, "http://localhost:9090", null, null, "NAMESPACE"));
+        return new Target(base.id(), base.displayName(), base.type(), base.environment(), true, base.keycloak(),
+                new InfrastructureTargetConfiguration(InfrastructureType.KUBERNETES, "cluster", "namespace", "ref"),
+                base.observability(), Map.of());
+    }
+
+    private Map<String, Object> databaseEvidence(Double current, Double average, Double max,
+            Map<String, MetricAvailability> availability) {
+        when(performanceConfig.dbAwaitingCritical()).thenReturn(OptionalInt.of(20));
+        Target target = target(new ObservabilityTargetConfiguration(
+                "PROMETHEUS", null, "http://localhost:9090", null, null, "NAMESPACE"));
+        when(metricsService.summaryForAssessment(target)).thenReturn(new PerformanceSummary(
+                "lab-a", MetricWindow.W_15M, MetricsProviderStatus.AVAILABLE, "PROMETHEUS", Instant.now(),
+                PerformanceSummary.Http.empty(),
+                new PerformanceSummary.Database(null, null, current, average, max, null),
+                PerformanceSummary.Jvm.empty(), PerformanceSummary.Cache.empty(),
+                PerformanceSummary.Cluster.empty(), PerformanceSummary.Runtime.empty(), availability));
+        return collector.collect(target).stream()
+                .collect(java.util.stream.Collectors.toMap(Evidence::key, Evidence::value));
     }
 
     private static Map<MetricAvailabilityService.SeriesKey, Boolean> emptySeries() {

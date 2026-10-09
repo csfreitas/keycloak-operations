@@ -6,6 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.config.MetricsConfig;
 import io.github.keycloakmcp.domain.metrics.PerformanceSummary;
 import io.github.keycloakmcp.observability.metrics.MetricAvailability;
@@ -13,6 +16,7 @@ import io.github.keycloakmcp.observability.metrics.MetricAvailabilityService;
 import io.github.keycloakmcp.observability.metrics.MetricCategory;
 import io.github.keycloakmcp.observability.metrics.MetricWindow;
 import io.github.keycloakmcp.observability.metrics.MetricsProvider;
+import io.github.keycloakmcp.observability.metrics.MetricsOperationBudget;
 import io.github.keycloakmcp.observability.metrics.MetricsProviderFactory;
 import io.github.keycloakmcp.observability.metrics.MetricsProviderStatus;
 import io.github.keycloakmcp.observability.metrics.MetricsQueryBounds;
@@ -33,6 +37,8 @@ public class PerformanceSummaryService {
     private final MetricsProviderFactory providerFactory;
     private final MetricAvailabilityService availabilityService;
     private final MetricsConfig metricsConfig;
+    @ConfigProperty(name = "collection.operation-timeout-ms", defaultValue = "30000")
+    long collectionTimeoutMs = 30000;
 
     @Inject
     public PerformanceSummaryService(
@@ -45,24 +51,44 @@ public class PerformanceSummaryService {
     }
 
     public PerformanceSummary summarize(Target target, MetricWindow window) {
+        try (var scope = CollectionBudget.open(target.id().value(), collectionTimeoutMs)) {
+            return summarize(target, window, MetricsOperationBudget.fromConfig(metricsConfig));
+        }
+    }
+
+    // One invocation-local deadline; nested providers must never renew it.
+    PerformanceSummary summarize(Target target, MetricWindow window, MetricsOperationBudget budget) {
         MetricWindow w = window == null ? assessmentWindow() : window;
         MetricsQueryBounds.validateWindow(w, metricsConfig);
         MetricsProvider provider = providerFactory.forTarget(target);
-        MetricsProviderStatus status = provider.status(target);
+        MetricsProviderStatus status = budget.exhausted() ? MetricsProviderStatus.DEGRADED : provider.status(target, budget);
         String source = sourceLabel(target, provider);
 
         Map<SemanticMetric, SemanticMetricResult> results = new EnumMap<>(SemanticMetric.class);
         for (SemanticMetric metric : SemanticMetric.values()) {
-            results.put(metric, provider.query(target, metric, w));
+            SemanticMetricResult result = budget.exhausted() ? null : provider.query(target, metric, w, budget);
+            results.put(metric, budget.exhausted()
+                    ? SemanticMetricResult.notAvailable(target.id().value(), metric, w, source, budget.reason())
+                    : result);
         }
 
-        boolean histogramPresent = availabilityService.hasHttpBucket(target);
-        boolean noTraffic = histogramPresent
+        Map<MetricAvailabilityService.SeriesKey, Boolean> series = budget.exhausted()
+                ? Map.of() : availabilityService.detect(target, budget);
+        if (budget.exhausted()) series = Map.of();
+        boolean histogramKnown = series.containsKey(MetricAvailabilityService.SeriesKey.HTTP_BUCKET);
+        boolean histogramPresent = Boolean.TRUE.equals(series.get(MetricAvailabilityService.SeriesKey.HTTP_BUCKET));
+        RangeMetricSummary awaitingRange = budget.exhausted()
+                ? RangeMetricSummary.notAvailable(budget.reason())
+                : provider.queryRange(target, SemanticMetric.DB_POOL_AWAITING, w, budget);
+        if (budget.exhausted()) awaitingRange = RangeMetricSummary.notAvailable(budget.reason());
+        Double requestRate = usable(results.get(SemanticMetric.HTTP_REQUEST_RATE));
+        boolean observedNoTraffic = !budget.exhausted() && histogramPresent && requestRate != null && requestRate == 0d;
+        boolean noTraffic = observedNoTraffic
                 && usable(results.get(SemanticMetric.HTTP_P99_LATENCY)) == null
                 && percentileUnavailableDueToNoTraffic(results.get(SemanticMetric.HTTP_P99_LATENCY));
 
         // Rewrite percentile availability reasons when histogram exists but window has no observations
-        if (histogramPresent) {
+        if (observedNoTraffic) {
             rewriteNoTraffic(results, SemanticMetric.HTTP_P50_LATENCY);
             rewriteNoTraffic(results, SemanticMetric.HTTP_P95_LATENCY);
             rewriteNoTraffic(results, SemanticMetric.HTTP_P99_LATENCY);
@@ -79,7 +105,6 @@ public class PerformanceSummaryService {
                 histogramPresent,
                 noTraffic);
 
-        RangeMetricSummary awaitingRange = provider.queryRange(target, SemanticMetric.DB_POOL_AWAITING, w);
         Double awaitingCurrent = awaitingRange.availability() == MetricAvailability.AVAILABLE
                 ? awaitingRange.current()
                 : usable(results.get(SemanticMetric.DB_POOL_AWAITING));
@@ -116,6 +141,7 @@ public class PerformanceSummaryService {
                 usable(results.get(SemanticMetric.RUNTIME_MEMORY_WORKING_SET)));
 
         Map<String, MetricAvailability> availability = new LinkedHashMap<>();
+        availability.put("HTTP_BUCKET_SERIES", histogramKnown ? MetricAvailability.AVAILABLE : MetricAvailability.UNKNOWN);
         for (Map.Entry<SemanticMetric, SemanticMetricResult> e : results.entrySet()) {
             MetricAvailability a = e.getValue() == null
                     ? MetricAvailability.UNKNOWN
@@ -125,6 +151,9 @@ public class PerformanceSummaryService {
         if (awaitingRange.availability() != null) {
             availability.put("DB_POOL_AWAITING_RANGE", awaitingRange.availability());
         }
+        boolean aborted = budget.exhausted();
+        availability.put("COLLECTION_BUDGET", aborted ? MetricAvailability.NOT_AVAILABLE : MetricAvailability.AVAILABLE);
+        if (aborted) status = MetricsProviderStatus.DEGRADED;
 
         return new PerformanceSummary(
                 target.id().value(),
@@ -142,9 +171,12 @@ public class PerformanceSummaryService {
     }
 
     public List<SemanticMetricResult> category(Target target, MetricCategory category, MetricWindow window) {
-        MetricWindow w = window == null ? interactiveWindow() : window;
-        MetricsQueryBounds.validateWindow(w, metricsConfig);
-        return providerFactory.forTarget(target).queryCategory(target, category, w);
+        try (var scope = CollectionBudget.open(target.id().value(), collectionTimeoutMs)) {
+            MetricWindow w = window == null ? interactiveWindow() : window;
+            MetricsQueryBounds.validateWindow(w, metricsConfig);
+            return providerFactory.forTarget(target).queryCategory(target, category, w,
+                    MetricsOperationBudget.fromConfig(metricsConfig));
+        }
     }
 
     public MetricWindow assessmentWindow() {
@@ -170,14 +202,13 @@ public class PerformanceSummaryService {
             return false;
         }
         String reason = result.reason();
-        return reason == null
-                || reason.contains("No time series")
+        return SemanticMetricResult.REASON_NO_SERIES.equals(reason)
                 || SemanticMetricResult.REASON_NO_TRAFFIC.equals(reason);
     }
 
     private static void rewriteNoTraffic(Map<SemanticMetric, SemanticMetricResult> results, SemanticMetric metric) {
         SemanticMetricResult r = results.get(metric);
-        if (r == null || r.availability() != MetricAvailability.NOT_AVAILABLE) {
+        if (!percentileUnavailableDueToNoTraffic(r)) {
             return;
         }
         if (r.value() != null) {

@@ -3,6 +3,8 @@ package io.github.keycloakmcp.config;
 import io.smallrye.config.ConfigMapping;
 import io.smallrye.config.WithDefault;
 import io.smallrye.config.WithName;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @ConfigMapping(prefix = "metrics")
 public interface MetricsConfig {
@@ -26,6 +28,13 @@ public interface MetricsConfig {
     @WithName("read-timeout-ms")
     @WithDefault("10000")
     int readTimeoutMs();
+
+    /** Shared total collection budget, not a fresh timeout for every nested request. */
+    @WithName("operation-timeout-ms")
+    @WithDefault("30000")
+    @Min(1)
+    @Max(120000)
+    int operationTimeoutMs();
 
     @WithName("availability-cache-ttl-seconds")
     @WithDefault("60")

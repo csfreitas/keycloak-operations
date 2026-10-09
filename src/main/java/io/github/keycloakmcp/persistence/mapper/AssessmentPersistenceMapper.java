@@ -71,7 +71,7 @@ public class AssessmentPersistenceMapper {
         summary.put("mediumCount", counts.getOrDefault("medium", 0));
         summary.put("lowCount", counts.getOrDefault("low", 0));
         summary.put("infoCount", counts.getOrDefault("info", 0));
-        entity.summary = sensitiveDataFilter.redact(summary);
+        entity.summary = sensitiveDataFilter.redactMetadata(summary);
         entity.startedAt = result.startedAt() == null ? Instant.now() : result.startedAt();
         entity.completedAt = result.completedAt() == null ? Instant.now() : result.completedAt();
         entity.createdAt = Instant.now();
@@ -89,6 +89,8 @@ public class AssessmentPersistenceMapper {
             if (lifecycle != FindingLifecycleStatus.OPEN) {
                 continue;
             }
+            // Evaluation has already completed. Sanitize only the retained/exported finding projection.
+            finding = sanitizeFinding(finding);
             AssessmentFindingEntity entity = new AssessmentFindingEntity();
             entity.id = UUID.randomUUID().toString();
             entity.assessmentId = assessmentId;
@@ -102,7 +104,7 @@ public class AssessmentPersistenceMapper {
             entity.description = finding.description();
             entity.evidence = finding.evidence() == null
                     ? null
-                    : sensitiveDataFilter.redact(new HashMap<>(finding.evidence()));
+                    : new LinkedHashMap<>(finding.evidence());
             entity.impact = finding.impact();
             entity.recommendation = finding.recommendation();
             entity.references = finding.references() == null ? List.of() : List.copyOf(finding.references());
@@ -181,7 +183,7 @@ public class AssessmentPersistenceMapper {
             SubjectType type = parseSubjectType(entity.resourceType);
             subject = new EvidenceSubject(type, entity.resourceId, entity.resourceName);
         }
-        return new Finding(
+        return sanitizeFinding(new Finding(
                 entity.targetId,
                 entity.findingKey,
                 entity.title,
@@ -193,7 +195,26 @@ public class AssessmentPersistenceMapper {
                 entity.impact,
                 entity.recommendation,
                 entity.references,
-                subject);
+                subject));
+    }
+
+    private Finding sanitizeFinding(Finding finding) {
+        EvidenceSubject subject = finding.subject();
+        return new Finding(
+                finding.targetId(),
+                finding.id(),
+                sensitiveDataFilter.redactString(finding.title()),
+                finding.category(),
+                finding.severity(),
+                finding.status(),
+                sensitiveDataFilter.redactString(finding.description()),
+                sensitiveDataFilter.redactMetadata(finding.evidence()),
+                sensitiveDataFilter.redactString(finding.impact()),
+                sensitiveDataFilter.redactString(finding.recommendation()),
+                sensitiveDataFilter.redactMetadata(finding.references()),
+                subject == null ? null : new EvidenceSubject(subject.type(),
+                        sensitiveDataFilter.redactString(subject.id()),
+                        sensitiveDataFilter.redactString(subject.displayName())));
     }
 
     /**

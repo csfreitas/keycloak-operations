@@ -1,6 +1,7 @@
 package io.github.keycloakmcp.observability.metrics;
 
 import java.util.Objects;
+import java.util.LinkedHashMap;
 
 /**
  * Builds controlled PromQL for semantic metrics. Never accepts raw PromQL from callers.
@@ -8,6 +9,21 @@ import java.util.Objects;
 public final class MetricsQueryBuilder {
 
     private MetricsQueryBuilder() {
+    }
+
+    /** Scrape identity always includes the actual registered target, even with a shared job. */
+    public static MetricsQueryContext scrapeContext(String targetId, MetricsQueryContext configured) {
+        Objects.requireNonNull(targetId, "targetId");
+        Objects.requireNonNull(configured, "configured");
+        var labels = new LinkedHashMap<>(configured.mandatoryLabels());
+        labels.put("target_id", targetId);
+        return new MetricsQueryContext(targetId, configured.namespace(), configured.scope(), labels, configured.httpScope());
+    }
+
+    /** Controlled direct selector: do not aggregate away failed or invalid observations. */
+    public static String scrapeUp(MetricsQueryContext ctx) {
+        Objects.requireNonNull(ctx, "ctx");
+        return "up{" + scrapeContext(ctx.targetId(), ctx).selectorClause() + "}";
     }
 
     public static String build(SemanticMetric metric, MetricWindow window, MetricsQueryContext ctx) {

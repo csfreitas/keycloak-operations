@@ -22,6 +22,25 @@ class AuthenticatedBoundaryTest {
     ObjectMapper mapper;
 
     @Test
+    void anonymousCannotDiscoverOrConfirmInstallations() {
+        given().contentType("application/json").post("/api/v1/targets/lab-keycloak-a/installation/discover")
+                .then().statusCode(anyOf(equalTo(401), equalTo(403)));
+        given().contentType("application/json").body("{\"runId\":\"unknown\",\"candidateId\":\"unknown\"}")
+                .post("/api/v1/targets/lab-keycloak-a/installation/confirm")
+                .then().statusCode(anyOf(equalTo(401), equalTo(403)));
+    }
+
+    @Test
+    @TestSecurity(user = "reader", roles = "reader-a")
+    void readingTargetDoesNotGrantInstallationDiscoveryOrConfirmation() {
+        given().get("/api/v1/targets/lab-keycloak-a/installation").then().statusCode(200);
+        given().get("/api/v1/targets/lab-keycloak-b/installation").then().statusCode(403);
+        given().contentType("application/json").post("/api/v1/targets/lab-keycloak-a/installation/discover").then().statusCode(403);
+        given().contentType("application/json").body("{\"runId\":\"unknown\",\"candidateId\":\"unknown\"}")
+                .post("/api/v1/targets/lab-keycloak-a/installation/confirm").then().statusCode(403);
+    }
+
+    @Test
     void anonymousCannotAccessRestMcpOrSse() {
         given().get("/api/v1/targets").then().statusCode(anyOf(equalTo(401), equalTo(403)));
         given().get("/api/v1/events").then().statusCode(anyOf(equalTo(401), equalTo(403)));

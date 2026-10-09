@@ -13,6 +13,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.representations.info.ServerInfoRepresentation;
 
 import io.github.keycloakmcp.domain.error.ErrorCode;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.domain.error.McpError;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.observability.McpMetrics;
@@ -49,7 +50,10 @@ public class StableAdminApiAdapter {
         requireNonBlank(realm, "realm");
         return execute(target, "getRealm", realm, () -> {
             try {
-                return realmResource(target, realm).toRepresentation();
+                RealmRepresentation observed = realmResource(target, realm).toRepresentation();
+                checkpoint(target);
+                requireRealmIdentity(realm, observed);
+                return observed;
             } catch (NotFoundException e) {
                 throw McpException.realmNotFound(realm);
             }
@@ -229,9 +233,18 @@ public class StableAdminApiAdapter {
 
     private void ensureRealmExists(Target target, String realm) {
         try {
-            realmResource(target, realm).toRepresentation();
+            checkpoint(target);
+            RealmRepresentation observed = realmResource(target, realm).toRepresentation();
+            checkpoint(target);
+            requireRealmIdentity(realm, observed);
         } catch (NotFoundException e) {
             throw McpException.realmNotFound(realm);
+        }
+    }
+
+    private static void requireRealmIdentity(String expected, RealmRepresentation observed) {
+        if (CollectionBudget.current() != null && (observed == null || !expected.equals(observed.getRealm()))) {
+            throw McpException.evidenceCollectionFailed("Keycloak collection realm identity is unavailable", null);
         }
     }
 
@@ -243,34 +256,57 @@ public class StableAdminApiAdapter {
 
     private <T> T execute(Target target, String operation, String realm, SupplierWithException<T> supplier) {
         Objects.requireNonNull(target, "target");
+        checkpoint(target);
         metrics.recordKeycloakAdminRequest(target.id().value(), operation);
         try {
-            return supplier.get();
+            T value = supplier.get();
+            checkpoint(target);
+            return value;
+        } catch (CollectionBudget.Aborted e) {
+            throw e;
         } catch (McpException e) {
+            checkpoint(target);
+            if (CollectionBudget.current() != null) throw collectionFailure(e.getCode());
             throw e;
         } catch (NotFoundException e) {
+            checkpoint(target);
             throw mapNotFound(operation, realm, e);
         } catch (NotAuthorizedException e) {
+            checkpoint(target);
+            if (CollectionBudget.current() != null) throw collectionFailure(ErrorCode.AUTHENTICATION_FAILED);
             throw McpException.authenticationFailed("Authentication with Keycloak Admin API failed", e);
         } catch (WebApplicationException e) {
+            checkpoint(target);
             int status = e.getResponse() == null ? -1 : e.getResponse().getStatus();
             if (status == 401) {
+                if (CollectionBudget.current() != null) throw collectionFailure(ErrorCode.AUTHENTICATION_FAILED);
                 throw McpException.authenticationFailed("Authentication with Keycloak Admin API failed", e);
             }
             if (status == 403) {
+                if (CollectionBudget.current() != null) throw collectionFailure(ErrorCode.AUTHORIZATION_FAILED);
                 throw McpException.authorizationFailed("Not authorized to perform " + operation
                         + (realm == null ? "" : " in realm " + realm));
             }
             if (status == 404) {
                 throw mapNotFound(operation, realm, e);
             }
+            if (CollectionBudget.current() != null) throw collectionFailure(ErrorCode.KEYCLOAK_UNAVAILABLE);
             throw McpException.keycloakUnavailable(
                     "Keycloak Admin API request failed for " + operation + " (HTTP " + status + ")", e);
         } catch (ProcessingException e) {
+            checkpoint(target);
+            if (CollectionBudget.current() != null) throw collectionFailure(ErrorCode.KEYCLOAK_UNAVAILABLE);
             throw McpException.keycloakUnavailable("Keycloak Admin API is unavailable for " + operation, e);
         } catch (RuntimeException e) {
+            checkpoint(target);
+            if (CollectionBudget.current() != null) throw collectionFailure(ErrorCode.KEYCLOAK_UNAVAILABLE);
             throw McpException.keycloakUnavailable("Keycloak Admin API error during " + operation, e);
         }
+    }
+
+    private static void checkpoint(Target target) {
+        // Controlled operations outside a read collection retain their existing behavior.
+        if (CollectionBudget.current() != null) CollectionBudget.checkpoint(target.id().value());
     }
 
     private static McpException mapNotFound(String operation, String realm, Exception cause) {
@@ -284,7 +320,21 @@ public class StableAdminApiAdapter {
             case "getRealmRole" -> ErrorCode.ROLE_NOT_FOUND;
             default -> ErrorCode.INTERNAL_ERROR;
         };
+        if (CollectionBudget.current() != null) return collectionFailure(code);
         return new McpException(McpError.of(code, message), cause);
+    }
+
+    private static McpException collectionFailure(ErrorCode code) {
+        String message = switch (code) {
+            case AUTHENTICATION_FAILED -> "Authentication with Keycloak Admin API failed";
+            case AUTHORIZATION_FAILED -> "Keycloak Admin collection is not authorized";
+            case REALM_NOT_FOUND, CLIENT_NOT_FOUND, USER_NOT_FOUND, GROUP_NOT_FOUND, ROLE_NOT_FOUND ->
+                "Keycloak Admin collection resource was not found";
+            case EVIDENCE_COLLECTION_FAILED -> "Keycloak Admin collection evidence is unavailable";
+            default -> "Keycloak Admin collection request failed";
+        };
+        // Codes remain useful; provider bodies, entity identifiers and nested causes do not.
+        return McpException.of(code, message);
     }
 
     @FunctionalInterface

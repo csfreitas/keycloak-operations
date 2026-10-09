@@ -43,4 +43,15 @@ Statistical anomaly detection requires enough history, target-specific baseline 
 
 ## Validation
 
+The planned [SecOps/IAM catalogue](../development/secops-iam-scenarios.md) adds
+IAM-06 password-age assessment and SECOPS-01 identity-event investigation to P1.
+Both require authoritative provider/version semantics and bounded, authorized
+sources; current aggregate metrics/user reads do not implement them. Subject
+compliance is separate from population coverage, and geographic signals are not
+proof of compromise. Event-source adapters and deterministic application services
+will own collection/classification; MCP/REST will share results, not duplicate
+policy in a model. No new service, event store or automatic listener is introduced.
+The initial synthetic catalogue checks validate examples only. Any user containment
+is a separate P2 plan, never a side effect of analytics or an alert.
+
 Fixtures: success/failure, zero traffic, missing client/error labels, scrape gap, counter reset, multiple replicas, target denial, high cardinality, duplicate events, timezone edge, service accounts versus humans and configured-but-unused MFA. Live tests record actual RHBK release and event-metric capability without secrets. Publish each KPI only after its source and semantics have passed these gates.

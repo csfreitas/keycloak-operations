@@ -1,0 +1,15 @@
+# Local real scrapes only; labels match the configured target query scope.
+global:
+  scrape_interval: 2s
+  evaluation_interval: 2s
+scrape_configs:
+  - job_name: identity-keycloak-a
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["target-a:9000"]
+        labels: {target_id: lab-keycloak-a, service: keycloak}
+  - job_name: identity-keycloak-b
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["target-b:9000"]
+        labels: {target_id: lab-keycloak-b, service: keycloak-b}

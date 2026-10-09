@@ -17,6 +17,8 @@ AI coding agents may be used when contributing to this repository.
 
 See root [`AGENTS.md`](../../AGENTS.md) for the short bootstrap checklist.
 
+Its continuity checklist also governs slice completion: reconcile project context, affected architecture, milestone acceptance, Unreleased changes and artifact-version status before handoff. Preserve dated validation evidence and distinguish implemented, locally verified, live-verified and planned behavior. Documentation-only maintenance does not require creating containers or presenting old test results as a fresh run.
+
 ## Contributor responsibility
 
 Whether or not AI tools were used, contributors remain responsible for tests, security expectations, and reviewable changes. See [`CONTRIBUTING.md`](../../CONTRIBUTING.md).

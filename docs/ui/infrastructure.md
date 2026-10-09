@@ -6,6 +6,8 @@ Route: `/targets/{targetId}/infrastructure`
 
 Show OpenShift/Kubernetes posture for a Target using **normalized snapshots**, not raw cluster dumps.
 
+Current workload collection requires exact installation binding; the separate `/targets/{targetId}/installation` screen supports existing-target confirmation. Conceptual drift/layout details below do not imply full coverage-aware history or live network/certificate validation. See [inventory](../infrastructure-inventory.md).
+
 ## Data
 
 Prefer `EnvironmentSnapshot` / inventory fields:

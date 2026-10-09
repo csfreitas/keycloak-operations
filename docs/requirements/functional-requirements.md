@@ -1,6 +1,6 @@
 # Functional requirements
 
-Stable IDs for product capabilities present or planned through the documented roadmap (through **0.8**). Language: **MUST** / **SHOULD** / **MAY**.
+Stable IDs for implemented foundations and planned product capabilities. Language: **MUST** / **SHOULD** / **MAY**. [Roadmap extension requirements](roadmap-requirements.md) cover the later accepted tracks; requirements are not claims of implementation. See milestone acceptance for delivery status.
 
 ## Targets
 
@@ -18,7 +18,7 @@ The platform **MUST** expose target list/get/find capabilities for operators and
 
 ### FR-TARGET-004
 
-Callers **MUST NOT** supply arbitrary Keycloak, cluster, or metrics endpoint URLs; endpoints **MUST** come from registered target configuration.
+Operational callers **MUST NOT** supply arbitrary Keycloak, cluster, or metrics endpoint URLs; outbound operations **MUST** use registered target configuration. The separately authorized administrative draft preflight in FR-ONBOARD-002 accepts candidate URLs only as inert bounded data, never as authority for a network request or registration.
 
 ## Keycloak administration (read)
 
@@ -38,15 +38,31 @@ Outbound admin representations **MUST** be sanitized (no client secrets or crede
 
 ### FR-DISC-001
 
-The platform **MUST** support environment discovery for a registered target (OpenShift, Kubernetes, VM/unknown as applicable).
+The platform **MUST** support environment discovery for a registered target independently of hosting (OpenShift, Kubernetes, VM, physical host, Docker, Podman, Compose-managed or standalone installations, and extensible other platforms). This is a product requirement, not a claim that all infrastructure collectors exist. See [portable discovery](../architecture/portable-environment-discovery.md).
+
+### FR-DISC-002
+
+Hosting, runtime and deployment management **MUST** be represented independently; a VM running Podman Compose is not three mutually exclusive targets. Target assessment through available Keycloak/management/metrics sources **MUST NOT** require a Kubernetes connection.
+
+### FR-DISC-003
+
+Discovery **MUST** remain within registered, authorized connection scope. Candidates **MUST** require explicit installation binding before operational use; ambiguous matches **MUST NOT** select the first resource or automatically grant target access.
+
+### FR-DISC-004
+
+Collector support, configured capability, authorization, observation freshness and collection success **MUST** be distinguished. Unsupported/unknown infrastructure **MUST NOT** be reported as healthy or inferred from an unrelated cluster. Platform-specific rules **MUST** declare evidence/applicability requirements.
 
 ### FR-INV-001
 
-When infrastructure is configured for a target, the platform **MUST** collect a structured infrastructure inventory (workload, pods, topology, and related objects as permitted by RBAC).
+When infrastructure is configured for a target, the platform **MUST** collect a structured inventory of the applicable host, service/process, container or cluster workload and related topology within the authorized scope. Unsupported collectors or unavailable fields **MUST** remain explicit gaps, not fabricated Kubernetes objects or successful empty inventories.
 
 ### FR-INV-002
 
 Inventory and discovery **MUST** be target-aware (per-target clients and namespaces).
+
+### FR-INV-003
+
+Inventory **MUST** preserve source/installation identity, collection window, version and gaps. A failed or denied query **MUST NOT** imply resource deletion. Desired configuration **MUST NOT** be presented as observed state. Container/service metadata and imported evidence **MUST** be allowlisted and sanitized, not raw inspect/configuration dumps.
 
 ## Assessment
 

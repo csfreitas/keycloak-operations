@@ -9,9 +9,11 @@ This directory is reserved for container-based integration tests of
 |--------|-------|---------------|-----------------|
 | Keycloak Community 26.7.x | `quay.io/keycloak/keycloak:26.7.1` | No (public Quay) | **TESTED**: version, controlled client URL write/restore, stale-plan rejection, and read-only MCP/report smoke |
 | Keycloak Community 26.6.x | `quay.io/keycloak/keycloak:26.6.x` | No | **NOT VERIFIED** by the automated smoke job |
-| RHBK 26.6.x (e.g. 26.6.5) | `registry.redhat.io/rhbk/keycloak-rhel9:26.6` (exact tag may vary) | **Yes** — Red Hat registry credentials | **Not auto-tested** |
+| RHBK fixture `26.6.3.redhat-00002` | `registry.redhat.io/rhbk/keycloak-rhel9:26.6` (tag mutable; record actual version/digest) | **Yes** — Red Hat registry credentials | **Historical local read-only run**, not public CI or real OpenShift validation |
 
 ## Why RHBK is not auto-tested
+
+The [2026-09-04 ledger](../docs/development/trust-hardening-validation-2026-09-04.md) records two local read-only RHBK checks. They do not establish current-working-tree or every-26.6-release compatibility. Later skipped integrations must still be reported as skipped. See the [current matrix](../docs/compatibility.md).
 
 RHBK container images are published on `registry.redhat.io` and require an
 authenticated pull (`podman login registry.redhat.io` with a Red Hat account /

@@ -1,0 +1,130 @@
+H1 inventory envelopes and bounds — retained run excerpts
+Captured: 2026-09-18T19:40:29.342Z
+Unsigned local retained excerpts; process exits were observed by the coordinator. Not complete logs or release attestation.
+Java: 21.0.10 via per-command jenv
+Node: 25.6.1 for standalone lab scripts only; no UI rerun
+Final source aggregate: 838b08901744a957673d0177d8bf11336ad17c227671698f801cd42304740f34
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-baseline-20260918.log
+SHA-256: 49475689282bd3b3bf366c3450226c6453186f8e4dc173b2d888045123daa5f1
+Observed process exit: 0
+[INFO] Tests run: 765, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T16:19:46-03:00
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-focused-20260918.log
+SHA-256: d8e2b4221e7f9087497160ba6423517ce4265364ac91b3101fde073cdd16a3d7
+Observed process exit: 1
+[ERROR] COMPILATION ERROR : 
+[INFO] BUILD FAILURE
+[INFO] Finished at: 2026-09-18T16:28:47-03:00
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-focused2-20260918.log
+SHA-256: ca0a319098441cd7b5458dcafd81d2cdeee89655190c539d41a56cc514759283
+Observed process exit: 1
+[ERROR] COMPILATION ERROR : 
+[INFO] BUILD FAILURE
+[INFO] Finished at: 2026-09-18T16:29:13-03:00
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-focused3-20260918.log
+SHA-256: 7ccf48063a7eccad17cdd4c398916bb96c922321f8e6c93a1e7668cd4a2df5c1
+Observed process exit: 1
+[ERROR] Tests run: 376, Failures: 3, Errors: 0, Skipped: 0
+[INFO] BUILD FAILURE
+[INFO] Finished at: 2026-09-18T16:30:32-03:00
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-verify-20260918.log
+SHA-256: 7b7b8812e9d13da0b5514b0d04750a1016e81bce8549ee56c3f4d47621f72fb1
+Observed process exit: 0
+[INFO] Tests run: 970, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Finished at: 2026-09-18T16:35:14-03:00
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-metrics-20260918.log
+SHA-256: 963f0a870afa5c03ce62efe4f2a3c98c088266cb433840f6f00575deb0f9b088
+Observed process exit: 0
+Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.vN07sM
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-installation-20260918.log
+SHA-256: 2be9e4a609da6be92990094b42871b598e86f47c92efeca711723c35bd1534b4
+Observed process exit: 0
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+Local installation diagnostic logs: /private/tmp/kcops-installation.EvJJqR
+
+Log: /private/tmp/kcops-h1-inventory-envelopes-default-20260918.log
+SHA-256: fab21b783b61dd1cad60218c5dd0db9b5f2cd67fdd70b6cd4dd5a5b2a9403a8e
+Observed process exit: 0
+Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.PmyMW6
+
+Final package references:
+2875c5d1ad6da849fdbe5d7312e00092462104e910d2156b589f353c176e6d25  target/quarkus-app/quarkus-run.jar
+e5ce8819211ba6022b6cc06ebb7deddf57a8f0d60fb72ec60cfbadf29c43205b  target/quarkus-app/app/keycloak-operations-mcp-0.8.1-SNAPSHOT.jar
+74af1297f6bd06812ff42e8914c83ef7a59b28a0fa2e6337701936609ea232e7  target/quarkus-app/quarkus-app-dependencies.txt
+
+Final source verification: all 557 inputs match.
+Final test evidence verification: all 107 references match.
+Final owned-resource hygiene (observed process exit 0):
+Zero containers and volumes; default network only; preexisting reusable images unchanged.
+DRIVER      VOLUME NAME
+NETWORK ID    NAME        DRIVER
+2f259bab93aa  podman      bridge
+quay.io/keycloak/keycloak:26.7.1 cc689d358fe6
+docker.io/library/postgres:16 02ad0fee02ae
+registry.redhat.io/rhbk/keycloak-rhel9:26.6 e7affbc8b409
+docker.io/prom/prometheus:v2.55.1 f59c592ea6d9
+{
+  "checks": [
+    {
+      "port": 15432,
+      "bindable": true
+    },
+    {
+      "port": 18080,
+      "bindable": true
+    },
+    {
+      "port": 18180,
+      "bindable": true
+    },
+    {
+      "port": 18280,
+      "bindable": true
+    },
+    {
+      "port": 18081,
+      "bindable": true
+    },
+    {
+      "port": 18082,
+      "bindable": true
+    },
+    {
+      "port": 19001,
+      "bindable": true
+    },
+    {
+      "port": 19002,
+      "bindable": true
+    },
+    {
+      "port": 18300,
+      "bindable": true
+    },
+    {
+      "port": 18490,
+      "bindable": true
+    },
+    {
+      "port": 18590,
+      "bindable": true
+    }
+  ],
+  "lockAbsent": true
+}

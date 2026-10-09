@@ -3,7 +3,6 @@ package io.github.keycloakmcp.adapter.infrastructure;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,12 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jboss.logging.Logger;
 
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.github.keycloakmcp.credential.CredentialProvider;
 import io.github.keycloakmcp.credential.InfrastructureCredentials;
-import io.github.keycloakmcp.credential.InfrastructureCredentials.AuthMode;
 import io.github.keycloakmcp.target.InfrastructureTargetConfiguration;
 import io.github.keycloakmcp.target.InfrastructureType;
 import io.github.keycloakmcp.target.Target;
@@ -33,7 +30,7 @@ import jakarta.inject.Inject;
  * <ol>
  *   <li>KUBECONFIG – path to a kubeconfig file</li>
  *   <li>TOKEN – bearer token + API server URL</li>
- *   <li>IN_CLUSTER – service account automatically detected via {@link Config#autoConfigure()}</li>
+ *   <li>IN_CLUSTER – explicitly enabled mounted pod service account, without ambient configuration</li>
  * </ol>
  * <p>
  * Clients are cached by target ID + fingerprint ({@code url, namespace, sha256(token), trustInsecure}).
@@ -74,11 +71,14 @@ public class InfrastructureClientFactory {
         if (credentialRef != null && !credentialRef.isBlank()) {
             credentials = credentialProvider.getInfrastructureCredentials(credentialRef);
         } else {
-            credentials = InfrastructureCredentials.inCluster();
+            return Optional.empty();
         }
 
         String namespace = infraConfig != null ? infraConfig.namespace() : null;
-        String fingerprint = fingerprint(credentials, namespace);
+        Config resolvedConfig = ExplicitInfrastructureConfig.resolve(credentials, namespace);
+        // Evidence collection has explicit response deadlines; do not silently multiply requests.
+        resolvedConfig.setRequestRetryBackoffLimit(0);
+        String fingerprint = fingerprint(resolvedConfig, credentialRef, target);
         String cacheKey = target.id().value();
 
         CachedClient existing = cache.get(cacheKey);
@@ -99,7 +99,7 @@ public class InfrastructureClientFactory {
             LOG.debugf("Building infrastructure client for target=%s type=%s authMode=%s",
                     cacheKey, type, credentials.authMode());
 
-            DefaultClusterClient client = buildClient(credentials, namespace, type);
+            DefaultClusterClient client = buildClient(resolvedConfig, namespace, type);
             cache.put(cacheKey, new CachedClient(client, fingerprint));
             return Optional.of(client);
         }
@@ -115,73 +115,23 @@ public class InfrastructureClientFactory {
     }
 
     private DefaultClusterClient buildClient(
-            InfrastructureCredentials credentials, String namespace, InfrastructureType typeHint) {
+            Config config, String namespace, InfrastructureType typeHint) {
 
-        Config config = buildFabric8Config(credentials, namespace);
-        KubernetesClient k8sClient = new KubernetesClientBuilder().withConfig(config).build();
+        KubernetesClient k8sClient = new KubernetesClientBuilder().withConfig(config)
+                .withHttpClientFactory(new RedirectRejectingHttpClientFactory()).build();
         DefaultClusterClient client = new DefaultClusterClient(k8sClient,
                 namespace != null && !namespace.isBlank() ? namespace : k8sClient.getNamespace());
         client.setTypeHint(typeHint);
         return client;
     }
 
-    private Config buildFabric8Config(InfrastructureCredentials credentials, String namespace) {
-        AuthMode mode = credentials.authMode();
-        if (mode == AuthMode.KUBECONFIG) {
-            // Load kubeconfig from path without mutating global System properties
-            // (would break multi-target concurrency).
-            try {
-                String contents = java.nio.file.Files.readString(
-                        java.nio.file.Path.of(credentials.kubeconfigPath()),
-                        StandardCharsets.UTF_8);
-                Config loaded = Config.fromKubeconfig(contents);
-                ConfigBuilder builder = new ConfigBuilder(loaded);
-                if (namespace != null && !namespace.isBlank()) {
-                    builder.withNamespace(namespace);
-                }
-                if (credentials.trustInsecure()) {
-                    builder.withTrustCerts(true);
-                }
-                return builder.build();
-            } catch (java.io.IOException e) {
-                throw io.github.keycloakmcp.domain.error.McpException.authenticationFailed(
-                        "Unable to read kubeconfig at configured path");
-            }
-        }
-
-        if (mode == AuthMode.TOKEN) {
-            ConfigBuilder builder = new ConfigBuilder();
-            if (credentials.apiServerUrl() != null && !credentials.apiServerUrl().isBlank()) {
-                builder.withMasterUrl(credentials.apiServerUrl());
-            }
-            builder.withOauthToken(credentials.token());
-            builder.withTrustCerts(credentials.trustInsecure());
-            if (credentials.caCertData() != null && !credentials.caCertData().isBlank()) {
-                // caCertData is base64-encoded PEM; fabric8 wants raw PEM bytes as base64
-                builder.withCaCertData(credentials.caCertData());
-            }
-            if (namespace != null && !namespace.isBlank()) {
-                builder.withNamespace(namespace);
-            }
-            return builder.build();
-        }
-
-        // IN_CLUSTER: auto-configure from service account / KUBECONFIG env var
-        Config base = Config.autoConfigure(null);
-        ConfigBuilder builder = new ConfigBuilder(base);
-        if (namespace != null && !namespace.isBlank()) {
-            builder.withNamespace(namespace);
-        }
-        return builder.build();
-    }
-
-    private static String fingerprint(InfrastructureCredentials credentials, String namespace) {
-        String tokenPart = credentials.token() != null ? sha256(credentials.token()) : "no-token";
-        String urlPart = credentials.apiServerUrl() != null ? credentials.apiServerUrl() : "in-cluster";
-        String kubeconfigPart = credentials.kubeconfigPath() != null ? credentials.kubeconfigPath() : "no-kubeconfig";
-        String nsPart = namespace != null ? namespace : "default";
-        return sha256(urlPart + "|" + tokenPart + "|" + kubeconfigPart + "|" + nsPart
-                + "|" + credentials.trustInsecure() + "|" + credentials.authMode());
+    private static String fingerprint(Config config, String credentialRef, Target target) {
+        // Resolved content makes CA, token and explicit kubeconfig rotation invalidate the cache.
+        // Hash the complete resolved configuration in memory, including proxy/impersonation/TLS.
+        // Neither this serialization nor its digest is logged, returned or persisted.
+        return sha256(credentialRef + "|" + target.infrastructureTypeOrNone().name() + "|"
+                + target.infrastructure().clusterId() + "|"
+                + io.fabric8.kubernetes.client.utils.Serialization.asJson(config));
     }
 
     private static void closeQuietly(ClusterClient client) {
@@ -189,7 +139,7 @@ public class InfrastructureClientFactory {
         try {
             client.close();
         } catch (RuntimeException e) {
-            LOG.debugf(e, "Error closing cluster client");
+            LOG.debug("Error closing cluster client");
         }
     }
 

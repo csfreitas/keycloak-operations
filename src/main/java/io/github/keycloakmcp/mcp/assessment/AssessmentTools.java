@@ -13,12 +13,12 @@ import io.github.keycloakmcp.assessment.profile.ProfileRegistry;
 import io.github.keycloakmcp.audit.AuditService;
 import io.github.keycloakmcp.discovery.EnvironmentDiscovery;
 import io.github.keycloakmcp.discovery.EnvironmentInfo;
-import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.AssessmentRunSummary;
 import io.github.keycloakmcp.domain.platform.HealthCheckSummary;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.TriggerType;
 import io.github.keycloakmcp.domain.report.OperationsReport;
+import io.github.keycloakmcp.mcp.McpToolErrorProjector;
 import io.github.keycloakmcp.observability.McpMetrics;
 import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.security.ToolAuthorization;
@@ -30,7 +30,6 @@ import io.github.keycloakmcp.target.TargetPermission;
 import io.github.keycloakmcp.target.TargetResolver;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
-import io.quarkiverse.mcp.server.ToolCallException;
 import jakarta.inject.Inject;
 
 /**
@@ -74,6 +73,9 @@ public class AssessmentTools {
 
     @Inject
     ToolAuthorization toolAuthorization;
+
+    @Inject
+    McpToolErrorProjector errorProjector;
 
     @Tool(
             name = "keycloak_discover_environment",
@@ -329,9 +331,11 @@ public class AssessmentTools {
             assessment.put("rulesNotEvaluated", report.assessment().rulesNotEvaluated());
             assessment.put("evidenceCompleteness", report.assessment().evidenceCompleteness());
             assessment.put("confidence", report.assessment().confidence());
-            assessment.put("findingCount", report.assessment().findings().size());
+            assessment.put("findingCount", report.assessment().findings() == null
+                    ? null : report.assessment().findings().size());
             out.put("assessment", assessment);
         }
+        out.put("findingDetails", ReportFindingDetails.project(report));
         out.put("markdown", report.markdown());
         return out;
     }
@@ -356,12 +360,8 @@ public class AssessmentTools {
             T result = action.get();
             success = true;
             return result;
-        } catch (McpException e) {
-            throw new ToolCallException(e.getError().code() + ": " + e.getMessage());
-        } catch (RuntimeException e) {
-            throw e;
         } catch (Exception e) {
-            throw new ToolCallException(e.getMessage());
+            throw errorProjector.project(e);
         } finally {
             long duration = System.currentTimeMillis() - start;
             metrics.recordToolInvocation(toolName, duration, success);

@@ -68,7 +68,7 @@ public class ServerInfoService {
                     target.keycloak().authRealm(),
                     capabilities);
             success = true;
-            return sensitiveDataFilter.redact(info);
+            return sensitiveDataFilter.redactMetadata(info);
         } finally {
             auditService.logToolInvocation(
                     "ServerInfoService.getServerInfo",
