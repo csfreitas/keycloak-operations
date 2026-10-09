@@ -1,5 +1,8 @@
 package io.github.keycloakmcp.service.platform;
 
+import static io.github.keycloakmcp.adapter.infrastructure.BoundedKubernetesReader.*;
+
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -8,8 +11,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jboss.logging.Logger;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.fabric8.kubernetes.api.model.Container;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.github.keycloakmcp.target.KubernetesInstallationBinding;
 import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.Node;
@@ -17,27 +23,29 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodSpec;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
+import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
 import io.fabric8.kubernetes.api.model.autoscaling.v2.HorizontalPodAutoscaler;
-import io.fabric8.kubernetes.api.model.networking.v1.Ingress;
 import io.fabric8.kubernetes.api.model.policy.v1.PodDisruptionBudget;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.dsl.base.ResourceDefinitionContext;
-import io.fabric8.openshift.api.model.Route;
-import io.fabric8.openshift.client.OpenShiftClient;
 import io.github.keycloakmcp.adapter.infrastructure.ClusterClient;
 import io.github.keycloakmcp.adapter.infrastructure.InfrastructureClientFactory;
 import io.github.keycloakmcp.assessment.engine.Evidence;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.discovery.EnvironmentDiscovery;
 import io.github.keycloakmcp.discovery.EnvironmentInfo;
+import io.github.keycloakmcp.discovery.ClusterApiCapabilities.ApiAvailability;
+import io.github.keycloakmcp.discovery.DetectionConfidence;
+import io.github.keycloakmcp.discovery.RuntimeType;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.inventory.ClusterInfo;
 import io.github.keycloakmcp.domain.inventory.CollectionWarning;
 import io.github.keycloakmcp.domain.inventory.DeploymentMethod;
 import io.github.keycloakmcp.domain.inventory.HpaInfo;
 import io.github.keycloakmcp.domain.inventory.InfrastructureInventory;
+import io.github.keycloakmcp.domain.inventory.InfrastructureCoverage;
 import io.github.keycloakmcp.domain.inventory.KeycloakWorkloadInfo;
 import io.github.keycloakmcp.domain.inventory.NetworkingInfo;
 import io.github.keycloakmcp.domain.inventory.PdbInfo;
@@ -65,14 +73,14 @@ public class InventoryService {
 
     private static final Logger LOG = Logger.getLogger(InventoryService.class);
     private static final String ZONE_LABEL = "topology.kubernetes.io/zone";
-    private static final String KEYCLOAK_CR_GROUP = "k8s.keycloak.org";
-    private static final String KEYCLOAK_CR_VERSION = "v2alpha1";
-    private static final String KEYCLOAK_CR_PLURAL = "keycloaks";
 
     private final TargetResolver targetResolver;
     private final TargetAuthorizationService targetAuthorization;
     private final InfrastructureClientFactory clientFactory;
     private final EnvironmentDiscovery environmentDiscovery;
+
+    @ConfigProperty(name = "collection.operation-timeout-ms", defaultValue = "30000")
+    long collectionTimeoutMs = CollectionBudget.DEFAULT_TIMEOUT_MS;
 
     @Inject
     public InventoryService(
@@ -86,6 +94,48 @@ public class InventoryService {
         this.environmentDiscovery = environmentDiscovery;
     }
 
+    /** Internal bounded configuration association; raw Services are not an API/report payload. */
+    public record ServiceAssociation(String namespace, List<Service> services, List<Service> namespaceServices, boolean complete) {
+        public ServiceAssociation {
+            services = List.copyOf(services);
+            namespaceServices = List.copyOf(namespaceServices);
+        }
+
+        public ServiceAssociation(String namespace, List<Service> services, boolean complete) {
+            this(namespace, services, services, complete);
+        }
+    }
+
+    /** Revalidates a passed target and its exact installation without collecting nodes or exposure resources. */
+    public ServiceAssociation associatedServices(Target target, ClusterClient cluster) {
+        if (target == null) return new ServiceAssociation(null, List.of(), List.of(), false);
+        Target current = targetResolver.require(target.id().value());
+        targetAuthorization.assertAllowed(current, TargetPermission.READ);
+        String namespace = target.infrastructure() == null ? null : target.infrastructure().namespace();
+        if (!current.equals(target) || cluster == null || !target.hasInfrastructure()
+                || (target.infrastructureTypeOrNone() != InfrastructureType.KUBERNETES
+                    && target.infrastructureTypeOrNone() != InfrastructureType.OPENSHIFT)
+                || target.infrastructure().installation() == null || namespace == null || namespace.isBlank()
+                || !namespace.equals(cluster.namespace()) || Thread.currentThread().isInterrupted()) {
+            return new ServiceAssociation(namespace, List.of(), List.of(), false);
+        }
+        var warnings = new ArrayList<CollectionWarning>();
+        try (var scope = CollectionBudget.open(target.id().value(), collectionTimeoutMs)) {
+            InstallationServiceCollector.checkpoint();
+            WorkloadRef workload = findWorkload(cluster.kubernetes(), namespace, target.infrastructure().installation(), warnings);
+            if (!warnings.isEmpty() || workload.method() == DeploymentMethod.UNKNOWN || workload.podSpec() == null) {
+                return new ServiceAssociation(namespace, List.of(), List.of(), false);
+            }
+            var selection = new InstallationServiceCollector().collect(cluster, toWorkloadInfo(workload, namespace), warnings);
+            InstallationServiceCollector.checkpoint();
+            return new ServiceAssociation(namespace, List.copyOf(selection.services().values()), selection.namespaceServices(),
+                    selection.associationComplete());
+        } catch (RuntimeException e) {
+            // Never expose raw resources, endpoint details or exception messages through this association.
+            return new ServiceAssociation(namespace, List.of(), List.of(), false);
+        }
+    }
+
     public InfrastructureInventory collect(String targetId) {
         Target target = targetResolver.require(targetId);
         targetAuthorization.assertAllowed(target, TargetPermission.READ);
@@ -93,52 +143,86 @@ public class InventoryService {
         if (!target.hasInfrastructure()
                 || target.infrastructureTypeOrNone() == InfrastructureType.NONE
                 || target.infrastructureTypeOrNone() == InfrastructureType.VM) {
-            Instant now = Instant.now();
-            return new InfrastructureInventory(
-                    targetId,
-                    "UNKNOWN",
-                    new ClusterInfo(null, null, null, -1, -1),
-                    KeycloakWorkloadInfo.unknown(null),
-                    List.of(),
-                    new TopologyInfo(Map.of(), Map.of(), 0),
-                    new SchedulingInfo(false, false),
-                    HpaInfo.absent(),
-                    PdbInfo.absent(),
-                    new ResourceConfig(null, null, null, null),
-                    ProbeInfo.unknown(),
-                    new NetworkingInfo(false, null, false),
-                    List.of(new CollectionWarning(
-                            CollectionWarning.WarningCode.NOT_CONFIGURED,
-                            "infrastructure",
-                            "Target has no OpenShift/Kubernetes infrastructure binding")),
-                    now);
+            return unavailable(targetId, new CollectionWarning(
+                    target.infrastructureTypeOrNone() == InfrastructureType.VM
+                            ? CollectionWarning.WarningCode.NOT_SUPPORTED : CollectionWarning.WarningCode.NOT_CONFIGURED,
+                    "infrastructure", null), environmentDiscovery.discover(target));
         }
 
+        if (target.infrastructure().installation() == null) {
+            return unavailable(targetId, new CollectionWarning(CollectionWarning.WarningCode.BINDING_REQUIRED,
+                    "installation", "Confirm an explicit installation binding before collecting infrastructure"));
+        }
+        try (var scope = CollectionBudget.open(targetId, collectionTimeoutMs)) {
+            try {
+                scope.budget().checkpoint();
+                return withBudgetWarning(collectWithinBudget(target), scope.budget());
+            } catch (CollectionBudget.Aborted e) {
+                return unavailable(targetId, budgetWarning(e.reason()));
+            }
+        }
+    }
+
+    private InfrastructureInventory collectWithinBudget(Target target) {
+        String targetId = target.id().value();
+        CollectionBudget.checkpoint(targetId);
         Optional<ClusterClient> clientOpt = clientFactory.resolve(target);
+        CollectionBudget.checkpoint(targetId);
         if (clientOpt.isEmpty()) {
             throw McpException.unsupportedCapability(
                     "Infrastructure client unavailable for target '" + targetId + "'");
         }
 
         ClusterClient clusterClient = clientOpt.get();
+        String namespace = target.infrastructure().namespace();
+        if (!present(namespace) || !namespace.equals(clusterClient.namespace())) {
+            return unavailable(targetId, CollectionWarning.collectionFailed("infrastructure", null));
+        }
         KubernetesClient k8s = clusterClient.kubernetes();
-        String namespace = resolveNamespace(target, clusterClient);
         List<CollectionWarning> warnings = new ArrayList<>();
 
         EnvironmentInfo env = environmentDiscovery.discover(target);
+        if (env == null || !targetId.equals(env.targetId())
+                || (env.namespace() != null && !namespace.equals(env.namespace()))
+                || (env.confidence() == DetectionConfidence.CONFIRMED && !namespace.equals(env.namespace()))) {
+            return unavailable(targetId, CollectionWarning.collectionFailed("discovery", null));
+        }
         String runtime = env.runtime() == null ? "UNKNOWN" : env.runtime().name();
+        if (env.runtime() == null || env.runtime() == RuntimeType.UNKNOWN
+                || env.apiCapabilities().routeV1() == ApiAvailability.UNKNOWN
+                || env.apiCapabilities().configV1() == ApiAvailability.UNKNOWN) {
+            warnings.add(CollectionWarning.collectionFailed("discovery", null));
+        }
+        if (!present(env.clusterVersion())) {
+            warnings.add(CollectionWarning.collectionFailed("cluster-api-version", null));
+        }
 
-        ClusterInfo cluster = collectCluster(k8s, clusterClient, env, warnings);
-        WorkloadRef workload = findWorkload(k8s, namespace, warnings);
+        ClusterObservation clusterObservation = collectCluster(k8s, env, warnings);
+        ClusterInfo cluster = clusterObservation.info();
+        WorkloadRef workload = findWorkload(k8s, namespace, target.infrastructure().installation(), warnings);
+        if (workload.method() == DeploymentMethod.UNKNOWN) {
+            if (warnings.isEmpty()) warnings.add(CollectionWarning.collectionFailed("installation", null));
+            return new InfrastructureInventory(targetId, runtime, cluster, KeycloakWorkloadInfo.unknown(namespace),
+                    List.of(), null, null, null, null, null, null, null, List.copyOf(warnings), Instant.now(), env);
+        }
         KeycloakWorkloadInfo keycloak = toWorkloadInfo(workload, namespace);
-        List<PodInventoryItem> pods = collectPods(k8s, namespace, workload, warnings);
+        if (workload.podSpec() == null && warnings.stream().noneMatch(w -> "workload".equals(w.resource()))) {
+            warnings.add(CollectionWarning.collectionFailed("workload", "Bound workload template unavailable"));
+        }
+        List<PodInventoryItem> pods;
+        if (collectionActive()) pods = collectPods(k8s, namespace, workload, clusterObservation.nodes(), warnings);
+        else {
+            pods = List.of();
+            warnings.add(CollectionWarning.collectionFailed("pods", null));
+        }
         TopologyInfo topology = buildTopology(pods);
-        SchedulingInfo scheduling = collectScheduling(workload);
-        HpaInfo hpa = collectHpa(k8s, namespace, workload, warnings);
-        PdbInfo pdb = collectPdb(k8s, namespace, workload, warnings);
-        ResourceConfig resources = collectResources(workload);
-        ProbeInfo probes = collectProbes(workload);
-        NetworkingInfo networking = collectNetworking(k8s, clusterClient, namespace, warnings);
+        SchedulingInfo scheduling = workload.podSpec() == null || !collectionActive() ? null : collectScheduling(workload);
+        HpaInfo hpa = workload.podSpec() == null || !collectionActive() ? null : collectHpa(k8s, namespace, workload, warnings);
+        PdbInfo pdb = workload.podSpec() == null || !collectionActive() ? null : collectPdb(k8s, namespace, workload, warnings);
+        ResourceConfig resources = workload.podSpec() == null || !collectionActive() ? null : collectResources(workload);
+        ProbeInfo probes = workload.podSpec() == null || !collectionActive() ? null : collectProbes(workload);
+        NetworkingInfo networking = workload.podSpec() == null || !collectionActive() ? null
+                : new InstallationNetworkingCollector().collect(clusterClient, keycloak, env.apiCapabilities(), warnings);
 
         return new InfrastructureInventory(
                 targetId,
@@ -154,7 +238,28 @@ public class InventoryService {
                 probes,
                 networking,
                 List.copyOf(warnings),
-                Instant.now());
+                Instant.now(), env);
+    }
+
+    private static boolean collectionActive() {
+        CollectionBudget budget = CollectionBudget.current();
+        return budget == null ? !Thread.currentThread().isInterrupted() : !budget.exhausted();
+    }
+
+    private static CollectionWarning budgetWarning(String reason) {
+        return new CollectionWarning(CollectionBudget.REASON_INTERRUPTED.equals(reason)
+                ? CollectionWarning.WarningCode.OPERATION_INTERRUPTED : CollectionWarning.WarningCode.OPERATION_BUDGET_EXCEEDED,
+                "collection-budget", null);
+    }
+
+    private static InfrastructureInventory withBudgetWarning(InfrastructureInventory observed, CollectionBudget budget) {
+        if (!budget.exhausted()) return observed;
+        var warnings = new ArrayList<>(observed.warnings() == null ? List.of() : observed.warnings());
+        var warning = budgetWarning(budget.reason());
+        if (!warnings.contains(warning)) warnings.add(warning);
+        return new InfrastructureInventory(observed.targetId(), observed.runtime(), observed.cluster(), observed.keycloak(),
+                observed.pods(), observed.topology(), observed.scheduling(), observed.hpa(), observed.pdb(), observed.resources(),
+                observed.probes(), observed.networking(), List.copyOf(warnings), observed.collectedAt(), observed.discovery());
     }
 
     /**
@@ -179,6 +284,9 @@ public class InventoryService {
         }
         KeycloakWorkloadInfo kc = inventory.keycloak();
         if (kc != null) {
+            add(out, targetId, "workload", "keycloak.workload.uid", kc.uid(), now);
+            add(out, targetId, "workload", "keycloak.workload.kind", kc.kind(), now);
+            add(out, targetId, "workload", "keycloak.workload.apiVersion", kc.apiVersion(), now);
             add(out, targetId, "workload", "keycloak.deployment.method",
                     kc.deploymentMethod() == null ? null : kc.deploymentMethod().name(), now);
             if (kc.desiredReplicas() >= 0) {
@@ -193,22 +301,34 @@ public class InventoryService {
                         kc.readyReplicas() < kc.desiredReplicas(), now);
             }
         }
-        List<PodInventoryItem> pods = inventory.pods() == null ? List.of() : inventory.pods();
-        add(out, targetId, "pods", "keycloak.pods.total", pods.size(), now);
-        long ready = pods.stream().filter(PodInventoryItem::ready).count();
-        add(out, targetId, "pods", "keycloak.pods.ready", ready, now);
-        int restarts = pods.stream().mapToInt(PodInventoryItem::restartCount).sum();
-        add(out, targetId, "pods", "keycloak.pods.restartCount", restarts, now);
-        long oom = pods.stream().filter(PodInventoryItem::oomKilled).count();
-        add(out, targetId, "pods", "keycloak.pods.oomKilledCount", oom, now);
+        List<PodInventoryItem> pods = inventory.pods();
+        boolean podsKnown = pods != null && pods.stream().noneMatch(java.util.Objects::isNull);
+        if (podsKnown) {
+            add(out, targetId, "pods", "keycloak.pods.total", pods.size(), now);
+            long ready = pods.stream().filter(PodInventoryItem::ready).count();
+            add(out, targetId, "pods", "keycloak.pods.ready", ready, now);
+            if (pods.stream().allMatch(p -> p.restartCount() >= 0)) {
+                long restarts = pods.stream().mapToLong(PodInventoryItem::restartCount).sum();
+                add(out, targetId, "pods", "keycloak.pods.restartCount", restarts, now);
+            }
+            long oom = pods.stream().filter(PodInventoryItem::oomKilled).count();
+            add(out, targetId, "pods", "keycloak.pods.oomKilledCount", oom, now);
+        }
 
         TopologyInfo topo = inventory.topology();
-        if (topo != null) {
+        boolean zonesKnown = podsKnown && topo != null && topologyMatches(pods, topo.podsByZone(), true)
+                && topo.zoneCount() == topo.podsByZone().size();
+        boolean nodesKnown = podsKnown && topo != null && topologyMatches(pods, topo.podsByNode(), false);
+        if (zonesKnown) {
             add(out, targetId, "topology", "keycloak.topology.zoneCount", topo.zoneCount(), now);
             add(out, targetId, "topology", "keycloak.topology.podsByZone", topo.podsByZone(), now);
+            if (c != null && c.zoneCount() >= 0) {
+                add(out, targetId, "topology", "keycloak.topology.singleZoneConcentration",
+                        isSingleBucketConcentration(topo.podsByZone(), c.zoneCount()), now);
+            }
+        }
+        if (nodesKnown) {
             add(out, targetId, "topology", "keycloak.topology.podsByNode", topo.podsByNode(), now);
-            add(out, targetId, "topology", "keycloak.topology.singleZoneConcentration",
-                    isSingleBucketConcentration(topo.podsByZone(), topo.zoneCount()), now);
             add(out, targetId, "topology", "keycloak.topology.singleNodeConcentration",
                     isSingleBucketConcentration(topo.podsByNode(), -1), now);
         }
@@ -223,8 +343,8 @@ public class InventoryService {
         if (hpa != null) {
             add(out, targetId, "autoscaling", "keycloak.hpa.present", hpa.present(), now);
             if (hpa.present()) {
-                add(out, targetId, "autoscaling", "keycloak.hpa.minReplicas", hpa.minReplicas(), now);
-                add(out, targetId, "autoscaling", "keycloak.hpa.maxReplicas", hpa.maxReplicas(), now);
+                if (hpa.minReplicas() >= 0) add(out, targetId, "autoscaling", "keycloak.hpa.minReplicas", hpa.minReplicas(), now);
+                if (hpa.maxReplicas() >= 0) add(out, targetId, "autoscaling", "keycloak.hpa.maxReplicas", hpa.maxReplicas(), now);
             }
         }
         PdbInfo pdb = inventory.pdb();
@@ -251,15 +371,73 @@ public class InventoryService {
             add(out, targetId, "probes", "keycloak.probes.startup.present", probes.startupPresent(), now);
         }
         NetworkingInfo net = inventory.networking();
-        if (net != null) {
+        if (net != null && net.complete()) {
             add(out, targetId, "networking", "keycloak.route.present", net.routeOrIngressPresent(), now);
         }
         if (inventory.warnings() != null) {
             for (CollectionWarning w : inventory.warnings()) {
-                add(out, targetId, "collection", "collection.warning." + w.resource(), w.code().name(), now);
+                String resource = w == null || w.resource() == null ? "unknown" : w.resource();
+                add(out, targetId, "collection", "collection.warning." + resource,
+                        w == null ? "COLLECTION_FAILED" : w.code().name(), now);
+                // An unavailable collector is not evidence of an absent resource or a healthy zero.
+                java.util.Set<String> unavailableCategories = switch (resource) {
+                    case "unknown" -> java.util.Set.of("cluster", "workload", "pods", "topology", "scheduling", "autoscaling", "disruption", "resources", "probes", "networking");
+                    case "installation" -> java.util.Set.of("workload", "pods", "topology", "scheduling", "autoscaling", "disruption", "resources", "probes", "networking");
+                    case "workload" -> java.util.Set.of("pods", "topology", "scheduling", "autoscaling", "disruption", "resources", "probes", "networking");
+                    case "pods" -> java.util.Set.of("pods", "topology");
+                    case "hpa" -> java.util.Set.of("autoscaling");
+                    case "pdb" -> java.util.Set.of("disruption");
+                    case "networking" -> java.util.Set.of("networking");
+                    case "resources" -> java.util.Set.of("resources");
+                    case "probes" -> java.util.Set.of("probes");
+                    default -> java.util.Set.of();
+                };
+                out.removeIf(e -> unavailableCategories.contains(e.category()));
+                if ("nodes".equals(resource)) {
+                    out.removeIf(e -> java.util.Set.of("cluster.nodes.count", "cluster.zones.count",
+                            "keycloak.topology.singleZoneConcentration").contains(e.key()));
+                }
+                if ("node-zones".equals(resource)) {
+                    out.removeIf(e -> java.util.Set.of("cluster.zones.count", "keycloak.topology.singleZoneConcentration").contains(e.key()));
+                }
+                if ("pod-zones".equals(resource)) {
+                    out.removeIf(e -> java.util.Set.of("keycloak.topology.zoneCount", "keycloak.topology.podsByZone",
+                            "keycloak.topology.singleZoneConcentration").contains(e.key()));
+                }
+                if ("infrastructure".equals(resource) || "openshift-config".equals(resource)) {
+                    out.removeIf(e -> "cluster.platform".equals(e.key()));
+                }
+                if ("clusterversion".equals(resource) || "openshift-config".equals(resource)) {
+                    out.removeIf(e -> "cluster.version".equals(e.key()));
+                }
+                if ("infrastructure".equals(resource) && w.code() == CollectionWarning.WarningCode.NOT_CONFIGURED) {
+                    out.removeIf(e -> !java.util.Set.of("runtime", "collection").contains(e.category()));
+                }
             }
         }
+        boolean workloadKnown = kc != null && kc.deploymentMethod() != null
+                && kc.deploymentMethod() != DeploymentMethod.UNKNOWN && present(kc.name()) && present(kc.namespace());
+        if (!workloadKnown) {
+            out.removeIf(e -> !java.util.Set.of("runtime", "cluster", "collection").contains(e.category()));
+        }
+        boolean complete = InfrastructureCoverage.isComplete(inventory);
+        add(out, targetId, "collection", "infrastructure.collection.complete", complete, now);
         return List.copyOf(out);
+    }
+
+    private static boolean present(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private static boolean topologyMatches(List<PodInventoryItem> pods, Map<String, Integer> buckets, boolean zones) {
+        if (buckets == null) return false;
+        Map<String, Integer> observed = new LinkedHashMap<>();
+        for (PodInventoryItem pod : pods) {
+            String bucket = zones ? pod.zone() : pod.nodeName();
+            if (!present(bucket)) return false;
+            observed.merge(bucket, 1, Integer::sum);
+        }
+        return observed.equals(buckets);
     }
 
     private static void add(
@@ -278,7 +456,7 @@ public class InventoryService {
         if (buckets == null || buckets.isEmpty()) {
             return false;
         }
-        int total = buckets.values().stream().mapToInt(Integer::intValue).sum();
+        long total = buckets.values().stream().mapToLong(Integer::longValue).sum();
         if (total <= 1) {
             return false;
         }
@@ -293,67 +471,66 @@ public class InventoryService {
         return expectedBuckets < 0;
     }
 
-    private String resolveNamespace(Target target, ClusterClient client) {
-        if (target.infrastructure() != null
-                && target.infrastructure().namespace() != null
-                && !target.infrastructure().namespace().isBlank()) {
-            return target.infrastructure().namespace();
-        }
-        return client.namespace();
-    }
+    private record ClusterObservation(ClusterInfo info, List<Node> nodes) { }
 
-    private ClusterInfo collectCluster(
+    private ClusterObservation collectCluster(
             KubernetesClient k8s,
-            ClusterClient clusterClient,
             EnvironmentInfo env,
             List<CollectionWarning> warnings) {
-        String distribution = clusterClient.type() == InfrastructureType.OPENSHIFT ? "openshift" : "kubernetes";
+        String distribution = env.runtime() == RuntimeType.OPENSHIFT ? "openshift"
+                : env.runtime() == RuntimeType.KUBERNETES ? "kubernetes" : null;
         String version = env.clusterVersion();
         String platform = null;
         int nodeCount = -1;
         int zoneCount = -1;
+        List<Node> observedNodes = null;
 
         try {
-            List<Node> nodes = k8s.nodes().list().getItems();
+            List<Node> nodes = list(k8s, NODES, null);
+            observedNodes = nodes;
             nodeCount = nodes.size();
             Map<String, Integer> zones = new LinkedHashMap<>();
             for (Node node : nodes) {
+                CollectionBudget.checkpointCurrent();
                 String zone = label(node.getMetadata() == null ? null : node.getMetadata().getLabels(), ZONE_LABEL);
-                if (zone != null) {
+                if (present(zone)) {
                     zones.merge(zone, 1, Integer::sum);
                 }
             }
-            zoneCount = zones.isEmpty() ? 0 : zones.size();
+            boolean missingZones = nodes.stream().anyMatch(node -> !present(label(
+                    node.getMetadata() == null ? null : node.getMetadata().getLabels(), ZONE_LABEL)));
+            zoneCount = missingZones ? -1 : zones.size();
+            if (missingZones) warnings.add(CollectionWarning.collectionFailed("node-zones", null));
+            CollectionBudget.checkpointCurrent();
         } catch (KubernetesClientException e) {
             warnings.add(mapClientException("nodes", e));
         } catch (RuntimeException e) {
             warnings.add(CollectionWarning.collectionFailed("nodes", e.getMessage()));
         }
 
-        if (clusterClient.type() == InfrastructureType.OPENSHIFT) {
-            try {
-                Optional<OpenShiftClient> oc = clusterClient.openshift();
-                if (oc.isPresent()) {
-                    platform = readOpenShiftPlatform(oc.get(), warnings);
-                    String ocpVersion = readOpenShiftVersion(oc.get(), warnings);
-                    if (ocpVersion != null) {
-                        version = ocpVersion;
-                    }
-                }
-            } catch (RuntimeException e) {
-                warnings.add(CollectionWarning.collectionFailed("openshift-config", e.getMessage()));
+        if (env.apiCapabilities().configV1() == ApiAvailability.SERVED && collectionActive()) {
+            platform = readOpenShiftPlatform(k8s, warnings);
+            String ocpVersion = collectionActive() ? readOpenShiftVersion(k8s, warnings) : null;
+            if (ocpVersion != null) {
+                version = ocpVersion;
             }
+        } else if (env.runtime() == RuntimeType.OPENSHIFT
+                || env.apiCapabilities().configV1() == ApiAvailability.UNKNOWN) {
+            warnings.add(new CollectionWarning(env.apiCapabilities().configV1() == ApiAvailability.UNKNOWN
+                    ? CollectionWarning.WarningCode.COLLECTION_FAILED : CollectionWarning.WarningCode.NOT_SUPPORTED,
+                    "openshift-config", null));
         }
 
-        return new ClusterInfo(distribution, version, platform, nodeCount, zoneCount);
+        return new ClusterObservation(new ClusterInfo(distribution, version, platform, nodeCount, zoneCount), observedNodes);
     }
 
-    private String readOpenShiftPlatform(OpenShiftClient oc, List<CollectionWarning> warnings) {
+    private String readOpenShiftPlatform(KubernetesClient oc, List<CollectionWarning> warnings) {
         try {
-            var infra = oc.config().infrastructures().withName("cluster").get();
+            var infra = get(oc, INFRASTRUCTURES, null, "cluster");
             if (infra != null && infra.getStatus() != null && infra.getStatus().getPlatform() != null) {
                 return infra.getStatus().getPlatform();
             }
+            warnings.add(CollectionWarning.collectionFailed("infrastructure", null));
         } catch (KubernetesClientException e) {
             warnings.add(mapClientException("infrastructure", e));
         } catch (RuntimeException e) {
@@ -362,12 +539,14 @@ public class InventoryService {
         return null;
     }
 
-    private String readOpenShiftVersion(OpenShiftClient oc, List<CollectionWarning> warnings) {
+    private String readOpenShiftVersion(KubernetesClient oc, List<CollectionWarning> warnings) {
         try {
-            var cv = oc.config().clusterVersions().withName("version").get();
-            if (cv != null && cv.getStatus() != null && cv.getStatus().getDesired() != null) {
+            var cv = get(oc, CLUSTER_VERSIONS, null, "version");
+            if (cv != null && cv.getStatus() != null && cv.getStatus().getDesired() != null
+                    && present(cv.getStatus().getDesired().getVersion())) {
                 return cv.getStatus().getDesired().getVersion();
             }
+            warnings.add(CollectionWarning.collectionFailed("clusterversion", null));
         } catch (KubernetesClientException e) {
             warnings.add(mapClientException("clusterversion", e));
         } catch (RuntimeException e) {
@@ -376,141 +555,124 @@ public class InventoryService {
         return null;
     }
 
-    private WorkloadRef findWorkload(KubernetesClient k8s, String namespace, List<CollectionWarning> warnings) {
-        if (namespace == null || namespace.isBlank()) {
-            warnings.add(new CollectionWarning(
-                    CollectionWarning.WarningCode.NOT_CONFIGURED,
-                    "namespace",
-                    "No namespace configured on target infrastructure"));
-            return WorkloadRef.none();
-        }
-
-        // 1) Keycloak Operator CR
+    private WorkloadRef findWorkload(KubernetesClient k8s, String namespace,
+            KubernetesInstallationBinding binding, List<CollectionWarning> warnings) {
         try {
-            ResourceDefinitionContext ctx = new ResourceDefinitionContext.Builder()
-                    .withGroup(KEYCLOAK_CR_GROUP)
-                    .withVersion(KEYCLOAK_CR_VERSION)
-                    .withPlural(KEYCLOAK_CR_PLURAL)
-                    .withNamespaced(true)
-                    .build();
-            List<GenericKubernetesResource> crs = k8s.genericKubernetesResources(ctx)
-                    .inNamespace(namespace)
-                    .list()
-                    .getItems();
-            if (!crs.isEmpty()) {
-                GenericKubernetesResource cr = crs.get(0);
-                String name = cr.getMetadata() != null ? cr.getMetadata().getName() : null;
-                int instances = readCrInstances(cr);
-                return new WorkloadRef(DeploymentMethod.KEYCLOAK_OPERATOR, name, instances, instances, instances,
-                        instances, null, null, cr);
+            InstallationServiceCollector.checkpoint();
+            HasMetadata resource;
+            if ("Deployment".equals(binding.kind())) {
+                resource = get(k8s, DEPLOYMENTS, namespace, binding.name());
+            } else if ("StatefulSet".equals(binding.kind())) {
+                resource = get(k8s, STATEFUL_SETS, namespace, binding.name());
+            } else {
+                resource = get(k8s, keycloaks(binding.apiVersion()), namespace, binding.name());
             }
-        } catch (KubernetesClientException e) {
-            if (e.getCode() != 404) {
-                warnings.add(mapClientException("keycloak-cr", e));
+            if (resource == null) {
+                warnings.add(new CollectionWarning(CollectionWarning.WarningCode.RESOURCE_NOT_FOUND, "installation",
+                        "The bound installation was not found; no alternative was selected"));
+                return WorkloadRef.none();
             }
-        } catch (RuntimeException e) {
-            warnings.add(CollectionWarning.collectionFailed("keycloak-cr", e.getMessage()));
-        }
+            if (resource.getMetadata() == null || !binding.uid().equals(resource.getMetadata().getUid())
+                    || !binding.name().equals(resource.getMetadata().getName())
+                    || !namespace.equals(resource.getMetadata().getNamespace())
+                    || !binding.kind().equals(resource.getKind())
+                    || !binding.apiVersion().equals(resource.getApiVersion())) {
+                warnings.add(new CollectionWarning(CollectionWarning.WarningCode.BINDING_MISMATCH, "installation",
+                        "Installation identity changed; explicit reconfirmation is required"));
+                return WorkloadRef.none();
+            }
+            if (resource instanceof Deployment deployment) return fromDeployment(deployment, DeploymentMethod.DEPLOYMENT);
+            if (resource instanceof StatefulSet statefulSet) return fromStatefulSet(statefulSet, DeploymentMethod.STATEFULSET);
 
-        // 2) Deployment heuristic
-        try {
-            List<Deployment> deployments = k8s.apps().deployments().inNamespace(namespace).list().getItems();
-            Optional<Deployment> match = deployments.stream().filter(this::looksLikeKeycloak).findFirst();
-            if (match.isPresent()) {
-                Deployment d = match.get();
-                var status = d.getStatus();
-                int desired = d.getSpec() != null && d.getSpec().getReplicas() != null
-                        ? d.getSpec().getReplicas() : -1;
-                int ready = status != null && status.getReadyReplicas() != null ? status.getReadyReplicas() : -1;
-                int current = status != null && status.getReplicas() != null ? status.getReplicas() : -1;
-                int available = status != null && status.getAvailableReplicas() != null
-                        ? status.getAvailableReplicas() : -1;
-                PodSpec podSpec = d.getSpec() != null && d.getSpec().getTemplate() != null
-                        ? d.getSpec().getTemplate().getSpec() : null;
-                Map<String, String> selector = d.getSpec() != null && d.getSpec().getSelector() != null
-                        ? d.getSpec().getSelector().getMatchLabels() : Map.of();
-                return new WorkloadRef(DeploymentMethod.DEPLOYMENT, d.getMetadata().getName(),
-                        desired, ready, current, available, podSpec, selector, null);
+            // An Operator CR is not proof that its desired instances are running.
+            var cr = (GenericKubernetesResource) resource;
+            List<WorkloadRef> children = new ArrayList<>();
+            List<Deployment> deployments = list(k8s, DEPLOYMENTS, namespace);
+            for (Deployment d : deployments) {
+                CollectionBudget.checkpointCurrent();
+                if (ownedBy(d, binding.uid(), "Keycloak", binding.apiVersion())) children.add(fromDeployment(d, DeploymentMethod.KEYCLOAK_OPERATOR));
             }
-        } catch (KubernetesClientException e) {
-            warnings.add(mapClientException("deployments", e));
-        } catch (RuntimeException e) {
-            warnings.add(CollectionWarning.collectionFailed("deployments", e.getMessage()));
-        }
-
-        // 3) StatefulSet heuristic
-        try {
-            List<StatefulSet> sets = k8s.apps().statefulSets().inNamespace(namespace).list().getItems();
-            Optional<StatefulSet> match = sets.stream().filter(this::looksLikeKeycloakSts).findFirst();
-            if (match.isPresent()) {
-                StatefulSet s = match.get();
-                var status = s.getStatus();
-                int desired = s.getSpec() != null && s.getSpec().getReplicas() != null
-                        ? s.getSpec().getReplicas() : -1;
-                int ready = status != null && status.getReadyReplicas() != null ? status.getReadyReplicas() : -1;
-                int current = status != null && status.getReplicas() != null ? status.getReplicas() : -1;
-                int available = status != null && status.getAvailableReplicas() != null
-                        ? status.getAvailableReplicas() : -1;
-                PodSpec podSpec = s.getSpec() != null && s.getSpec().getTemplate() != null
-                        ? s.getSpec().getTemplate().getSpec() : null;
-                Map<String, String> selector = s.getSpec() != null && s.getSpec().getSelector() != null
-                        ? s.getSpec().getSelector().getMatchLabels() : Map.of();
-                return new WorkloadRef(DeploymentMethod.STATEFULSET, s.getMetadata().getName(),
-                        desired, ready, current, available, podSpec, selector, null);
+            List<StatefulSet> statefulSets = list(k8s, STATEFUL_SETS, namespace);
+            for (StatefulSet sts : statefulSets) {
+                CollectionBudget.checkpointCurrent();
+                if (ownedBy(sts, binding.uid(), "Keycloak", binding.apiVersion())) children.add(fromStatefulSet(sts, DeploymentMethod.KEYCLOAK_OPERATOR));
             }
+            if (children.size() > 1) {
+                warnings.add(new CollectionWarning(CollectionWarning.WarningCode.AMBIGUOUS_RESOURCE, "installation",
+                        "Multiple controller-owned workloads require explicit reconciliation"));
+                return WorkloadRef.none();
+            }
+            if (children.size() == 1) return children.getFirst();
+            warnings.add(new CollectionWarning(CollectionWarning.WarningCode.RESOURCE_NOT_FOUND, "workload",
+                    "Bound Operator CR has no verified controller-owned workload"));
+            return new WorkloadRef(DeploymentMethod.KEYCLOAK_OPERATOR, binding.name(), readCrInstances(cr),
+                    -1, -1, -1, null, Map.of(), cr, binding.uid(), binding.kind(), binding.apiVersion());
         } catch (KubernetesClientException e) {
-            warnings.add(mapClientException("statefulsets", e));
+            warnings.add(mapClientException("installation", e));
         } catch (RuntimeException e) {
-            warnings.add(CollectionWarning.collectionFailed("statefulsets", e.getMessage()));
+            warnings.add(CollectionWarning.collectionFailed("installation", "Bound installation could not be read"));
         }
-
-        warnings.add(new CollectionWarning(
-                CollectionWarning.WarningCode.RESOURCE_NOT_FOUND,
-                "keycloak-workload",
-                "No Keycloak Operator CR, Deployment, or StatefulSet matched in namespace " + namespace));
         return WorkloadRef.none();
     }
 
-    private boolean looksLikeKeycloak(Deployment d) {
-        String name = d.getMetadata() != null ? d.getMetadata().getName() : "";
-        Map<String, String> labels = d.getMetadata() != null ? d.getMetadata().getLabels() : Map.of();
-        return matchesKeycloakIdentity(name, labels);
+    private static WorkloadRef fromDeployment(Deployment d, DeploymentMethod method) {
+        var spec = d.getSpec();
+        var status = d.getStatus();
+        var template = spec == null ? null : spec.getTemplate();
+        return new WorkloadRef(method, d.getMetadata().getName(),
+                spec == null || spec.getReplicas() == null ? -1 : spec.getReplicas(),
+                status == null || status.getReadyReplicas() == null ? -1 : status.getReadyReplicas(),
+                status == null || status.getReplicas() == null ? -1 : status.getReplicas(),
+                status == null || status.getAvailableReplicas() == null ? -1 : status.getAvailableReplicas(),
+                template == null ? null : template.getSpec(),
+                template == null || template.getMetadata() == null || template.getMetadata().getLabels() == null ? Map.of() : template.getMetadata().getLabels(),
+                null, d.getMetadata().getUid(), d.getKind(), d.getApiVersion());
     }
 
-    private boolean looksLikeKeycloakSts(StatefulSet s) {
-        String name = s.getMetadata() != null ? s.getMetadata().getName() : "";
-        Map<String, String> labels = s.getMetadata() != null ? s.getMetadata().getLabels() : Map.of();
-        return matchesKeycloakIdentity(name, labels);
+    private static WorkloadRef fromStatefulSet(StatefulSet sts, DeploymentMethod method) {
+        var spec = sts.getSpec();
+        var status = sts.getStatus();
+        var template = spec == null ? null : spec.getTemplate();
+        return new WorkloadRef(method, sts.getMetadata().getName(),
+                spec == null || spec.getReplicas() == null ? -1 : spec.getReplicas(),
+                status == null || status.getReadyReplicas() == null ? -1 : status.getReadyReplicas(),
+                status == null || status.getReplicas() == null ? -1 : status.getReplicas(),
+                status == null || status.getAvailableReplicas() == null ? -1 : status.getAvailableReplicas(),
+                template == null ? null : template.getSpec(),
+                template == null || template.getMetadata() == null || template.getMetadata().getLabels() == null ? Map.of() : template.getMetadata().getLabels(),
+                null, sts.getMetadata().getUid(), sts.getKind(), sts.getApiVersion());
     }
 
-    private boolean matchesKeycloakIdentity(String name, Map<String, String> labels) {
-        String n = name == null ? "" : name.toLowerCase();
-        if (n.contains("keycloak") || n.contains("rhbk")) {
-            return true;
-        }
-        if (labels == null) {
-            return false;
-        }
-        for (Map.Entry<String, String> e : labels.entrySet()) {
-            String k = e.getKey() == null ? "" : e.getKey().toLowerCase();
-            String v = e.getValue() == null ? "" : e.getValue().toLowerCase();
-            if (k.contains("keycloak") || v.contains("keycloak") || v.equals("rhbk") || v.contains("rhbk")) {
-                return true;
-            }
-            if (("app".equals(k) || "app.kubernetes.io/name".equals(k))
-                    && (v.contains("keycloak") || v.contains("rhbk"))) {
-                return true;
-            }
-        }
-        return false;
+    private static boolean ownedBy(HasMetadata resource, String uid, String kind, String apiVersion) {
+        return uid != null && resource.getMetadata() != null && resource.getMetadata().getOwnerReferences() != null
+                && resource.getMetadata().getOwnerReferences().stream().anyMatch(owner ->
+                        uid.equals(owner.getUid()) && kind.equals(owner.getKind()) && apiVersion.equals(owner.getApiVersion())
+                                && Boolean.TRUE.equals(owner.getController()));
     }
 
-    private int readCrInstances(GenericKubernetesResource cr) {
+    private static InfrastructureInventory unavailable(String targetId, CollectionWarning warning) {
+        return unavailable(targetId, warning, null);
+    }
+
+    private static InfrastructureInventory unavailable(String targetId, CollectionWarning warning, EnvironmentInfo discovery) {
+        boolean collectionAborted = "collection-budget".equals(warning.resource());
+        return new InfrastructureInventory(targetId, "UNKNOWN", new ClusterInfo(null, null, null, -1, -1),
+                KeycloakWorkloadInfo.unknown(null), collectionAborted ? null : List.of(),
+                collectionAborted ? null : new TopologyInfo(Map.of(), Map.of(), 0),
+                null, null, null, null, null, null, List.of(warning), Instant.now(), discovery);
+    }
+
+    static int readCrInstances(GenericKubernetesResource cr) {
         Object spec = cr.get("spec");
         if (spec instanceof Map<?, ?> map) {
             Object instances = map.get("instances");
             if (instances instanceof Number number) {
-                return number.intValue();
+                try {
+                    int value = new java.math.BigDecimal(number.toString()).intValueExact();
+                    return value >= 0 ? value : -1;
+                } catch (NumberFormatException | ArithmeticException ignored) {
+                    return -1;
+                }
             }
         }
         return -1;
@@ -527,52 +689,64 @@ public class InventoryService {
                 workload.desired(),
                 workload.ready(),
                 workload.current(),
-                workload.available());
+                workload.available(), workload.apiVersion(), workload.kind(), workload.uid());
     }
 
     private List<PodInventoryItem> collectPods(
             KubernetesClient k8s,
             String namespace,
             WorkloadRef workload,
+            List<Node> observedNodes,
             List<CollectionWarning> warnings) {
         if (namespace == null || namespace.isBlank()) {
             return List.of();
         }
         try {
-            List<Pod> pods;
-            if (workload.selector() != null && !workload.selector().isEmpty()) {
-                pods = k8s.pods().inNamespace(namespace).withLabels(workload.selector()).list().getItems();
-            } else {
-                pods = k8s.pods().inNamespace(namespace).list().getItems().stream()
-                        .filter(p -> matchesKeycloakIdentity(
-                                p.getMetadata() != null ? p.getMetadata().getName() : "",
-                                p.getMetadata() != null ? p.getMetadata().getLabels() : Map.of()))
-                        .toList();
+            if (workload.uid() == null || workload.podSpec() == null) return List.of();
+            var replicaSetUids = new java.util.HashSet<String>();
+            if ("Deployment".equals(workload.kind())) {
+                for (var rs : list(k8s, REPLICA_SETS, namespace)) {
+                    CollectionBudget.checkpointCurrent();
+                    if (ownedBy(rs, workload.uid(), "Deployment", workload.apiVersion())) replicaSetUids.add(rs.getMetadata().getUid());
+                }
             }
+            List<Pod> pods = list(k8s, PODS, namespace).stream()
+                    .filter(p -> namespace.equals(p.getMetadata().getNamespace()))
+                    .filter(p -> ownedBy(p, workload.uid(), workload.kind(), workload.apiVersion())
+                            || replicaSetUids.stream().anyMatch(uid -> ownedBy(p, uid, "ReplicaSet", "apps/v1")))
+                    .toList();
 
             Map<String, String> nodeZones = new LinkedHashMap<>();
-            try {
-                for (Node node : k8s.nodes().list().getItems()) {
+            if (observedNodes != null) {
+                for (Node node : observedNodes) {
+                    CollectionBudget.checkpointCurrent();
                     String nodeName = node.getMetadata() != null ? node.getMetadata().getName() : null;
                     if (nodeName != null) {
                         nodeZones.put(nodeName,
                                 label(node.getMetadata().getLabels(), ZONE_LABEL));
                     }
                 }
-            } catch (RuntimeException e) {
-                LOG.debugf(e, "Unable to map node zones while collecting pods");
+            } else {
+                LOG.debug("Unable to map node zones while collecting pods");
+                warnings.add(CollectionWarning.collectionFailed("pod-zones", "Node topology unavailable"));
             }
 
             List<PodInventoryItem> items = new ArrayList<>();
             for (Pod pod : pods) {
+                CollectionBudget.checkpointCurrent();
                 String name = pod.getMetadata() != null ? pod.getMetadata().getName() : null;
                 String nodeName = pod.getSpec() != null ? pod.getSpec().getNodeName() : null;
                 String zone = nodeName == null ? null : nodeZones.get(nodeName);
                 boolean ready = isPodReady(pod);
                 int restarts = restartCount(pod);
                 boolean oom = isOomKilled(pod);
+                if (!podStatusKnown(pod)) {
+                    var warning = CollectionWarning.collectionFailed("pods", null);
+                    if (!warnings.contains(warning)) warnings.add(warning);
+                }
                 items.add(new PodInventoryItem(name, nodeName, zone, ready, restarts, oom));
             }
+            CollectionBudget.checkpointCurrent();
             return items;
         } catch (KubernetesClientException e) {
             warnings.add(mapClientException("pods", e));
@@ -584,24 +758,33 @@ public class InventoryService {
     }
 
     private static boolean isPodReady(Pod pod) {
-        if (pod.getStatus() == null || pod.getStatus().getConditions() == null) {
+        if (!podStatusKnown(pod)) {
             return false;
         }
         return pod.getStatus().getConditions().stream()
-                .anyMatch(c -> "Ready".equals(c.getType()) && "True".equalsIgnoreCase(c.getStatus()));
+                .anyMatch(c -> c != null && "Ready".equals(c.getType()) && "True".equals(c.getStatus()));
     }
 
     private static int restartCount(Pod pod) {
-        if (pod.getStatus() == null || pod.getStatus().getContainerStatuses() == null) {
-            return 0;
+        if (pod.getStatus() == null || pod.getStatus().getContainerStatuses() == null
+                || pod.getStatus().getContainerStatuses().isEmpty()) {
+            return -1;
         }
-        int total = 0;
+        long total = 0;
         for (ContainerStatus status : pod.getStatus().getContainerStatuses()) {
-            if (status.getRestartCount() != null) {
-                total += status.getRestartCount();
-            }
+            if (status == null || status.getRestartCount() == null || status.getRestartCount() < 0) return -1;
+            total += status.getRestartCount();
         }
-        return total;
+        return total <= Integer.MAX_VALUE ? (int) total : -1;
+    }
+
+    private static boolean podStatusKnown(Pod pod) {
+        if (pod.getStatus() == null || pod.getStatus().getConditions() == null || restartCount(pod) < 0) return false;
+        var conditions = pod.getStatus().getConditions();
+        return conditions.stream().noneMatch(java.util.Objects::isNull)
+                && conditions.stream().filter(c -> "Ready".equals(c.getType())).count() == 1
+                && conditions.stream().anyMatch(c -> "Ready".equals(c.getType())
+                        && ("True".equals(c.getStatus()) || "False".equals(c.getStatus())));
     }
 
     private static boolean isOomKilled(Pod pod) {
@@ -658,21 +841,34 @@ public class InventoryService {
         }
         try {
             List<HorizontalPodAutoscaler> hpas =
-                    k8s.autoscaling().v2().horizontalPodAutoscalers().inNamespace(namespace).list().getItems();
+                    list(k8s, HPAS, namespace);
+            HpaInfo selected = null;
             for (HorizontalPodAutoscaler hpa : hpas) {
+                CollectionBudget.checkpointCurrent();
                 if (hpa.getSpec() == null || hpa.getSpec().getScaleTargetRef() == null) {
-                    continue;
+                    throw new IllegalStateException("Incomplete HPA configuration");
                 }
                 String refName = hpa.getSpec().getScaleTargetRef().getName();
-                if (workload.name().equals(refName)) {
+                if (!present(refName) || !present(hpa.getSpec().getScaleTargetRef().getKind())
+                        || !present(hpa.getSpec().getScaleTargetRef().getApiVersion())) {
+                    throw new IllegalStateException("Incomplete HPA association");
+                }
+                if (workload.name().equals(refName)
+                        && workload.kind().equals(hpa.getSpec().getScaleTargetRef().getKind())
+                        && workload.apiVersion().equals(hpa.getSpec().getScaleTargetRef().getApiVersion())) {
                     int min = hpa.getSpec().getMinReplicas() == null ? -1 : hpa.getSpec().getMinReplicas();
                     int max = hpa.getSpec().getMaxReplicas() == null ? -1 : hpa.getSpec().getMaxReplicas();
                     int current = hpa.getStatus() != null && hpa.getStatus().getCurrentReplicas() != null
                             ? hpa.getStatus().getCurrentReplicas() : -1;
-                    return new HpaInfo(true, min, max, current);
+                    if (selected != null) {
+                        warnings.add(new CollectionWarning(CollectionWarning.WarningCode.AMBIGUOUS_RESOURCE, "hpa", "Multiple HPAs target the bound workload"));
+                        return null;
+                    }
+                    selected = new HpaInfo(true, min, max, current);
                 }
             }
-            return HpaInfo.absent();
+            CollectionBudget.checkpointCurrent();
+            return selected == null ? HpaInfo.absent() : selected;
         } catch (KubernetesClientException e) {
             warnings.add(mapClientException("hpa", e));
             return HpaInfo.absent();
@@ -689,31 +885,35 @@ public class InventoryService {
         }
         try {
             List<PodDisruptionBudget> pdbs =
-                    k8s.policy().v1().podDisruptionBudget().inNamespace(namespace).list().getItems();
+                    list(k8s, PDBS, namespace);
+            PdbInfo selected = null;
             for (PodDisruptionBudget pdb : pdbs) {
+                CollectionBudget.checkpointCurrent();
                 if (pdb.getSpec() == null) {
+                    throw new IllegalStateException("Incomplete PDB configuration");
+                }
+                var selector = pdb.getSpec().getSelector();
+                if (selector == null || workload.selector() == null) continue;
+                if (selector.getMatchExpressions() != null && !selector.getMatchExpressions().isEmpty()) {
+                    warnings.add(new CollectionWarning(CollectionWarning.WarningCode.NOT_SUPPORTED, "pdb",
+                            "Expression-based PDB association is not yet evaluated"));
                     continue;
                 }
-                // Prefer selector match against workload labels when available
-                boolean related = workload.selector() == null || workload.selector().isEmpty()
-                        || selectorsOverlap(workload.selector(),
-                        pdb.getSpec().getSelector() == null
-                                ? Map.of()
-                                : pdb.getSpec().getSelector().getMatchLabels());
-                if (!related && workload.name() != null
-                        && pdb.getMetadata() != null
-                        && pdb.getMetadata().getName() != null
-                        && !pdb.getMetadata().getName().toLowerCase().contains("keycloak")
-                        && !pdb.getMetadata().getName().toLowerCase().contains("rhbk")) {
-                    continue;
-                }
+                Map<String, String> labels = selector.getMatchLabels();
+                if (labels != null && !labels.entrySet().stream().allMatch(e -> e.getValue().equals(workload.selector().get(e.getKey())))) continue;
                 String minAvailable = pdb.getSpec().getMinAvailable() == null
                         ? null : pdb.getSpec().getMinAvailable().toString();
                 String maxUnavailable = pdb.getSpec().getMaxUnavailable() == null
                         ? null : pdb.getSpec().getMaxUnavailable().toString();
-                return new PdbInfo(true, minAvailable, maxUnavailable);
+                if (selected != null) {
+                    warnings.add(new CollectionWarning(CollectionWarning.WarningCode.AMBIGUOUS_RESOURCE, "pdb", "Multiple PDBs apply; combined policy is not yet evaluated"));
+                    return null;
+                }
+                selected = new PdbInfo(true, minAvailable, maxUnavailable);
             }
-            return PdbInfo.absent();
+            if (warnings.stream().anyMatch(w -> "pdb".equals(w.resource()))) return null;
+            CollectionBudget.checkpointCurrent();
+            return selected == null ? PdbInfo.absent() : selected;
         } catch (KubernetesClientException e) {
             warnings.add(mapClientException("pdb", e));
             return PdbInfo.absent();
@@ -723,22 +923,10 @@ public class InventoryService {
         }
     }
 
-    private static boolean selectorsOverlap(Map<String, String> a, Map<String, String> b) {
-        if (a == null || b == null || a.isEmpty() || b.isEmpty()) {
-            return false;
-        }
-        for (Map.Entry<String, String> e : a.entrySet()) {
-            if (e.getValue() != null && e.getValue().equals(b.get(e.getKey()))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private ResourceConfig collectResources(WorkloadRef workload) {
         Container container = primaryContainer(workload.podSpec());
         if (container == null) {
-            return new ResourceConfig(null, null, null, null);
+            return null;
         }
         ResourceRequirements rr = container.getResources();
         if (rr == null) {
@@ -754,7 +942,7 @@ public class InventoryService {
     private ProbeInfo collectProbes(WorkloadRef workload) {
         Container container = primaryContainer(workload.podSpec());
         if (container == null) {
-            return ProbeInfo.unknown();
+            return null;
         }
         return new ProbeInfo(
                 container.getReadinessProbe() != null,
@@ -779,76 +967,15 @@ public class InventoryService {
         return map.get(key).toString();
     }
 
-    private NetworkingInfo collectNetworking(
-            KubernetesClient k8s,
-            ClusterClient clusterClient,
-            String namespace,
-            List<CollectionWarning> warnings) {
-        if (namespace == null) {
-            return new NetworkingInfo(false, null, false);
-        }
-
-        if (clusterClient.type() == InfrastructureType.OPENSHIFT) {
-            try {
-                Optional<OpenShiftClient> oc = clusterClient.openshift();
-                if (oc.isPresent()) {
-                    List<Route> routes = oc.get().routes().inNamespace(namespace).list().getItems();
-                    Optional<Route> route = routes.stream()
-                            .filter(r -> {
-                                String n = r.getMetadata() != null ? r.getMetadata().getName() : "";
-                                return matchesKeycloakIdentity(n,
-                                        r.getMetadata() != null ? r.getMetadata().getLabels() : Map.of());
-                            })
-                            .findFirst()
-                            .or(() -> routes.stream().findFirst());
-                    if (route.isPresent()) {
-                        String host = route.get().getSpec() != null ? route.get().getSpec().getHost() : null;
-                        boolean tls = route.get().getSpec() != null && route.get().getSpec().getTls() != null;
-                        return new NetworkingInfo(true, host, tls);
-                    }
-                }
-            } catch (KubernetesClientException e) {
-                warnings.add(mapClientException("routes", e));
-            } catch (RuntimeException e) {
-                warnings.add(CollectionWarning.collectionFailed("routes", e.getMessage()));
-            }
-        }
-
-        try {
-            List<Ingress> ingresses =
-                    k8s.network().v1().ingresses().inNamespace(namespace).list().getItems();
-            Optional<Ingress> ingress = ingresses.stream()
-                    .filter(i -> matchesKeycloakIdentity(
-                            i.getMetadata() != null ? i.getMetadata().getName() : "",
-                            i.getMetadata() != null ? i.getMetadata().getLabels() : Map.of()))
-                    .findFirst()
-                    .or(() -> ingresses.stream().findFirst());
-            if (ingress.isPresent() && ingress.get().getSpec() != null
-                    && ingress.get().getSpec().getRules() != null
-                    && !ingress.get().getSpec().getRules().isEmpty()) {
-                String host = ingress.get().getSpec().getRules().get(0).getHost();
-                boolean tls = ingress.get().getSpec().getTls() != null
-                        && !ingress.get().getSpec().getTls().isEmpty();
-                return new NetworkingInfo(true, host, tls);
-            }
-        } catch (KubernetesClientException e) {
-            warnings.add(mapClientException("ingresses", e));
-        } catch (RuntimeException e) {
-            warnings.add(CollectionWarning.collectionFailed("ingresses", e.getMessage()));
-        }
-
-        return new NetworkingInfo(false, null, false);
-    }
-
     private static CollectionWarning mapClientException(String resource, KubernetesClientException e) {
-        if (e.getCode() == 403) {
-            return CollectionWarning.permissionDenied(resource, e.getMessage());
+        if (e.getCode() == 401 || e.getCode() == 403) {
+            return CollectionWarning.permissionDenied(resource, null);
         }
         if (e.getCode() == 404) {
             return new CollectionWarning(
-                    CollectionWarning.WarningCode.RESOURCE_NOT_FOUND, resource, e.getMessage());
+                    CollectionWarning.WarningCode.RESOURCE_NOT_FOUND, resource, null);
         }
-        return CollectionWarning.apiUnavailable(resource, e.getMessage());
+        return CollectionWarning.apiUnavailable(resource, null);
     }
 
     private static String label(Map<String, String> labels, String key) {
@@ -867,10 +994,13 @@ public class InventoryService {
             int available,
             PodSpec podSpec,
             Map<String, String> selector,
-            GenericKubernetesResource cr) {
+            GenericKubernetesResource cr,
+            String uid,
+            String kind,
+            String apiVersion) {
 
         static WorkloadRef none() {
-            return new WorkloadRef(DeploymentMethod.UNKNOWN, null, -1, -1, -1, -1, null, Map.of(), null);
+            return new WorkloadRef(DeploymentMethod.UNKNOWN, null, -1, -1, -1, -1, null, Map.of(), null, null, null, null);
         }
     }
 }

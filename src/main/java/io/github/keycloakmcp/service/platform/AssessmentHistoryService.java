@@ -17,6 +17,7 @@ import io.github.keycloakmcp.persistence.entity.AssessmentRunEntity;
 import io.github.keycloakmcp.persistence.mapper.AssessmentPersistenceMapper;
 import io.github.keycloakmcp.persistence.repository.AssessmentRepository;
 import io.github.keycloakmcp.persistence.repository.FindingRepository;
+import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.target.Target;
 import io.github.keycloakmcp.target.TargetAuthorizationService;
 import io.github.keycloakmcp.target.TargetPermission;
@@ -35,6 +36,7 @@ public class AssessmentHistoryService {
     private final FindingRepository findingRepository;
     private final AssessmentPersistenceMapper mapper;
     private final OperationalEventBus eventBus;
+    private final SensitiveDataFilter sensitiveDataFilter;
 
     @Inject
     public AssessmentHistoryService(
@@ -44,7 +46,8 @@ public class AssessmentHistoryService {
             AssessmentRepository assessmentRepository,
             FindingRepository findingRepository,
             AssessmentPersistenceMapper mapper,
-            OperationalEventBus eventBus) {
+            OperationalEventBus eventBus,
+            SensitiveDataFilter sensitiveDataFilter) {
         this.assessmentEngine = assessmentEngine;
         this.targetResolver = targetResolver;
         this.targetAuthorization = targetAuthorization;
@@ -52,6 +55,7 @@ public class AssessmentHistoryService {
         this.findingRepository = findingRepository;
         this.mapper = mapper;
         this.eventBus = eventBus;
+        this.sensitiveDataFilter = sensitiveDataFilter;
     }
 
     @Transactional
@@ -70,9 +74,11 @@ public class AssessmentHistoryService {
         eventBus.publish(OperationalEvent.of(
                 "assessment_completed",
                 targetId,
-                "Assessment score " + persisted.overallScore(),
+                persisted.scoreAvailable() ? "Assessment score " + persisted.overallScore()
+                        : "Assessment inconclusive (" + persisted.status() + ")",
                 runId));
-        return persisted;
+        // All callers consume this result as output; never feed this lossy projection back into evaluation.
+        return sensitiveDataFilter.redactMetadata(persisted);
     }
 
     public PageResult<AssessmentRunSummary> list(String targetId, int page, int size) {

@@ -7,16 +7,20 @@ import java.util.Map;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import io.github.keycloakmcp.target.RegistryOwner;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "targets")
@@ -25,6 +29,16 @@ public class TargetEntity extends PanacheEntityBase {
     @Id
     @Column(name = "id", length = 128, nullable = false)
     public String id;
+
+    /** Definition ownership is assigned explicitly by its writer, never inferred from target identity. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "registry_owner", length = 32, nullable = false)
+    public RegistryOwner registryOwner = RegistryOwner.LEGACY_UNCLASSIFIED;
+
+    /** ORM concurrency revision of this row; distinct from the installation confirmation revision. */
+    @Version
+    @Column(name = "registry_revision", nullable = false)
+    public long registryRevision;
 
     @Column(name = "display_name", nullable = false)
     public String displayName;
@@ -62,6 +76,20 @@ public class TargetEntity extends PanacheEntityBase {
 
     @Column(name = "infra_credential_ref")
     public String infraCredentialRef;
+
+    @Column(name = "installation_api_version", length = 128)
+    public String installationApiVersion;
+    @Column(name = "installation_kind", length = 32)
+    public String installationKind;
+    @Column(name = "installation_name", length = 253)
+    public String installationName;
+    @Column(name = "installation_uid", length = 128)
+    public String installationUid;
+
+    @Column(name = "installation_revision", nullable = false)
+    public long installationRevision;
+    @Column(name = "installation_managed", nullable = false)
+    public boolean installationManaged;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "observability", columnDefinition = "jsonb")

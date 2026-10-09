@@ -1,6 +1,12 @@
 # Demo readiness — 15 January 2027
 
-Status: **IN PROGRESS — corrective foundation only; live RHBK/OpenShift gate NOT VERIFIED**.
+Status: **IN PROGRESS — local identity/discovery/installation-confirmation foundations implemented; browser end-to-end and live RHBK/OpenShift gates NOT VERIFIED**.
+
+## Local checkpoint — 2026-09-11
+
+The working tree now includes OIDC/PKCE and authenticated event transport, explicit approved infrastructure connections, exact installation identity, scoped networking association and REST/UI candidate confirmation with transactional audit. [Architecture](../architecture/overview.md), [project state](../project-state.md) and [latest local evidence](../development/installation-onboarding-2026-09-11.md) distinguish implementation from live acceptance. The recorded 358 backend and 94 UI passes, with nine skipped opt-in integrations, do not close the go/no-go checklist below. New connection/target registration, host/container collectors and retained-evidence replay remain open.
+
+Development versions are aligned in the D1 increment. Next: finish acceptance of the [D1 browser/identity workflow](d1-local-workflow.md) on approved local fixtures before [D2](d2-rhbk-openshift.md). [Executable milestones](README.md) provide implementation scopes; this document remains the presentation go/no-go authority. Earlier validation ledgers remain historical evidence. The presentation year is inferred from the supplied 15 January date; session duration remains unconfirmed.
 
 ## Submitted session promise
 
@@ -23,9 +29,13 @@ Business/IAM reporting is an approved product extension. Verified login/failure/
 
 ## Environments and responsibilities
 
+The optional reference agent is a planned product deliverable (AGT-01/AGT-02 in the [roadmap](../roadmap.md#agente-de-referência--planejado-ainda-não-implementado)), not an implemented or mandatory platform dependency. D1 prototypes the versioned profile/setup guide; D2 validates a specific MCP client/model/OIDC combination against the selected RHBK environment; D3 evaluates grounding and safety; D4 rehearses and freezes that combination. The profile uses READ/ASSESS only, cites evidence, preserves uncertainty and never replaces backend policy or deterministic rules. Model/provider choice and external data disclosure require organizational approval. UI/API and deterministic reporting remain usable without it.
+
 1. Local: disposable Community targets, platform DB and Prometheus; named/labeled resources with transient storage; metrics-present and unavailable fixtures.
 2. RHBK/OpenShift: maintainer provisions dedicated non-customer namespace/workload; exact product/platform versions; read-only credentials and namespace RBAC; no Secret contents. Provisioning requires that environment/access, not inferred authority.
-3. Negative identity: only target A readable; target B denied including history/events. AI has READ/ASSESS; PLAN only if necessary; never APPROVE/WRITE for demo.
+3. Negative identity: only target A readable; target B denied including history/events. The reference AI has READ/ASSESS only; no DISCOVER/BIND/PLAN/APPROVE/WRITE/ADMIN grants in the principal demo.
+
+Installation setup is separate from the principal read-only demonstration. Candidate discovery needs READ + DISCOVER; confirmation additionally requires BIND and disabling global read-only after administrator review. Do not grant BIND to the reference agent or disable that global guard as a demo convenience. Existing-target confirmation binds platform metadata and does not write to the cluster.
 
 ## Modular live sequence
 
@@ -50,6 +60,8 @@ Prepare non-production fixtures instead of changing customer configurations. Do 
 - [ ] Incomplete evidence has no favorable overall score/conclusion.
 - [ ] Metrics isolation, units, freshness and empty-data behavior verified.
 - [ ] AI preserves evidence/uncertainty; unsafe instructions do not alter authority.
+- [ ] Reference agent profile, setup guide and evaluation cases are versioned; actual client/model/authentication compatibility is recorded, not assumed.
+- [ ] Reference agent passes normal/missing-data/cross-target/malicious-metadata cases without critical disclosure, unauthorized actions or invented conclusions; no-AI fallback is rehearsed.
 - [ ] Credentials valid, least-privilege and not exposed in recording/artifacts.
 - [ ] Network/certificates/quotas checked one week before and shortly before session.
 - [ ] Rehearsal timed; sanitized recording/export fallback available and dated.

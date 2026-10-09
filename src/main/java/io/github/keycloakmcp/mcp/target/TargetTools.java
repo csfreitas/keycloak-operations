@@ -5,8 +5,10 @@ import java.util.Locale;
 
 import io.github.keycloakmcp.audit.AuditService;
 import io.github.keycloakmcp.domain.error.McpException;
+import io.github.keycloakmcp.mcp.McpToolErrorProjector;
 import io.github.keycloakmcp.observability.McpMetrics;
 import io.github.keycloakmcp.security.ToolAuthorization;
+import io.github.keycloakmcp.security.ReadMetadataProjection;
 import io.github.keycloakmcp.target.TargetDetails;
 import io.github.keycloakmcp.target.TargetEnvironment;
 import io.github.keycloakmcp.target.TargetMapper;
@@ -19,7 +21,6 @@ import io.github.keycloakmcp.target.TargetAuthorizationService;
 import io.github.keycloakmcp.target.TargetPermission;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
-import io.quarkiverse.mcp.server.ToolCallException;
 import jakarta.inject.Inject;
 
 /**
@@ -50,12 +51,19 @@ public class TargetTools {
     @Inject
     ToolAuthorization toolAuthorization;
 
+    @Inject
+    ReadMetadataProjection readProjection;
+
+    @Inject
+    McpToolErrorProjector errorProjector;
+
     @Tool(
             name = "keycloak_list_targets",
             description = "List registered Keycloak/RHBK targets (sanitized metadata only). "
                     + "Call this before other tools when targetId is unknown.")
     public List<TargetSummary> keycloakListTargets() {
-        return invoke("keycloak_list_targets", null, () -> TargetMapper.toSummaries(readableTargets()));
+        return invoke("keycloak_list_targets", null, () -> TargetMapper.toSummaries(readableTargets()).stream()
+                .map(summary -> readProjection.project(summary, "id")).toList());
     }
 
     @Tool(
@@ -69,7 +77,7 @@ public class TargetTools {
                 () -> {
                     Target target = targetResolver.require(targetId);
                     targetAuthorization.assertAllowed(target, TargetPermission.READ);
-                    return TargetMapper.toDetails(target);
+                    return readProjection.project(TargetMapper.toDetails(target), "id");
                 });
     }
 
@@ -93,6 +101,7 @@ public class TargetTools {
                     .filter(t -> typeFilter == null || t.type() == typeFilter)
                     .filter(t -> envFilter == null || t.environment() == envFilter)
                     .map(TargetMapper::toSummary)
+                    .map(summary -> readProjection.project(summary, "id"))
                     .toList();
         });
     }
@@ -133,12 +142,8 @@ public class TargetTools {
             T result = action.call();
             success = true;
             return result;
-        } catch (McpException e) {
-            throw new ToolCallException(e.getError().code() + ": " + e.getMessage());
-        } catch (ToolCallException e) {
-            throw e;
         } catch (Exception e) {
-            throw new ToolCallException("INTERNAL_ERROR: " + e.getMessage());
+            throw errorProjector.project(e);
         } finally {
             long duration = System.currentTimeMillis() - start;
             metrics.recordToolInvocation(toolName, duration, success);

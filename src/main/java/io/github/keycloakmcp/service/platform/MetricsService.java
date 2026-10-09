@@ -2,6 +2,9 @@ package io.github.keycloakmcp.service.platform;
 
 import java.util.List;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.domain.metrics.MetricsStatusView;
 import io.github.keycloakmcp.domain.metrics.PerformanceSummary;
 import io.github.keycloakmcp.observability.metrics.MetricCategory;
@@ -27,6 +30,8 @@ public class MetricsService {
     private final TargetAuthorizationService targetAuthorization;
     private final MetricsProviderFactory metricsProviderFactory;
     private final PerformanceSummaryService performanceSummaryService;
+    @ConfigProperty(name = "collection.operation-timeout-ms", defaultValue = "30000")
+    long collectionTimeoutMs = 30000;
 
     @Inject
     public MetricsService(
@@ -42,10 +47,17 @@ public class MetricsService {
 
     public MetricsStatusView status(String targetId) {
         Target target = requireReadable(targetId);
+        try (var scope = CollectionBudget.open(targetId, collectionTimeoutMs)) {
+            return status(target, scope.budget());
+        }
+    }
+
+    private MetricsStatusView status(Target target, CollectionBudget budget) {
         MetricsProvider provider = metricsProviderFactory.forTarget(target);
-        MetricsProviderStatus status = provider.status(target);
+        MetricsProviderStatus status = budget.exhausted() ? MetricsProviderStatus.DEGRADED : provider.status(target);
+        if (budget.exhausted()) status = MetricsProviderStatus.DEGRADED;
         String metricsType = target.observability() == null ? null : target.observability().metricsType();
-        boolean configured = target.hasMetrics() || provider.supported(target);
+        boolean configured = target.hasMetrics() || !budget.exhausted() && provider.supported(target);
         String message = switch (status) {
             case AVAILABLE -> "Metrics backend reachable";
             case DEGRADED -> "Metrics backend degraded";
@@ -54,7 +66,7 @@ public class MetricsService {
             case NOT_CONFIGURED -> "Metrics not configured for target";
             case UNKNOWN -> "Metrics status unknown";
         };
-        return MetricsStatusView.of(targetId, status, metricsType, configured, message);
+        return MetricsStatusView.of(target.id().value(), status, metricsType, configured, message);
     }
 
     public PerformanceSummary summary(String targetId, String window) {

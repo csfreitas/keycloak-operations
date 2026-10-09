@@ -84,8 +84,19 @@ public class RuleEngine {
                 evaluated++;
                 Optional<Finding> finding = rule.evaluate(scopedContext);
                 if (finding.isPresent()) {
-                    all.add(finding.get());
-                    matched++;
+                    Finding f = finding.get();
+                    all.add(f);
+                    if (f.status() == FindingStatus.NOT_EVALUATED) {
+                        evaluated--;
+                        notEvaluated++;
+                        Object key = f.evidence() == null ? null : f.evidence().get("missingEvidence");
+                        if (key != null) missing.add(String.valueOf(key));
+                    } else if (f.status() == FindingStatus.SKIPPED) {
+                        evaluated--;
+                        skipped++;
+                    } else if (f.status() == FindingStatus.OPEN || f.status() == FindingStatus.FAIL) {
+                        matched++;
+                    }
                 }
             }
         }

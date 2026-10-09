@@ -6,7 +6,7 @@ Normative security controls. Related narrative: [architecture/security.md](../ar
 
 ### SEC-TARGET-001
 
-MCP/API callers **MUST NOT** provide arbitrary target endpoints (Keycloak, cluster, metrics, or other system URLs).
+Operational MCP/API callers **MUST NOT** provide arbitrary target endpoints (Keycloak, cluster, metrics, or other system URLs). Only the default-closed REST administrative preflight in FR-ONBOARD-002 may accept a bounded candidate URL as inert data; it **MUST NOT** resolve its host, credentials or issue requests to it. This exception grants no operational target access, registration or MCP capability; see [ADR 0013](../adr/0013-registry-preflight-before-registration.md).
 
 ### SEC-TARGET-002
 
@@ -62,6 +62,14 @@ The platform **MUST NOT** inventory or return Kubernetes Secret **contents** wit
 
 Infrastructure RBAC **SHOULD** follow least privilege (read-oriented assessor roles).
 
+### SEC-INFRA-004
+
+Target operations **MUST NOT** fall back to ambient kubeconfig, engine context/socket, SSH configuration or host filesystem discovery. Host/runtime access **MUST** have explicit source identity and scope. Discovery authorization **MUST NOT** imply installation, workload mutation, cleanup or new target grants.
+
+### SEC-INFRA-005
+
+Docker/Podman socket access **MUST NOT** be described as read-only merely because collectors issue reads or the socket is mounted read-only. Host collectors **MUST** expose only bounded allowlisted observations and **MUST NOT** expose arbitrary shell/exec, raw environment, command-line or file-content access to REST/MCP/AI callers.
+
 ## Transport & defaults
 
 ### SEC-TLS-001
@@ -116,7 +124,7 @@ Data and credentials from one target **MUST NOT** leak into another target’s c
 
 ### SEC-AUTHZ-001
 
-Target-scoped operations **SHOULD** enforce target authorization before execution.
+Target-scoped operations **MUST** enforce target authorization before execution, including discovery, history/export and installation confirmation. Permissions **MUST** be explicit; global read-only **MUST** deny BIND, APPROVE, WRITE and ADMIN regardless of grants. Unauthenticated operation is limited to explicitly selected local-lab/dev/test profiles; packaged defaults **MUST** fail closed.
 
 ### SEC-RBAC-001
 

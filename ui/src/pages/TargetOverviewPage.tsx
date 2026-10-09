@@ -9,6 +9,11 @@ interface OutletCtx {
   overview: TargetOverview | null;
 }
 
+function observedCount(value: number | null) {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0
+    ? value : 'Unknown / not collected';
+}
+
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', padding: 'var(--space-2) 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
@@ -51,10 +56,10 @@ export function TargetOverviewPage() {
               Details →
             </Link>
           </div>
-          <InfoRow label="Desired replicas" value={overview.desiredReplicas} />
-          <InfoRow label="Ready replicas" value={overview.readyReplicas} />
-          <InfoRow label="Pod count" value={overview.podCount} />
-          <InfoRow label="Zone count" value={overview.zoneCount} />
+          <InfoRow label="Desired replicas" value={observedCount(overview.desiredReplicas)} />
+          <InfoRow label="Ready replicas" value={observedCount(overview.readyReplicas)} />
+          <InfoRow label="Pod count" value={observedCount(overview.podCount)} />
+          <InfoRow label="Zone count" value={observedCount(overview.zoneCount)} />
         </div>
       </div>
 

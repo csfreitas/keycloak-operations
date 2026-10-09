@@ -22,6 +22,10 @@ public record SemanticMetricResult(
     public static final String REASON_HISTOGRAM_NOT_AVAILABLE = "HTTP_HISTOGRAM_NOT_ENABLED";
     public static final String REASON_SERIES_LIMIT = "LIMIT_EXCEEDED";
     public static final String REASON_STALE = "STALE";
+    public static final String REASON_NO_SERIES = "NO_TIME_SERIES";
+    public static final String REASON_INVALID_SAMPLE = "INVALID_SAMPLE";
+    public static final String REASON_TEMPORAL_COVERAGE = "TEMPORAL_COVERAGE_INCOMPLETE";
+    public static final String REASON_UNEXPECTED_SERIES = "UNEXPECTED_SERIES";
 
     public SemanticMetricResult {
         labels = labels == null ? List.of() : List.copyOf(labels);
@@ -79,6 +83,6 @@ public record SemanticMetricResult(
 
     /** True when the result may drive performance PASS/FAIL findings. */
     public boolean usableForFindings() {
-        return availability == MetricAvailability.AVAILABLE && value != null;
+        return availability == MetricAvailability.AVAILABLE && value != null && Double.isFinite(value);
     }
 }

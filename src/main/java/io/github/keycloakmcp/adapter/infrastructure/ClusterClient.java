@@ -10,7 +10,7 @@ import io.github.keycloakmcp.target.InfrastructureType;
  * Thin wrapper around fabric8 Kubernetes/OpenShift clients for a single target.
  * <p>
  * Callers must close the returned client when done (factory manages lifecycle via cache).
- * Use {@link #type()} to determine which specific API surface is available.
+ * API availability must come from explicit bounded discovery, never this transport wrapper.
  */
 public interface ClusterClient extends AutoCloseable {
 
@@ -18,15 +18,17 @@ public interface ClusterClient extends AutoCloseable {
     KubernetesClient kubernetes();
 
     /**
-     * OpenShift-specific client, present only when {@link #type()} is {@link InfrastructureType#OPENSHIFT}.
+     * Legacy configured OpenShift transport handle; its presence is not observed API support.
      * The OpenShift client is returned as a separate handle; callers should not close it directly.
      */
+    @Deprecated
     Optional<OpenShiftClient> openshift();
 
     /** Namespace derived from config/credentials, or null when not configured. */
     String namespace();
 
-    /** Whether the underlying cluster is OPENSHIFT or KUBERNETES. */
+    /** Configured type hint only; NONE when absent. Never probes or confirms runtime identity. */
+    @Deprecated
     InfrastructureType type();
 
     /** Closes the underlying clients. Safe to call multiple times. */

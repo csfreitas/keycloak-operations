@@ -153,4 +153,15 @@ class MultiTargetAssessmentIsolationTest {
                 null,
                 Map.of());
     }
+
+    @Test
+    void unknownProfileDoesNotEchoUntrustedInput() {
+        Target target = target("target-a");
+        when(evidenceService.collect(target)).thenReturn(new AssessmentEvidenceService.EvidenceCollectionResult(
+                List.of(), List.of(), List.of("keycloak")));
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> engine.assess(target, "profile-secret-canary"))
+                .isInstanceOf(io.github.keycloakmcp.domain.error.McpException.class)
+                .hasMessage("Assessment profile is not available")
+                .hasNoCause();
+    }
 }

@@ -39,14 +39,19 @@ public class PodHealthCheck implements HealthCheck {
                     name(),
                     HealthStatus.UNKNOWN,
                     "No infrastructure configuration",
-                    Map.of("configured", false),
+                    Map.of("configured", false, "reasonCode", "NOT_CONFIGURED"),
                     System.currentTimeMillis() - start);
         }
         int restartThreshold = Math.max(0, healthConfig.pods().restartWarningThreshold());
         try {
             InfrastructureInventory inventory = inventoryService.collect(target.id().value());
-            List<PodInventoryItem> pods = inventory.pods() == null ? List.of() : inventory.pods();
-            int desired = inventory.keycloak() == null ? -1 : inventory.keycloak().desiredReplicas();
+            if (InventoryHealthEvidence.unavailable(inventory, "infrastructure", "installation", "workload", "pods")
+                    || InventoryHealthEvidence.workloadUnavailable(inventory.keycloak())
+                    || inventory.pods() == null || inventory.pods().stream().anyMatch(p -> p == null || p.restartCount() < 0)) {
+                return unknown(start, "EVIDENCE_UNAVAILABLE", "Pod evidence is incomplete; health is inconclusive");
+            }
+            List<PodInventoryItem> pods = inventory.pods();
+            int desired = inventory.keycloak().desiredReplicas();
             int ready = 0;
             int highRestarts = 0;
             int oom = 0;
@@ -98,13 +103,13 @@ public class PodHealthCheck implements HealthCheck {
 
             return HealthComponentResult.of(name(), status, message, details, System.currentTimeMillis() - start);
         } catch (RuntimeException e) {
-            return HealthComponentResult.of(
-                    name(),
-                    HealthStatus.CRITICAL,
-                    e.getMessage() == null ? "Pod inventory failed" : e.getMessage(),
-                    Map.of(),
-                    System.currentTimeMillis() - start);
+            return unknown(start, "CHECK_FAILED", "Pod inventory failed; health is inconclusive");
         }
+    }
+
+    private HealthComponentResult unknown(long start, String reason, String message) {
+        return HealthComponentResult.of(name(), HealthStatus.UNKNOWN, message, Map.of("reasonCode", reason),
+                System.currentTimeMillis() - start);
     }
 
     private static HealthStatus worse(HealthStatus a, HealthStatus b) {

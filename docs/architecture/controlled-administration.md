@@ -15,6 +15,15 @@ Remaining before production writes: durable attempt/reconciliation after remote 
 
 ## Principle
 
+Planned user-specific workflows are now bounded by the
+[HLP-01 / SECOPS-02 catalogue](../development/secops-iam-scenarios.md), including
+effective privileges, sponsor/expiry, partial provisioning and protected identities.
+They reuse the intended application-service/policy boundary only after P2 durable
+attempts, human approval, recovery and authorization are accepted. Current client
+supports are not user supports: no create/disable-user tool, expiry scheduler or
+session/token-revocation guarantee is delivered by the catalogue. Its synthetic
+decisions are neither runtime statuses nor execution authority.
+
 AI and REST callers never receive unrestricted write access.
 
 ```text
@@ -82,7 +91,7 @@ Target-scoped permissions:
 | WRITE | Apply approved non-admin changes |
 | ADMIN | High-impact administrative applies (future) |
 
-Global `mcp.read-only=true` (default) denies WRITE/ADMIN Keycloak mutations.
+Global `mcp.read-only=true` (default) denies APPROVE/WRITE/ADMIN, as well as BIND for installation setup.
 PLAN remains available so operators can dry-run.
 
 ## Environment policy
@@ -114,10 +123,52 @@ After Admin API mutation success:
 
 HTTP 2xx alone is insufficient.
 
+## Metadata admission and outward projection
+
+`ChangeMetadataGuard` separates authoritative change state from lossy presentation.
+After target authorization, planning rejects recognizable credential-bearing input
+with `INVALID_ARGUMENT`, before normalization, provider lookup, fingerprints or
+persistence. This covers resource identifiers, idempotency keys and the supplied
+semantic values; it never substitutes redaction markers into desired configuration.
+Generated baseline/desired state, operations and diffs are checked before retention.
+
+Observation checks inspect the complete JSON-shaped `ClientRepresentation`, including
+attributes and unrelated fields that an update would resubmit. Only the known
+`secret` and `registrationAccessToken` fields are excluded from that check; both are
+explicitly cleared before outbound create/update. Recognizable credentials elsewhere
+cause `CHANGE_CONFLICT` with a fixed `REPLAN_REQUIRED` diagnostic. The guard does not
+silently strip unrelated client configuration to make a write succeed.
+
+Approval/apply check retained executable state as well as the existing policy and
+integrity constraints. Explicit verification checks the stored plan too. Unsafe or
+unavailable read-back metadata produces a failed, **inconclusive** verification with
+no raw mismatch payload; it is not evidence of a successful apply or a definite
+configuration mismatch. Verification output, rejection reasons and audit payloads
+receive separate presentation filtering.
+
+Service responses, including historical records, use sanitized copies. Stored legacy
+plans and fingerprints are not rewritten, and sanitized copies are never used for
+authorization, integrity, baseline comparisons or execution. Canonical change/target
+IDs and trusted actor/approver/rejector identities remain intact. Reading an old
+record does not certify its original stored bytes or authorize its execution.
+
+REST `McpExceptionMapper` filters recognizable credentials from domain-error messages
+without changing HTTP status or error code. MCP `ChangeTools` does the same and
+reconstructs tool errors without their original cause/suppressed exceptions; unknown
+failures use a fixed diagnostic. Authorization, read-only policy and audit flow are
+unchanged. Other legacy MCP tool error paths are not covered by this correction.
+
+These controls recognize the formats supported by `SensitiveDataFilter`, not arbitrary
+unlabelled/encoded secrets, and do not constitute universal prompt-injection protection
+or production-write certification. See the
+[change metadata evidence and limitations](../development/h1-change-metadata-2026-09-19.md).
+
 ## Persistence
 
 Flyway migration `V7` introduces `change_records` (aggregate lifecycle + JSON plan/diff/verification).
-Secrets are never stored; values pass `SensitiveDataFilter` before persist.
+V8 adds the approval safety context described above. New executable state is admitted
+unchanged only after the metadata guard; descriptive output is filtered separately.
+No migration or historical-row rewrite is introduced by this metadata correction.
 
 ## Surfaces
 
@@ -127,6 +178,20 @@ Secrets are never stored; values pass `SensitiveDataFilter` before persist.
 | MCP | `keycloak_get/list/approve/reject/apply/verify_change` + semantic plan tools |
 | REST | `/api/v1/changes...` |
 | Web UI | Minimal pending/detail/history views (not a full admin console) |
+
+## UI presentation boundary
+
+Change detail state and action controls belong to a single route visit; stale read,
+action, error and completion callbacks cannot cross visits. A synchronous guard blocks
+duplicate submissions, and a reload removes old controls. Detail response IDs must
+match the requested change; action responses must also match its target. Change lists
+are keyed by explicit target/status and reject pages containing foreign-target records.
+These are defensive UI checks, not permission grants or proof of human approval.
+Discarding an obsolete response does not cancel or undo a server operation.
+
+The [19 September navigation evidence](../development/d1-change-navigation-2026-09-19.md)
+uses real components with synthetic HTTP responses. No actual approval/apply was
+performed; production-write recovery and all existing backend policy gates remain open.
 
 ## Proof-of-concept mutation (0.8)
 

@@ -1,6 +1,6 @@
 # Assessment screen (conceptual)
 
-Route: `/targets/{targetId}/assessments`
+Implemented route: `/targets/{targetId}/assessment`. Layout below mixes the current screen with future UX; it is not a feature-completion checklist.
 
 ## Purpose
 
@@ -21,9 +21,11 @@ Run assessments, browse history, and triage findings.
 4. **Evidence panel** — sanitized JSON evidence (never secrets)
 5. **History** — compare two runs (future: side-by-side score + finding delta)
 
-## Future MCP (same services)
+## MCP (same services)
 
 - `keycloak_list_assessments`
 - `keycloak_get_assessment`
 - `keycloak_get_latest_assessment`
-- `keycloak_compare_assessments`
+- `keycloak_compare_assessments` — planned, not implemented
+
+Scores are unavailable/inconclusive when evidence is incomplete; see [scoring](../scoring.md). Findings lifecycle triage/comparison UX must not be assumed implemented from this conceptual layout.

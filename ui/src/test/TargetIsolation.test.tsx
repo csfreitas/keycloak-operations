@@ -22,6 +22,28 @@ function renderOverviewWithTarget(targetId: string, overview: typeof targetOverv
 }
 
 describe('Target isolation', () => {
+  it('shows unavailable infrastructure counts explicitly', () => {
+    renderOverviewWithTarget('keycloak-dev-01', { ...targetOverview,
+      desiredReplicas: null, readyReplicas: null, podCount: null, zoneCount: null });
+    expect(screen.getAllByText('Unknown / not collected')).toHaveLength(4);
+  });
+
+  it('does not display legacy negative or invalid count sentinels', () => {
+    renderOverviewWithTarget('keycloak-dev-01', { ...targetOverview,
+      desiredReplicas: -1, readyReplicas: -1, podCount: NaN, zoneCount: 1.5 });
+    expect(screen.getAllByText('Unknown / not collected')).toHaveLength(4);
+    expect(screen.queryByText('-1')).not.toBeInTheDocument();
+  });
+
+  it('preserves valid observed zero counts', () => {
+    renderOverviewWithTarget('keycloak-dev-01', { ...targetOverview,
+      desiredReplicas: 0, readyReplicas: 0, podCount: 0, zoneCount: 0 });
+    expect(screen.queryByText('Unknown / not collected')).not.toBeInTheDocument();
+    for (const label of ['Desired replicas', 'Ready replicas', 'Pod count', 'Zone count']) {
+      expect(screen.getByText(label).parentElement).toHaveTextContent('0');
+    }
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
   });

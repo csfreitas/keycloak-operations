@@ -12,7 +12,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 /**
- * Default {@link TargetRegistry}: prefers database after seeding from configuration.
+ * Default {@link TargetRegistry}: database authority after successful configuration bootstrap.
  * Modes: {@code configuration}, {@code database}, {@code composite} (default).
  */
 @ApplicationScoped
@@ -48,8 +48,10 @@ public class CompositeTargetRegistry implements TargetRegistry {
         }
         try {
             bootstrapService.syncConfigTargetsToDatabase();
-        } catch (RuntimeException e) {
-            LOG.warnf(e, "Target bootstrap from configuration failed; falling back where possible");
+        } catch (RuntimeException failedBootstrap) {
+            // Do not activate a different source after ownership, transaction or database failure.
+            LOG.warn("Target registry initialization failed; configuration was not used as a fallback");
+            throw new IllegalStateException("Target registry initialization failed; configuration was not used as a fallback");
         }
     }
 
@@ -57,8 +59,7 @@ public class CompositeTargetRegistry implements TargetRegistry {
     public List<Target> list() {
         return switch (mode) {
             case CONFIGURATION -> configurationRegistry.list();
-            case DATABASE -> databaseRegistry.list();
-            case COMPOSITE -> preferDatabaseOrConfig();
+            case DATABASE, COMPOSITE -> databaseRegistry.list();
         };
     }
 
@@ -66,30 +67,8 @@ public class CompositeTargetRegistry implements TargetRegistry {
     public Optional<Target> findById(String id) {
         return switch (mode) {
             case CONFIGURATION -> configurationRegistry.findById(id);
-            case DATABASE -> databaseRegistry.findById(id);
-            case COMPOSITE -> {
-                Optional<Target> fromDb = databaseRegistry.findById(id);
-                if (fromDb.isPresent()) {
-                    yield fromDb;
-                }
-                if (databaseRegistry.list().isEmpty()) {
-                    yield configurationRegistry.findById(id);
-                }
-                yield Optional.empty();
-            }
+            case DATABASE, COMPOSITE -> databaseRegistry.findById(id);
         };
-    }
-
-    private List<Target> preferDatabaseOrConfig() {
-        List<Target> db = databaseRegistry.list();
-        if (!db.isEmpty()) {
-            return db;
-        }
-        List<Target> config = configurationRegistry.list();
-        if (!config.isEmpty()) {
-            LOG.debug("Database target table empty; using configuration targets");
-        }
-        return config;
     }
 
     enum Mode {

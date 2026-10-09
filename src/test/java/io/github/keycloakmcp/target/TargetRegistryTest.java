@@ -33,6 +33,27 @@ class TargetRegistryTest {
     }
 
     @Test
+    void mapsExplicitInstallationFromServerConfiguration() {
+        var entry = targetEntry("Bound", "RHBK", "TEST", true, "http://kc:8080", "ref");
+        var infra = mock(McpRuntimeConfig.InfrastructureEntry.class);
+        var installation = mock(McpRuntimeConfig.InstallationEntry.class);
+        when(infra.type()).thenReturn("OPENSHIFT");
+        when(infra.clusterId()).thenReturn(Optional.of("cluster-a"));
+        when(infra.namespace()).thenReturn(Optional.of("iam"));
+        when(infra.credentialRef()).thenReturn(Optional.of("infra-ref"));
+        when(installation.apiVersion()).thenReturn("k8s.keycloak.org/v2alpha1");
+        when(installation.kind()).thenReturn("Keycloak");
+        when(installation.name()).thenReturn("rhbk");
+        when(installation.uid()).thenReturn("resource-uid");
+        when(infra.installation()).thenReturn(Optional.of(installation));
+        when(entry.infrastructure()).thenReturn(Optional.of(infra));
+        when(runtimeConfig.targets()).thenReturn(Map.of("bound", entry));
+        registry.load();
+        assertThat(registry.require("bound").infrastructure().installation()).isEqualTo(
+                new KubernetesInstallationBinding("k8s.keycloak.org/v2alpha1", "Keycloak", "rhbk", "resource-uid"));
+    }
+
+    @Test
     void listsConfiguredTargets() {
         assertThat(registry.list()).hasSize(2);
         assertThat(registry.list()).extracting(t -> t.id().value()).containsExactly("lab-a", "lab-b");

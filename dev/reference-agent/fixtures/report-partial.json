@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.1",
+  "reportId": "10000000-0000-4000-8000-000000000001",
+  "targetId": "synthetic-target-a",
+  "targetDisplayName": "Synthetic local test target A",
+  "productType": "KEYCLOAK",
+  "environment": "TEST",
+  "configuredInfrastructureType": "NONE",
+  "generatedAt": "2026-09-19T21:00:00Z",
+  "provenance": {
+    "collectionStartedAt": "2026-09-19T21:00:00Z",
+    "collectionCompletedAt": "2026-09-19T21:00:04Z",
+    "collectionMode": "INDEPENDENT_SECTION_COLLECTIONS",
+    "bundledRuleCatalogSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "retainedEvidenceReplayAvailable": false
+  },
+  "reportCompleteness": "PARTIAL",
+  "sections": [
+    {"name": "platform", "status": "PARTIAL", "message": "Synthetic infrastructure evidence is incomplete"},
+    {"name": "health", "status": "COMPLETE", "message": "Synthetic health collection completed"},
+    {"name": "assessment", "status": "PARTIAL", "message": "Synthetic assessment has missing evidence"},
+    {"name": "performance", "status": "SKIPPED", "message": "Metrics provider is not configured for this synthetic target"}
+  ],
+  "healthStatus": "UNKNOWN",
+  "assessment": {
+    "assessmentId": "20000000-0000-4000-8000-000000000002",
+    "profile": "keycloak-production",
+    "status": "PARTIAL",
+    "overallScore": null,
+    "scoreAvailable": false,
+    "rulesEvaluated": 7,
+    "rulesNotEvaluated": 5,
+    "evidenceCompleteness": 58,
+    "confidence": "LOW",
+    "findingCount": 2
+  },
+  "findingDetails": {
+    "version": "1.0",
+    "reportId": "10000000-0000-4000-8000-000000000001",
+    "targetId": "synthetic-target-a",
+    "assessmentId": "20000000-0000-4000-8000-000000000002",
+    "availability": "AVAILABLE",
+    "totalFindings": 2,
+    "returnedFindings": 1,
+    "omittedFindings": 1,
+    "limits": {"maxFindings": 20, "maxDepth": 6, "maxNodes": 256, "maxTextCharacters": 8192},
+    "items": [{
+      "sourceIndex": 1,
+      "finding": {
+        "id": "synthetic-ha-rule",
+        "title": "Synthetic single replica observation",
+        "category": "AVAILABILITY",
+        "severity": "HIGH",
+        "status": "WARNING",
+        "description": "Synthetic finding, not an assessment of a real environment.",
+        "impact": "Synthetic availability impact.",
+        "recommendation": "Review the synthetic replica observation.",
+        "evidence": {"replicas": 1, "available": true, "zone/a~b": "synthetic-zone"},
+        "references": ["https://example.invalid/synthetic-reference"],
+        "subjectType": "environment",
+        "subjectId": "synthetic-environment-a",
+        "subjectName": "Synthetic environment A"
+      }
+    }]
+  },
+  "markdown": "# Synthetic fixture, not collected environment evidence\n\nThis document tests bounded report-local findings. Metrics and retained evidence replay are not supplied by this compact MCP envelope."
+}

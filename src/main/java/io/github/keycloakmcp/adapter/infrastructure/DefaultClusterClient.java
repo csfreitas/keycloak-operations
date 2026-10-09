@@ -1,9 +1,7 @@
 package io.github.keycloakmcp.adapter.infrastructure;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import org.jboss.logging.Logger;
 
@@ -16,19 +14,17 @@ import io.github.keycloakmcp.target.InfrastructureType;
  * <p>
  * The OpenShift client is obtained via {@code KubernetesClient.adapt(OpenShiftClient.class)};
  * it shares the underlying connection pool with the base client.
- * Type detection is performed lazily on first call to {@link #type()}.
+ * Type is a configured hint only; this wrapper performs no implicit discovery.
  */
 class DefaultClusterClient implements ClusterClient {
 
     private static final Logger LOG = Logger.getLogger(DefaultClusterClient.class);
-    private static final String ROUTE_API_GROUP = "route.openshift.io";
-    private static final String CONFIG_API_GROUP = "config.openshift.io";
 
     private final KubernetesClient kubernetesClient;
     private final String namespace;
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    private volatile InfrastructureType detectedType;
+    private volatile InfrastructureType configuredType = InfrastructureType.NONE;
     private volatile OpenShiftClient openShiftClient;
 
     DefaultClusterClient(KubernetesClient kubernetesClient, String namespace) {
@@ -42,6 +38,7 @@ class DefaultClusterClient implements ClusterClient {
     }
 
     @Override
+    @Deprecated
     public Optional<OpenShiftClient> openshift() {
         if (type() != InfrastructureType.OPENSHIFT) {
             return Optional.empty();
@@ -62,34 +59,14 @@ class DefaultClusterClient implements ClusterClient {
     }
 
     @Override
+    @Deprecated
     public InfrastructureType type() {
-        if (detectedType == null) {
-            synchronized (this) {
-                if (detectedType == null) {
-                    detectedType = detectType();
-                }
-            }
-        }
-        return detectedType;
+        return configuredType;
     }
 
-    /** Allow callers to provide the type hint to avoid an extra API round-trip. */
+    /** Retain operator intent for legacy transport callers; not an observed capability. */
     void setTypeHint(InfrastructureType hint) {
-        this.detectedType = hint;
-    }
-
-    private InfrastructureType detectType() {
-        try {
-            Set<String> groups = kubernetesClient.getApiGroups().getGroups().stream()
-                    .map(g -> g.getName())
-                    .collect(Collectors.toSet());
-            if (groups.contains(ROUTE_API_GROUP) || groups.contains(CONFIG_API_GROUP)) {
-                return InfrastructureType.OPENSHIFT;
-            }
-        } catch (RuntimeException e) {
-            LOG.debugf(e, "Unable to probe API groups for type detection; defaulting to KUBERNETES");
-        }
-        return InfrastructureType.KUBERNETES;
+        this.configuredType = hint == null ? InfrastructureType.NONE : hint;
     }
 
     @Override
@@ -99,7 +76,7 @@ class DefaultClusterClient implements ClusterClient {
             try {
                 kubernetesClient.close();
             } catch (RuntimeException e) {
-                LOG.debugf(e, "Error closing Kubernetes client");
+                LOG.debug("Error closing Kubernetes client");
             }
         }
     }

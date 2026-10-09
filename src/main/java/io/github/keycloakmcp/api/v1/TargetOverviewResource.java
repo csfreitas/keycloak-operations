@@ -1,7 +1,7 @@
 package io.github.keycloakmcp.api.v1;
 
 import io.github.keycloakmcp.domain.platform.TargetOverview;
-import io.github.keycloakmcp.security.SensitiveDataFilter;
+import io.github.keycloakmcp.security.ReadMetadataProjection;
 import io.github.keycloakmcp.service.platform.TargetOverviewService;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -18,10 +18,10 @@ public class TargetOverviewResource {
     TargetOverviewService targetOverviewService;
 
     @Inject
-    SensitiveDataFilter sensitiveDataFilter;
+    ReadMetadataProjection readProjection;
 
     @GET
     public TargetOverview overview(@PathParam("targetId") String targetId) {
-        return sensitiveDataFilter.redact(targetOverviewService.overview(targetId));
+        return readProjection.overview(targetOverviewService.overview(targetId));
     }
 }

@@ -10,6 +10,7 @@ import java.util.Set;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.EnvironmentChange;
 import io.github.keycloakmcp.persistence.entity.EnvironmentSnapshotEntity;
+import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.target.Target;
 import io.github.keycloakmcp.target.TargetAuthorizationService;
 import io.github.keycloakmcp.target.TargetPermission;
@@ -23,15 +24,18 @@ public class EnvironmentChangeService {
     private final TargetResolver targetResolver;
     private final TargetAuthorizationService targetAuthorization;
     private final SnapshotService snapshotService;
+    private final SensitiveDataFilter sensitiveDataFilter;
 
     @Inject
     public EnvironmentChangeService(
             TargetResolver targetResolver,
             TargetAuthorizationService targetAuthorization,
-            SnapshotService snapshotService) {
+            SnapshotService snapshotService,
+            SensitiveDataFilter sensitiveDataFilter) {
         this.targetResolver = targetResolver;
         this.targetAuthorization = targetAuthorization;
         this.snapshotService = snapshotService;
+        this.sensitiveDataFilter = sensitiveDataFilter;
     }
 
     public List<EnvironmentChange> compare(String targetId, String fromSnapshotId, String toSnapshotId) {
@@ -45,8 +49,10 @@ public class EnvironmentChangeService {
         EnvironmentSnapshotEntity to = snapshotService.findEntity(targetId, ids.toId())
                 .orElseThrow(() -> McpException.invalidArgument("to snapshot not found: " + ids.toId()));
 
-        return diffMaps("", from.summary == null ? Map.of() : from.summary,
-                to.summary == null ? Map.of() : to.summary);
+        // Compare safe display projections, not secret-bearing historical values or dynamic keys.
+        // Existing derived hashes retain their original policy and are not rewritten.
+        return diffMaps("", from.summary == null ? Map.of() : sensitiveDataFilter.redactMetadata(from.summary),
+                to.summary == null ? Map.of() : sensitiveDataFilter.redactMetadata(to.summary));
     }
 
     private ResolvedSnapshotIds resolveSnapshotIds(String targetId, String fromSnapshotId, String toSnapshotId) {

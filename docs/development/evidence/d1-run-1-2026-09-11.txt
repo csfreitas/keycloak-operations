@@ -1,0 +1,54 @@
+PASS 1: Anonymous denied /api/v1/me
+PASS 2: Anonymous denied /api/v1/targets
+PASS 3: Anonymous denied /api/v1/events
+PASS 4: Anonymous denied /mcp
+PASS 5: Real signed Identity A accepted: a
+PASS 6: Target listing isolated: a
+PASS 7: Own target readable: a
+PASS 8: Foreign target denied: a
+PASS 9: Authenticated SSE connects: a
+PASS 10: Reader cannot plan a write: a
+PASS 11: Separate Identity B credential works: a
+PASS 12: Target credential cannot authenticate to the platform: a
+PASS 13: Identity B can inspect target clients: a
+PASS 14: Foreign Identity B credential denied: a
+PASS 15: Real authenticated MCP initializes: a
+PASS 16: MCP target listing isolated: a
+PASS 17: MCP foreign target denied: a
+PASS 18: Real signed Identity A accepted: b
+PASS 19: Target listing isolated: b
+PASS 20: Own target readable: b
+PASS 21: Foreign target denied: b
+PASS 22: Authenticated SSE connects: b
+PASS 23: Reader cannot plan a write: b
+PASS 24: Separate Identity B credential works: b
+PASS 25: Target credential cannot authenticate to the platform: b
+PASS 26: Identity B can inspect target clients: b
+PASS 27: Foreign Identity B credential denied: b
+PASS 28: Real authenticated MCP initializes: b
+PASS 29: MCP target listing isolated: b
+PASS 30: MCP foreign target denied: b
+PASS 31: SSE delivers own persisted health events: a
+PASS 32: SSE excludes foreign target events: a
+PASS 33: SSE delivers own persisted health events: b
+PASS 34: SSE excludes foreign target events: b
+PASS 35: Authenticated report retains target identity: a
+PASS 36: Missing metrics remains skipped: a
+PASS 37: Report does not claim retained replay: a
+PASS 38: Report assessment history is readable by owner: a
+PASS 39: Report assessment history denied to foreign caller: a
+PASS 40: Report omits known fixture credentials: a
+PASS 41: Authenticated report retains target identity: b
+PASS 42: Missing metrics remains skipped: b
+PASS 43: Report does not claim retained replay: b
+PASS 44: Report assessment history is readable by owner: b
+PASS 45: Report assessment history denied to foreign caller: b
+PASS 46: Report omits known fixture credentials: b
+PASS 47: Authenticated principal without grants sees no targets
+PASS 48: Wrong audience denied
+PASS 49: Tampered signature denied
+PASS 50: Expired real token denied
+Identity validation: 50 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in platform logs
+Browser lab ready: http://127.0.0.1:18300/ (maximum 15 minutes).
+Local diagnostic logs: /private/tmp/kcops-identity.RZCAL4

@@ -83,6 +83,8 @@ public interface McpRuntimeConfig {
 
     interface InfrastructureEntry {
 
+        Optional<InstallationEntry> installation();
+
         /** OPENSHIFT, KUBERNETES, VM, NONE */
         String type();
 
@@ -93,6 +95,14 @@ public interface McpRuntimeConfig {
 
         @WithName("credential-ref")
         Optional<String> credentialRef();
+    }
+
+    interface InstallationEntry {
+        @WithName("api-version")
+        String apiVersion();
+        String kind();
+        String name();
+        String uid();
     }
 
     interface ObservabilityEntry {
@@ -127,6 +137,11 @@ public interface McpRuntimeConfig {
     }
 
     interface CredentialEntry {
+
+        /** Explicit opt-in to this pod's mounted service account; never a fallback. */
+        @WithName("in-cluster")
+        @WithDefault("false")
+        boolean inCluster();
 
         @WithName("client-secret")
         Optional<String> clientSecret();

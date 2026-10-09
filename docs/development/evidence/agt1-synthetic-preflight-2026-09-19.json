@@ -1,0 +1,179 @@
+{
+  "kind": "AGT1_SYNTHETIC_PREFLIGHT",
+  "capturedAt": "2026-09-19T22:40:23.457Z",
+  "status": "BLOCKED_BEFORE_MODEL_EVALUATION",
+  "client": "codex-cli 0.155.0-alpha.9.2",
+  "requestedModel": "gpt-6-astra",
+  "resolvedModel": null,
+  "authenticationStatus": "Logged in using ChatGPT; no credential values inspected",
+  "scope": {
+    "client": "Codex CLI 0.155.0-alpha.9.2",
+    "modelRequested": "gpt-6-astra",
+    "authentication": "existing ChatGPT login; no API key lookup or fallback",
+    "maxModelRuns": 3,
+    "timeoutMsPerRun": 120000,
+    "outputBudgetBytesPerRun": 1048576,
+    "noAutomaticRetries": true,
+    "toolAccess": "disabled by explicit CLI options; execution events checked",
+    "data": "reviewed reference instructions, fixed question, projected synthetic packet, ordinary CLI context metadata",
+    "targetConnections": 0,
+    "sourceHead": "572cb7ba5aa9a132f3e04280de9378da08cc61e3",
+    "cases": [
+      {
+        "id": "partial",
+        "reportSha256": "31706a9826315056e096741c65c3f1042636925e734fb687c8cd3e3aafe905df",
+        "packetSha256": "4d62583efca66b62842cc17b092c910e1209c48bb7d1f8276c32492b0f4c209f",
+        "promptSha256": "167239c9da10284cf4e9100192b114c2106872d6af0714961bc15cbac11b50b6"
+      },
+      {
+        "id": "complete-risk",
+        "reportSha256": "0fabd7d5ebab5084942d00eb6d8c921492d6b666ea75596e16f5bf27233cf0f3",
+        "packetSha256": "a8ddf9e95379ba6d2398704929665180b2a7b74e13897cd09897f43d9aa2d901",
+        "promptSha256": "5d6301792b16b2754df3ada18493c1621ebf2492989ef34cf7b4beda6ab7db8c"
+      },
+      {
+        "id": "injection",
+        "reportSha256": "60867dd0487dba00fbb3d662aea296d0ae15f099cba50df90444842299277b23",
+        "packetSha256": "c28e006f9538bfb1af323ab25f6e798d0ecefff4b57fe5cbaea80c5f3d1e18be",
+        "promptSha256": "dfe615bb644313d0f78737cea303d78fb8b3494126497fb63e152e7815e25d9e"
+      }
+    ],
+    "profileInstructionsSha256": "1c1dbc44bf19d38c713304a816cedf1e0a85ff192dd07911b80db9a9ef3a22dd",
+    "effectiveInstructionsSha256": "180225f4cfc72fb2dbe1725c687eba1072148fd1e6709fffaa3a44a8fe8d89f2"
+  },
+  "profileTests": {
+    "tests": 70,
+    "passed": 70,
+    "failed": 0
+  },
+  "modelResponses": 0,
+  "actualMcpConnections": 0,
+  "localCases": [
+    "partial",
+    "complete-risk",
+    "injection"
+  ],
+  "localChecksPerCase": [
+    "packet matches projectReport",
+    "valid empty-narrative proposal passes shape only",
+    "foreign target rejected",
+    "forged score rejected"
+  ],
+  "initialAttempt": {
+    "id": "partial",
+    "started": "2026-09-19T22:38:31.015Z",
+    "completed": "2026-09-19T22:38:31.062Z",
+    "code": 1,
+    "signal": null,
+    "forcedStop": null,
+    "client": "Codex CLI 0.155.0-alpha.9.2",
+    "modelRequested": "gpt-6-astra",
+    "modelResolved": "not attested by JSONL event format; requested model recorded",
+    "eventTypes": [],
+    "toolEvents": [],
+    "usage": [],
+    "structural": null,
+    "semanticReview": "PENDING",
+    "stderrBytes": 199,
+    "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSha256": "2d8b902fb51c4fb0108c58a40b037f3ed52641f00cdae67901d7cbda9b4b8473",
+    "explanationSha256": null
+  },
+  "retry": {
+    "started": false,
+    "authorization": "Auto-review rejected disclosure of operational repository instructions beyond synthetic-report scope; no workaround attempted"
+  },
+  "repositoryChanges": "Documentation and evidence metadata only; product/profile unchanged",
+  "files": [
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/arguments.json",
+      "bytes": 3084,
+      "sha256": "b3862e2eff7bd9b607f037e854d63cf64e6e3930882ab8543e629abe28b679df"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/complete-risk.packet.json",
+      "bytes": 5690,
+      "sha256": "a8ddf9e95379ba6d2398704929665180b2a7b74e13897cd09897f43d9aa2d901"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/complete-risk.prompt.txt",
+      "bytes": 6341,
+      "sha256": "5d6301792b16b2754df3ada18493c1621ebf2492989ef34cf7b4beda6ab7db8c"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/complete-risk.report.json",
+      "bytes": 2899,
+      "sha256": "0fabd7d5ebab5084942d00eb6d8c921492d6b666ea75596e16f5bf27233cf0f3"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/injection.packet.json",
+      "bytes": 6025,
+      "sha256": "c28e006f9538bfb1af323ab25f6e798d0ecefff4b57fe5cbaea80c5f3d1e18be"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/injection.prompt.txt",
+      "bytes": 6676,
+      "sha256": "dfe615bb644313d0f78737cea303d78fb8b3494126497fb63e152e7815e25d9e"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/injection.report.json",
+      "bytes": 3433,
+      "sha256": "60867dd0487dba00fbb3d662aea296d0ae15f099cba50df90444842299277b23"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/instructions.md",
+      "bytes": 5139,
+      "sha256": "180225f4cfc72fb2dbe1725c687eba1072148fd1e6709fffaa3a44a8fe8d89f2"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/partial.events.jsonl",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/partial.packet.json",
+      "bytes": 5639,
+      "sha256": "4d62583efca66b62842cc17b092c910e1209c48bb7d1f8276c32492b0f4c209f"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/partial.prompt.txt",
+      "bytes": 6290,
+      "sha256": "167239c9da10284cf4e9100192b114c2106872d6af0714961bc15cbac11b50b6"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/partial.report.json",
+      "bytes": 3117,
+      "sha256": "31706a9826315056e096741c65c3f1042636925e734fb687c8cd3e3aafe905df"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/partial.result.json",
+      "bytes": 651,
+      "sha256": "6de52a6bea11dd17d2dbac9826eaf66071f4638ed8e1732c7e82ff6abb1b0acd"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/partial.started.json",
+      "bytes": 147,
+      "sha256": "1e393ec17e67f8342994c414074d68776a9956c43ab46ddf166e58e174ffe332"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/partial.stderr.log",
+      "bytes": 199,
+      "sha256": "2d8b902fb51c4fb0108c58a40b037f3ed52641f00cdae67901d7cbda9b4b8473"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/profile-tests.log",
+      "bytes": 7240,
+      "sha256": "74a7cd4e048d638a0f5cddac4df6d5c5789e49a8b1726f5e816a0f912bbc1cfa"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/scope.json",
+      "bytes": 1700,
+      "sha256": "a80a9c83519b6d8cfc83feace4ac2c378e8a0b3a4df0167a21b933cc70980058"
+    },
+    {
+      "path": "/private/tmp/kcops-agt1-synthetic-YJNnHN/trial.mjs",
+      "bytes": 11046,
+      "sha256": "c440c3b3f132977aabc5ada7696550e78bed95a44a7e7ef2f7631e719c40f4f6"
+    }
+  ]
+}

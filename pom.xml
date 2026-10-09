@@ -6,7 +6,7 @@
 
     <groupId>io.github.keycloakmcp</groupId>
     <artifactId>keycloak-operations-mcp</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.8.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Keycloak / RHBK Operations Platform</name>
@@ -31,13 +31,13 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <surefire-plugin.version>3.5.3</surefire-plugin.version>
 
-        <!-- Verified on Maven Central / Quarkus Platform (2026-08) -->
+        <!-- Maintained Quarkus branch; dependency validation recorded 2026-09-18 -->
         <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.version>3.38.1</quarkus.platform.version>
+        <quarkus.platform.version>3.39.4</quarkus.platform.version>
 
-        <!-- Quarkiverse MCP Server 1.13.1 (stable); implements MCP 2025-11-25 -->
-        <quarkus-mcp-server.version>1.13.1</quarkus-mcp-server.version>
+        <!-- Conservative MCP patch; implements MCP 2025-11-25 -->
+        <quarkus-mcp-server.version>1.13.2</quarkus-mcp-server.version>
 
         <!-- Official Keycloak client libraries (independent release train) -->
         <keycloak-admin-client.version>26.0.12</keycloak-admin-client.version>

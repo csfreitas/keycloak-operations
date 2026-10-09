@@ -115,13 +115,25 @@ public class TargetOverviewService {
                 if (topology instanceof Map<?, ?> topo) {
                     zones = asInteger(topo.get("zoneCount"));
                 }
-                Object cluster = inv.get("cluster");
-                if (zones == null && cluster instanceof Map<?, ?> cl) {
-                    zones = asInteger(cl.get("zoneCount"));
-                }
                 Object podList = inv.get("pods");
                 if (podList instanceof List<?> list) {
                     pods = list.size();
+                    // Cluster-wide zones are not the bound installation's observed zones.
+                    if (list.stream().anyMatch(p -> !(p instanceof Map<?, ?> pod)
+                            || asString(pod.get("zone")) == null
+                            || asString(pod.get("zone")).isBlank())) zones = null;
+                }
+                boolean missingInstallation = "NONE".equals(summary.get("infraType"))
+                        || hasWarning(inv, "infrastructure", "installation", "workload")
+                        || !(keycloak instanceof Map<?, ?> kc) || asString(kc.get("name")) == null;
+                if (missingInstallation) {
+                    desired = null;
+                    ready = null;
+                    pods = null;
+                    zones = null;
+                } else {
+                    if (hasWarning(inv, "pods")) { pods = null; zones = null; }
+                    if (pods == null || hasWarning(inv, "nodes", "pod-zones")) zones = null;
                 }
             }
             return new OverviewSignals(version, runtime, namespace, desired, ready, pods, zones);
@@ -133,16 +145,25 @@ public class TargetOverviewService {
 
         private static Integer asInteger(Object value) {
             if (value instanceof Number n) {
-                return n.intValue();
+                double number = n.doubleValue();
+                return Double.isFinite(number) && number >= 0 && number <= Integer.MAX_VALUE
+                        && number == Math.rint(number) ? (int) number : null;
             }
             if (value instanceof String s && !s.isBlank()) {
                 try {
-                    return Integer.parseInt(s);
+                    int number = Integer.parseInt(s);
+                    return number >= 0 ? number : null;
                 } catch (NumberFormatException ignored) {
                     return null;
                 }
             }
             return null;
+        }
+
+        private static boolean hasWarning(Map<?, ?> inventory, String... resources) {
+            if (!(inventory.get("warnings") instanceof List<?> warnings)) return false;
+            return warnings.stream().anyMatch(w -> w instanceof Map<?, ?> warning
+                    && java.util.Arrays.asList(resources).contains(warning.get("resource")));
         }
     }
 }

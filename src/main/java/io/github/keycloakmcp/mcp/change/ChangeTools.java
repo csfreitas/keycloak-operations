@@ -13,6 +13,7 @@ import io.github.keycloakmcp.domain.change.ClientUrlChangeRequest;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.observability.McpMetrics;
+import io.github.keycloakmcp.security.SensitiveDataFilter;
 import io.github.keycloakmcp.security.ToolAuthorization;
 import io.github.keycloakmcp.service.change.ChangeManagementService;
 import io.quarkiverse.mcp.server.Tool;
@@ -37,6 +38,9 @@ public class ChangeTools {
 
     @Inject
     ToolAuthorization toolAuthorization;
+
+    @Inject
+    SensitiveDataFilter sensitiveDataFilter;
 
     @Tool(
             name = "keycloak_plan_client_update",
@@ -252,9 +256,13 @@ public class ChangeTools {
             success = true;
             return result;
         } catch (McpException e) {
-            throw new ToolCallException(e.getError().code() + ": " + e.getMessage());
+            String code = e.getCode().name();
+            throw new ToolCallException(code + ": "
+                    + (e.getMessage() == null ? code : sensitiveDataFilter.redactString(e.getMessage())));
         } catch (ToolCallException e) {
-            throw e;
+            // A prebuilt transport exception may retain provider details in its cause.
+            throw new ToolCallException(e.getMessage() == null
+                    ? "INTERNAL_ERROR: change operation failed" : sensitiveDataFilter.redactString(e.getMessage()));
         } catch (Exception e) {
             throw new ToolCallException("INTERNAL_ERROR: change operation failed");
         } finally {

@@ -139,6 +139,41 @@ class RuleEngineTest {
         return new Evidence("local-dev", "keycloak", "realm", key, value, Instant.EPOCH, EvidenceSubject.realm(realm));
     }
 
+    @Test
+    void javaRuleNotEvaluatedDoesNotCountAsEvaluatedOrMatched() {
+        Rule rule = javaRule(FindingStatus.NOT_EVALUATED);
+        var result = ruleEngine.evaluateDetailed(List.of(rule), new EvidenceContext(List.of()));
+        assertThat(result.rulesEvaluated()).isZero();
+        assertThat(result.rulesMatched()).isZero();
+        assertThat(result.rulesNotEvaluated()).isEqualTo(1);
+        assertThat(result.missingEvidence()).containsExactly("required-key");
+    }
+
+    @Test
+    void javaRuleSkippedDoesNotCountAsEvaluatedOrMatched() {
+        var result = ruleEngine.evaluateDetailed(List.of(javaRule(FindingStatus.SKIPPED)), new EvidenceContext(List.of()));
+        assertThat(result.rulesEvaluated()).isZero();
+        assertThat(result.rulesMatched()).isZero();
+        assertThat(result.rulesSkipped()).isEqualTo(1);
+    }
+
+    @Test
+    void javaRulePassAndWarningDoNotCountAsFailureMatches() {
+        var result = ruleEngine.evaluateDetailed(List.of(javaRule(FindingStatus.PASS), javaRule(FindingStatus.WARNING)),
+                new EvidenceContext(List.of()));
+        assertThat(result.rulesEvaluated()).isEqualTo(2);
+        assertThat(result.rulesMatched()).isZero();
+    }
+
+    private static Rule javaRule(FindingStatus status) {
+        Rule rule = org.mockito.Mockito.mock(Rule.class);
+        org.mockito.Mockito.when(rule.applies(org.mockito.ArgumentMatchers.any())).thenReturn(true);
+        org.mockito.Mockito.when(rule.evaluate(org.mockito.ArgumentMatchers.any())).thenReturn(java.util.Optional.of(
+                new Finding("local-dev", "JAVA-RULE", "Test", "security", Severity.HIGH, status, "Test",
+                        Map.of("missingEvidence", "required-key"), "Test", "Test", List.of())));
+        return rule;
+    }
+
     private static Rule realmRule() {
         return new DeclarativeRule("KC-SEC-001", "Brute force protection", "security", Severity.HIGH,
                 "Protection absent", "Risk", "Enable protection", List.of(), "security-baseline",

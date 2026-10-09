@@ -15,6 +15,12 @@ A document explains what it inspected, how it knows each fact, what it could not
 
 ## Canonical record — target design
 
+Implemented precursor: new infrastructure snapshots retain configured type, observed
+runtime and fixed Route/config v1 capability states, plus a shared completeness flag.
+Reports require explicit coverage instead of inferring success from empty warnings.
+This [cluster-specific increment](../development/h1-capability-coverage-2026-09-19.md)
+does not deliver the normalized all-source record, retained replay or attestations below.
+
 - Report/schema/collection IDs; target ID and non-secret revision; observed versus configured product version; runtime/provider capabilities.
 - Start/end and per-source windows; pagination/truncation/failed-call coverage per object/source.
 - Coverage distinguishes discovered, inspected, failed and unknown object counts from rule-evaluation coverage. If the true inventory denominator is unknown, do not display an inventory completeness percentage. Confidence is not a statistical probability inferred from the legacy completeness heuristic.
@@ -30,6 +36,13 @@ Collect once per defined source/window when possible; assessment/rendering consu
 ## Rendering and AI
 
 Canonical JSON drives Markdown/HTML and subsequent PDF/DOCX. Views agree on counts, dates, units, severity and unknowns. Render/inspect paginated formats before delivery for clipped tables, missing references or misleading charts.
+
+Implemented local precursor: [metadata projection](../development/h1-metadata-trust-2026-09-19.md)
+sanitizes report JSON before Markdown generation, preserving typed facts and rendering
+untrusted metadata literally. Snapshot and finding history are projected on read; original
+rows/hashes are unchanged. New snapshot hashes derive from sanitized inventory, so older
+hashes must not be treated as equivalent-policy digests. This does not deliver versioned
+export policies, historical data remediation, replay, PDF/DOCX or agent safety evaluation.
 
 AI is an optional explanation overlay labeled with report/model/prompt revision and references. Test factual grounding and contradictions; resource metadata never becomes instructions. Deterministic documents work without an external model and do not change facts when wording changes.
 

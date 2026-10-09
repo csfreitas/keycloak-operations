@@ -45,7 +45,7 @@ public class RoleService {
             Target target = resolve(targetId);
             List<RoleSummary> roles = adminApi.listRealmRoles(target, realm, true, first, max).stream()
                     .map(KeycloakRepresentationMapper::toRoleSummary)
-                    .map(summary -> sensitiveDataFilter.redact(summary))
+                    .map(summary -> sensitiveDataFilter.redactMetadata(summary))
                     .toList();
             success = true;
             return roles;
@@ -60,7 +60,7 @@ public class RoleService {
         boolean success = false;
         try {
             Target target = resolve(targetId);
-            RoleDetails details = sensitiveDataFilter.redact(
+            RoleDetails details = sensitiveDataFilter.redactMetadata(
                     KeycloakRepresentationMapper.toRoleDetails(adminApi.getRealmRole(target, realm, roleName)));
             success = true;
             return details;

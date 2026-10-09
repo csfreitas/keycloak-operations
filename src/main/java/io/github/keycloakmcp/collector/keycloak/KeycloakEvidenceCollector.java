@@ -19,6 +19,7 @@ import io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapter;
 import io.github.keycloakmcp.assessment.engine.Evidence;
 import io.github.keycloakmcp.assessment.engine.EvidenceSubject;
 import io.github.keycloakmcp.collector.EvidenceCollector;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.config.AssessmentConfig;
 import io.github.keycloakmcp.domain.common.ServerInfo;
 import io.github.keycloakmcp.domain.error.ErrorCode;
@@ -66,7 +67,7 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
 
         ServerInfoRepresentation serverInfo = null;
         try {
-            serverInfo = adminApi.getServerInfo(target);
+            serverInfo = observe(targetId, () -> adminApi.getServerInfo(target));
             if (serverInfo == null) {
                 issues.add(issue("INVALID_RESPONSE", "server-info"));
             }
@@ -93,12 +94,23 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
                 product == ServerInfo.Product.UNKNOWN ? null : product.name(), now, null));
         evidence.add(ev(targetId, "server", "keycloak.product.configured", target.type().name(), now, null));
 
-        List<RealmRepresentation> realms = adminApi.listRealms(target);
+        List<RealmRepresentation> realms;
+        boolean realmsKnown = true;
+        try {
+            realms = observe(targetId, () -> adminApi.listRealms(target));
+        } catch (RuntimeException e) {
+            // An invalid/oversized or denied list does not erase metadata already
+            // observed, nor establish an empty realm inventory.
+            issues.add(issue(failureCode(e), "realms"));
+            realms = List.of();
+            realmsKnown = false;
+        }
         if (realms == null) {
             issues.add(issue("INVALID_RESPONSE", "realms"));
             realms = List.of();
+            realmsKnown = false;
         }
-        evidence.add(ev(targetId, "realm", "keycloak.realm.count", realms.size(), now, null));
+        if (realmsKnown) evidence.add(ev(targetId, "realm", "keycloak.realm.count", realms.size(), now, null));
 
         int maxRealms = Math.max(0, assessmentConfig.maxRealms());
         int maxClients = Math.max(0, assessmentConfig.maxClientsPerRealm());
@@ -134,7 +146,8 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
         Set<String> publicWithoutPkceClients = new LinkedHashSet<>();
         Set<String> localhostRedirectClients = new LinkedHashSet<>();
 
-        for (RealmRepresentation brief : bounded) {
+        realmsLoop: for (RealmRepresentation brief : bounded) {
+            if (aborted(targetId, issues, "realms")) break;
             if (brief == null || brief.getRealm() == null || brief.getRealm().isBlank()) {
                 issues.add(issue("INVALID_RESPONSE", "realms"));
                 continue;
@@ -148,13 +161,14 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
 
             RealmRepresentation realm;
             try {
-                realm = adminApi.getRealm(target, realmName);
+                realm = observe(targetId, () -> adminApi.getRealm(target, realmName));
             } catch (RuntimeException e) {
                 issues.add(issue(failureCode(e), "realm:" + realmName));
-                LOG.warnf("Failed to load realm details for %s on target=%s", realmName, targetId);
+                if (e instanceof CollectionBudget.Aborted) break;
+                LOG.warnf("Realm detail collection unavailable for target=%s", targetId);
                 continue;
             }
-            if (realm == null) {
+            if (realm == null || !realmName.equals(realm.getRealm())) {
                 issues.add(issue("INVALID_RESPONSE", "realm:" + realmName));
                 continue;
             }
@@ -198,10 +212,11 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
             // Clients
             List<ClientRepresentation> clients;
             try {
-                clients = adminApi.listClients(target, realmName, false);
+                clients = observe(targetId, () -> adminApi.listClients(target, realmName, false));
             } catch (RuntimeException e) {
                 issues.add(issue(failureCode(e), "clients:" + realmName));
-                LOG.warnf("Failed to list clients for realm=%s target=%s", realmName, targetId);
+                if (e instanceof CollectionBudget.Aborted) break;
+                LOG.warnf("Client collection unavailable for target=%s", targetId);
                 continue;
             }
             if (clients == null) {
@@ -212,14 +227,14 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
             if (clients.size() > maxClients) {
                 issues.add(issue("TRUNCATED", "clients:" + realmName));
                 LOG.warnf(
-                        "Client collection truncated to assessment.max-clients-per-realm=%d for realm=%s target=%s",
+                        "Client collection truncated to assessment.max-clients-per-realm=%d for target=%s",
                         maxClients,
-                        realmName,
                         targetId);
                 clients = clients.subList(0, maxClients);
             }
 
             for (ClientRepresentation client : clients) {
+                if (aborted(targetId, issues, "clients:" + realmName)) break realmsLoop;
                 if (client == null) {
                     issues.add(issue("INVALID_RESPONSE", "clients:" + realmName));
                     continue;
@@ -369,16 +384,18 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
                 now,
                 null));
 
+        aborted(targetId, issues, "collection");
         if (issues.stream().anyMatch(i -> !i.get("scope").startsWith("server-info"))) {
             // These counters require exhaustive collection. Zero after an incomplete read is
             // unknown, not PASS. Positive observed findings remain useful lower bounds.
             // Missing server metadata alone does not invalidate complete realm/client reads.
-            evidence.removeIf(e -> e.subject() == null && e.value() instanceof Number n && n.intValue() == 0
+            evidence.removeIf(e -> e.subject() == null
+                    && (e.value() instanceof Number n && n.intValue() == 0 || e.value() instanceof List<?> values && values.isEmpty())
                     && (e.key().startsWith("keycloak.clients.") || e.key().startsWith("keycloak.realms.")));
         }
         evidence.add(ev(targetId, "collection", "keycloak.collection.complete", issues.isEmpty(), now, null));
         evidence.add(ev(targetId, "collection", "keycloak.collection.issues", List.copyOf(issues), now, null));
-        evidence.add(ev(targetId, "collection", "keycloak.collection.realmsDiscovered", realms.size(), now, null));
+        if (realmsKnown) evidence.add(ev(targetId, "collection", "keycloak.collection.realmsDiscovered", realms.size(), now, null));
         evidence.add(ev(targetId, "collection", "keycloak.collection.realmsCollected", realmsCollected, now, null));
         evidence.add(ev(targetId, "collection", "keycloak.collection.clientsObserved", clientsObserved, now, null));
         evidence.add(ev(targetId, "collection", "keycloak.collection.clientsInspected", clientsTotal, now, null));
@@ -391,6 +408,7 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
     }
 
     private static String failureCode(RuntimeException failure) {
+        if (failure instanceof CollectionBudget.Aborted aborted) return aborted.reason();
         if (failure instanceof McpException m && (m.getCode() == ErrorCode.AUTHORIZATION_FAILED
                 || m.getCode() == ErrorCode.AUTHENTICATION_FAILED)) {
             return "UNAUTHORIZED";
@@ -400,6 +418,24 @@ public class KeycloakEvidenceCollector implements EvidenceCollector {
             return "UNAUTHORIZED";
         }
         return "UNAVAILABLE";
+    }
+
+    private static <T> T observe(String targetId, java.util.function.Supplier<T> request) {
+        CollectionBudget.checkpoint(targetId);
+        T value = request.get();
+        CollectionBudget.checkpoint(targetId);
+        return value;
+    }
+
+    private static boolean aborted(String targetId, List<Map<String, String>> issues, String scope) {
+        try {
+            CollectionBudget.checkpoint(targetId);
+            return false;
+        } catch (CollectionBudget.Aborted aborted) {
+            var issue = issue(aborted.reason(), scope);
+            if (!issues.contains(issue)) issues.add(issue);
+            return true;
+        }
     }
 
     private Evidence ev(

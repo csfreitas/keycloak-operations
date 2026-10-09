@@ -60,6 +60,9 @@ public class ChangeManagementService {
     private final AuditService auditService;
 
     @Inject
+    ChangeMetadataGuard metadataGuard;
+
+    @Inject
     public ChangeManagementService(
             TargetResolver targetResolver,
             TargetAuthorizationService targetAuthorization,
@@ -103,16 +106,19 @@ public class ChangeManagementService {
         boolean success = false;
         try {
             Target target = resolve(targetId, TargetPermission.PLAN);
+            metadataGuard.requireSafeInput(realm, clientId, idempotencyKey, desiredState);
             Map<String, Object> normalizedDesired = clientConfigChangeSupport.sanitizeDesiredState(desiredState);
             Optional<ChangeRecordEntity> existing = findIdempotent(
                     target, idempotencyKey, realm, clientId, ChangeOperationType.UPDATE, normalizedDesired);
             if (existing.isPresent()) {
                 success = true;
-                return mapper.toDomain(existing.get());
+                return outward(existing.get());
             }
 
             ClientRepresentation current = adminApi.findClientByClientId(target, realm, clientId);
+            metadataGuard.requireSafeObserved(current);
             PlannedClientChange planned = clientConfigChangeSupport.plan(current, desiredState);
+            metadataGuard.requireSafeState(planned.baselineState(), planned.desiredState(), planned.operations(), planned.diff());
             ChangeRisk risk = riskClassifier.classify(planned.operations());
             PolicyResult policy = policyEvaluator.evaluate(
                     target.environment(), ChangeOperationType.UPDATE, risk, false);
@@ -170,7 +176,7 @@ public class ChangeManagementService {
                     "policy", policy.decision().name(),
                     "planFingerprint", planFingerprint));
             success = true;
-            return mapper.toDomain(entity);
+            return outward(entity);
         } finally {
             auditService.logToolInvocation(
                     "ChangeManagementService.planClientUpdate",
@@ -190,17 +196,21 @@ public class ChangeManagementService {
         boolean success = false;
         try {
             Target target = resolve(request.targetId(), TargetPermission.PLAN);
+            metadataGuard.requireSafeInput(request.realm(), request.clientId(), request.idempotencyKey(),
+                    request.redirectUris(), request.webOrigins());
             Optional<ChangeRecordEntity> existing = findIdempotent(
                     target, request.idempotencyKey(), request.realm(), request.clientId(),
                     ChangeOperationType.UPDATE, clientUrlSettingsChangeSupport.desiredState(request));
             if (existing.isPresent()) {
                 success = true;
-                return mapper.toDomain(existing.get());
+                return outward(existing.get());
             }
 
             ClientRepresentation current = adminApi.findClientByClientId(
                     target, request.realm(), request.clientId());
+            metadataGuard.requireSafeObserved(current);
             var planned = clientUrlSettingsChangeSupport.plan(current, request);
+            metadataGuard.requireSafeState(planned.baselineState(), planned.desiredState(), planned.operations(), planned.diff());
             ChangeRisk risk = riskClassifier.classifyClientUrls(planned.operations());
             PolicyResult policy = policyEvaluator.evaluateClientUrls(
                     target.environment(),
@@ -260,7 +270,7 @@ public class ChangeManagementService {
                     "policy", policy.decision().name(),
                     "planFingerprint", planFingerprint));
             success = true;
-            return mapper.toDomain(entity);
+            return outward(entity);
         } finally {
             auditService.logToolInvocation(
                     "ChangeManagementService.planClientUrlUpdate",
@@ -280,17 +290,21 @@ public class ChangeManagementService {
         boolean success = false;
         try {
             Target target = resolve(request.targetId(), TargetPermission.PLAN);
+            metadataGuard.requireSafeInput(request.realm(), request.clientId(), request.idempotencyKey(),
+                    request.pkceCodeChallengeMethod());
             Optional<ChangeRecordEntity> existing = findIdempotent(
                     target, request.idempotencyKey(), request.realm(), request.clientId(),
                     ChangeOperationType.UPDATE, ClientSecuritySettingsChangeSupport.desiredState(request));
             if (existing.isPresent()) {
                 success = true;
-                return mapper.toDomain(existing.get());
+                return outward(existing.get());
             }
 
             ClientRepresentation current = adminApi.findClientByClientId(
                     target, request.realm(), request.clientId());
+            metadataGuard.requireSafeObserved(current);
             var planned = clientSecuritySettingsChangeSupport.plan(current, request);
+            metadataGuard.requireSafeState(planned.baselineState(), planned.desiredState(), planned.operations(), planned.diff());
             ChangeRisk risk = riskClassifier.classifyClientSecurity(planned.operations());
             PolicyResult policy = policyEvaluator.evaluateClientSecurity(
                     target.environment(),
@@ -350,7 +364,7 @@ public class ChangeManagementService {
                     "policy", policy.decision().name(),
                     "planFingerprint", planFingerprint));
             success = true;
-            return mapper.toDomain(entity);
+            return outward(entity);
         } finally {
             auditService.logToolInvocation(
                     "ChangeManagementService.planClientSecurityUpdate",
@@ -370,13 +384,15 @@ public class ChangeManagementService {
         boolean success = false;
         try {
             Target target = resolve(request.targetId(), TargetPermission.PLAN);
+            metadataGuard.requireSafeInput(request.realm(), request.clientId(), request.idempotencyKey(),
+                    request.name(), request.description());
             var planned = clientLifecycleChangeSupport.planCreate(request);
             Optional<ChangeRecordEntity> existing = findIdempotent(
                     target, request.idempotencyKey(), request.realm(), request.clientId().trim(),
                     ChangeOperationType.CREATE, planned.desiredState());
             if (existing.isPresent()) {
                 success = true;
-                return mapper.toDomain(existing.get());
+                return outward(existing.get());
             }
             if (adminApi.clientExists(target, request.realm(), request.clientId().trim())) {
                 throw McpException.changeConflict("client already exists: " + request.clientId().trim());
@@ -404,7 +420,7 @@ public class ChangeManagementService {
                     "policy", policy.decision().name(),
                     "planFingerprint", entity.planFingerprint));
             success = true;
-            return mapper.toDomain(entity);
+            return outward(entity);
         } finally {
             auditService.logToolInvocation(
                     "ChangeManagementService.planClientCreate",
@@ -424,15 +440,17 @@ public class ChangeManagementService {
         boolean success = false;
         try {
             Target target = resolve(request.targetId(), TargetPermission.PLAN);
+            metadataGuard.requireSafeInput(request.realm(), request.clientId(), request.idempotencyKey());
             Optional<ChangeRecordEntity> existing = findIdempotent(
                     target, request.idempotencyKey(), request.realm(), request.clientId(),
                     ChangeOperationType.UPDATE, Map.of(ClientLifecycleChangeSupport.ENABLED, request.enabled()));
             if (existing.isPresent()) {
                 success = true;
-                return mapper.toDomain(existing.get());
+                return outward(existing.get());
             }
             ClientRepresentation current = adminApi.findClientByClientId(
                     target, request.realm(), request.clientId());
+            metadataGuard.requireSafeObserved(current);
             var planned = clientLifecycleChangeSupport.planEnabled(current, request);
             ChangeRisk risk = riskClassifier.classifyClientEnabled(planned.operations());
             PolicyResult policy = policyEvaluator.evaluate(
@@ -455,7 +473,7 @@ public class ChangeManagementService {
                     "policy", policy.decision().name(),
                     "planFingerprint", entity.planFingerprint));
             success = true;
-            return mapper.toDomain(entity);
+            return outward(entity);
         } finally {
             auditService.logToolInvocation(
                     "ChangeManagementService.planClientEnabledUpdate",
@@ -470,7 +488,7 @@ public class ChangeManagementService {
         ChangeRecordEntity entity = requireEntity(changeId);
         // READ on the owning target
         resolve(entity.targetId, TargetPermission.READ);
-        return sensitiveDataFilter.redact(mapper.toDomain(entity));
+        return outward(entity);
     }
 
     public PageResult<ChangeRecord> listChanges(
@@ -481,8 +499,7 @@ public class ChangeManagementService {
         resolve(targetId.get(), TargetPermission.READ);
         PageResult<ChangeRecordEntity> pageResult = changeRepository.list(targetId, status, page, size);
         List<ChangeRecord> items = pageResult.items().stream()
-                .map(mapper::toDomain)
-                .map(sensitiveDataFilter::redact)
+                .map(this::outward)
                 .toList();
         return new PageResult<>(items, pageResult.page(), pageResult.size(), pageResult.total());
     }
@@ -494,7 +511,7 @@ public class ChangeManagementService {
         validateSafetyContext(entity, target);
         ChangeStatus status = ChangeStatus.valueOf(entity.status);
         if (status == ChangeStatus.APPROVED) {
-            return mapper.toDomain(entity);
+            return outward(entity);
         }
         if (status == ChangeStatus.REJECTED) {
             throw McpException.approvalInvalid("rejected change cannot be approved: " + changeId);
@@ -514,7 +531,7 @@ public class ChangeManagementService {
         entity.approvalFingerprint = entity.planFingerprint;
         entity.updatedAt = Instant.now();
         auditChange("change.approve", entity, true, Map.of("approvedBy", entity.approvedBy));
-        return mapper.toDomain(entity);
+        return outward(entity);
     }
 
     @Transactional
@@ -526,15 +543,15 @@ public class ChangeManagementService {
             throw McpException.changeAlreadyApplied(changeId);
         }
         if (status == ChangeStatus.REJECTED) {
-            return mapper.toDomain(entity);
+            return outward(entity);
         }
         entity.status = ChangeStatus.REJECTED.name();
         entity.rejectedBy = targetAuthorization.currentActor();
         entity.rejectedAt = Instant.now();
-        entity.rejectionReason = reason;
+        entity.rejectionReason = sensitiveDataFilter.redactString(reason);
         entity.updatedAt = Instant.now();
         auditChange("change.reject", entity, true, Map.of("rejectedBy", entity.rejectedBy));
-        return mapper.toDomain(entity);
+        return outward(entity);
     }
 
     @Transactional(dontRollbackOn = McpException.class)
@@ -548,7 +565,7 @@ public class ChangeManagementService {
 
             if (status == ChangeStatus.VERIFIED || status == ChangeStatus.APPLIED) {
                 success = true;
-                return mapper.toDomain(entity);
+                return outward(entity);
             }
             if (status == ChangeStatus.REJECTED) {
                 throw McpException.policyDenied("rejected change cannot be applied");
@@ -582,11 +599,12 @@ public class ChangeManagementService {
             if (ChangeOperationType.CREATE.name().equals(entity.operation)) {
                 applyClientCreate(entity, target);
                 success = ChangeStatus.VERIFIED.name().equals(entity.status);
-                return mapper.toDomain(entity);
+                return outward(entity);
             }
 
             ClientRepresentation current =
                     adminApi.findClientByClientId(target, entity.realm, entity.resourceId);
+            metadataGuard.requireSafeObserved(current);
             boolean clientUrlChange = clientUrlSettingsChangeSupport.supports(operations);
             boolean clientSecurityChange = clientSecuritySettingsChangeSupport.supports(
                     operations, entity.baselineState);
@@ -625,11 +643,12 @@ public class ChangeManagementService {
             }
             // Never send secret fields back even if present on the representation.
             current.setSecret(null);
+            current.setRegistrationAccessToken(null);
             adminApi.updateClient(target, entity.realm, current);
 
             entity.appliedAt = Instant.now();
             entity.status = ChangeStatus.APPLIED.name();
-            entity.resultMessage = "Applied by " + targetAuthorization.currentActor();
+            entity.resultMessage = sensitiveDataFilter.redactString("Applied by " + targetAuthorization.currentActor());
             entity.updatedAt = Instant.now();
 
             ChangeVerificationResult verification = verifyEntity(entity, target);
@@ -645,11 +664,11 @@ public class ChangeManagementService {
             if (!verification.verified()) {
                 throw McpException.verificationFailed(verification.message());
             }
-            return mapper.toDomain(entity);
+            return outward(entity);
         } catch (McpException e) {
             if (ChangeStatus.APPLYING.name().equals(entity.status)) {
                 entity.status = ChangeStatus.FAILED.name();
-                entity.resultMessage = e.getCode() + ": " + e.getMessage();
+                entity.resultMessage = e.getCode() + ": Change apply failed";
                 entity.updatedAt = Instant.now();
                 auditChange("change.apply.failed", entity, false, Map.of("errorCode", e.getCode().name()));
             }
@@ -676,6 +695,7 @@ public class ChangeManagementService {
     public ChangeRecord verify(String changeId) {
         ChangeRecordEntity entity = requireEntityForUpdate(changeId);
         Target target = resolve(entity.targetId, TargetPermission.READ);
+        metadataGuard.requireSafePlan(entity);
         if (entity.status.equals(ChangeStatus.REJECTED.name())) {
             throw McpException.invalidArgument("cannot verify rejected change");
         }
@@ -693,12 +713,18 @@ public class ChangeManagementService {
         entity.updatedAt = Instant.now();
         auditChange("change.verify", entity, result.verified(), Map.of(
                 "verification", result.status()));
-        return mapper.toDomain(entity);
+        return outward(entity);
     }
 
     private ChangeVerificationResult verifyEntity(ChangeRecordEntity entity, Target target) {
         ClientRepresentation actual =
                 adminApi.findClientByClientId(target, entity.realm, entity.resourceId);
+        if (!metadataGuard.isSafeObserved(actual)) {
+            // Do not normalize potentially sensitive input into a new, unrecognizable
+            // form (for example PKCE uppercasing), or claim a successful read-back.
+            return retainVerification(entity, ChangeVerificationResult.failed(
+                    "Read-back contained unsafe or unavailable metadata; verification is inconclusive", List.of()));
+        }
         List<ChangeOperation> operations = mapper.toDomain(entity).operations();
         List<io.github.keycloakmcp.domain.change.ChangeDiffEntry> mismatches;
         if (ChangeOperationType.CREATE.name().equals(entity.operation)) {
@@ -721,10 +747,15 @@ public class ChangeManagementService {
                                         .sorted()
                                         .collect(java.util.stream.Collectors.joining(", ")),
                         mismatches);
-        entity.verificationStatus = result.status();
-        entity.verificationMessage = result.message();
-        entity.verificationJson = mapper.fromDiff(result.mismatches());
-        return result;
+        return retainVerification(entity, result);
+    }
+
+    private ChangeVerificationResult retainVerification(ChangeRecordEntity entity, ChangeVerificationResult result) {
+        ChangeVerificationResult safe = sensitiveDataFilter.redactMetadata(result);
+        entity.verificationStatus = safe.status();
+        entity.verificationMessage = safe.message();
+        entity.verificationJson = mapper.fromDiff(safe.mismatches());
+        return safe;
     }
 
     private void applyClientCreate(ChangeRecordEntity entity, Target target) {
@@ -742,7 +773,9 @@ public class ChangeManagementService {
         }
         ClientRepresentation representation =
                 clientLifecycleChangeSupport.toCreateRepresentation(entity.desiredState);
+        metadataGuard.requireSafeObserved(representation);
         representation.setSecret(null);
+        representation.setRegistrationAccessToken(null);
         adminApi.createClient(target, entity.realm, representation);
         entity.appliedAt = Instant.now();
         entity.status = ChangeStatus.APPLIED.name();
@@ -794,6 +827,7 @@ public class ChangeManagementService {
             PolicyResult policy,
             String actor,
             String idempotencyKey) {
+        metadataGuard.requireSafeState(realm, resourceId, idempotencyKey, baseline, desired, operations, diff);
         if (policy.decision() == ChangePolicyDecision.DENY) {
             throw McpException.policyDenied(policy.reason());
         }
@@ -887,6 +921,7 @@ public class ChangeManagementService {
     }
 
     private void validateSafetyContext(ChangeRecordEntity entity, Target target) {
+        metadataGuard.requireSafePlan(entity);
         if (!ChangePolicyEvaluator.REVISION.equals(entity.policyRevision)
                 || !Objects.equals(targetContextFingerprint(target), entity.targetContextFingerprint)) {
             throw McpException.changeConflict("REPLAN_REQUIRED: target or policy context changed or is unavailable");
@@ -963,6 +998,10 @@ public class ChangeManagementService {
                 operation,
                 success ? "SUCCESS" : "FAILURE",
                 0L,
-                sensitiveDataFilter.redact(metadata));
+                sensitiveDataFilter.redactMetadata(metadata));
+    }
+
+    private ChangeRecord outward(ChangeRecordEntity entity) {
+        return metadataGuard.outward(mapper.toDomain(entity));
     }
 }

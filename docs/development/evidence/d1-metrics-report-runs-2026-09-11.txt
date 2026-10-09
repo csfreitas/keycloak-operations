@@ -1,0 +1,228 @@
+/private/tmp/kcops-metrics-report-final2.log:PASS 1: Real Prometheus scrapes both separately labelled local targets
+/private/tmp/kcops-metrics-report-final2.log:PASS 2: Anonymous denied /api/v1/me
+/private/tmp/kcops-metrics-report-final2.log:PASS 3: Anonymous denied /api/v1/targets
+/private/tmp/kcops-metrics-report-final2.log:PASS 4: Anonymous denied /api/v1/events
+/private/tmp/kcops-metrics-report-final2.log:PASS 5: Anonymous denied /mcp
+/private/tmp/kcops-metrics-report-final2.log:PASS 6: Real signed Identity A accepted: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 7: Target listing isolated: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 8: Own target readable: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 9: Foreign target denied: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 10: Authenticated SSE connects: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 11: Reader cannot plan a write: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 12: Separate Identity B credential works: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 13: Target credential cannot authenticate to the platform: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 14: Identity B can inspect target clients: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 15: Foreign Identity B credential denied: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 16: Real authenticated MCP initializes: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 17: MCP target listing isolated: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 18: MCP foreign target denied: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 19: MCP report retains target identity and schema: a
+/private/tmp/kcops-metrics-report-final2.log:OBSERVED: MCP a performance=COMPLETE; message=Semantic performance summary collected
+/private/tmp/kcops-metrics-report-final2.log:PASS 20: MCP performance section matches explicit configuration: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 21: MCP report preserves inconclusive score and unavailable replay: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 22: MCP report contains deterministic Markdown without fixture secrets: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 23: MCP report rejects foreign target: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 24: Real signed Identity A accepted: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 25: Target listing isolated: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 26: Own target readable: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 27: Foreign target denied: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 28: Authenticated SSE connects: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 29: Reader cannot plan a write: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 30: Separate Identity B credential works: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 31: Target credential cannot authenticate to the platform: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 32: Identity B can inspect target clients: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 33: Foreign Identity B credential denied: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 34: Real authenticated MCP initializes: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 35: MCP target listing isolated: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 36: MCP foreign target denied: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 37: MCP report retains target identity and schema: b
+/private/tmp/kcops-metrics-report-final2.log:OBSERVED: MCP b performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-final2.log:PASS 38: MCP performance section matches explicit configuration: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 39: MCP report preserves inconclusive score and unavailable replay: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 40: MCP report contains deterministic Markdown without fixture secrets: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 41: MCP report rejects foreign target: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 42: SSE delivers own persisted health events: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 43: SSE excludes foreign target events: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 44: SSE delivers own persisted health events: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 45: SSE excludes foreign target events: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 46: Authenticated report retains target identity: a
+/private/tmp/kcops-metrics-report-final2.log:OBSERVED: REST a performance=COMPLETE; message=Semantic performance summary collected
+/private/tmp/kcops-metrics-report-final2.log:PASS 47: REST performance section matches explicit configuration: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 48: REST report contains real scoped JVM metrics
+/private/tmp/kcops-metrics-report-final2.log:PASS 49: Missing container metrics are not invented as zero
+/private/tmp/kcops-metrics-report-final2.log:PASS 50: Available telemetry does not make incomplete assessment conclusive
+/private/tmp/kcops-metrics-report-final2.log:PASS 51: Scoped readable fixture is not mislabeled as Admin API outage: a
+/private/tmp/kcops-metrics-report-final2.log:OBSERVED: a admin health=HEALTHY; reason=NONE; versionAvailable=false
+/private/tmp/kcops-metrics-report-final2.log:PASS 52: Uncollected infrastructure counts stay unknown: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 53: Report does not claim retained replay: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 54: Report assessment history is readable by owner: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 55: Report assessment history denied to foreign caller: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 56: Report omits known fixture credentials: a
+/private/tmp/kcops-metrics-report-final2.log:PASS 57: Authenticated report retains target identity: b
+/private/tmp/kcops-metrics-report-final2.log:OBSERVED: REST b performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-final2.log:PASS 58: REST performance section matches explicit configuration: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 59: Unconfigured metrics do not leak other target telemetry: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 60: Scoped readable fixture is not mislabeled as Admin API outage: b
+/private/tmp/kcops-metrics-report-final2.log:OBSERVED: b admin health=HEALTHY; reason=NONE; versionAvailable=false
+/private/tmp/kcops-metrics-report-final2.log:PASS 61: Uncollected infrastructure counts stay unknown: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 62: Report does not claim retained replay: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 63: Report assessment history is readable by owner: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 64: Report assessment history denied to foreign caller: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 65: Report omits known fixture credentials: b
+/private/tmp/kcops-metrics-report-final2.log:PASS 66: Authenticated principal without grants sees no targets
+/private/tmp/kcops-metrics-report-final2.log:PASS 67: Wrong audience denied
+/private/tmp/kcops-metrics-report-final2.log:PASS 68: Tampered signature denied
+/private/tmp/kcops-metrics-report-final2.log:PASS 69: Expired real token denied
+/private/tmp/kcops-metrics-report-final2.log:Identity validation: 69 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+/private/tmp/kcops-metrics-report-final2.log:PASS: no compact JWT found in platform logs
+/private/tmp/kcops-metrics-report-default.log:PASS 1: Anonymous denied /api/v1/me
+/private/tmp/kcops-metrics-report-default.log:PASS 2: Anonymous denied /api/v1/targets
+/private/tmp/kcops-metrics-report-default.log:PASS 3: Anonymous denied /api/v1/events
+/private/tmp/kcops-metrics-report-default.log:PASS 4: Anonymous denied /mcp
+/private/tmp/kcops-metrics-report-default.log:PASS 5: Real signed Identity A accepted: a
+/private/tmp/kcops-metrics-report-default.log:PASS 6: Target listing isolated: a
+/private/tmp/kcops-metrics-report-default.log:PASS 7: Own target readable: a
+/private/tmp/kcops-metrics-report-default.log:PASS 8: Foreign target denied: a
+/private/tmp/kcops-metrics-report-default.log:PASS 9: Authenticated SSE connects: a
+/private/tmp/kcops-metrics-report-default.log:PASS 10: Reader cannot plan a write: a
+/private/tmp/kcops-metrics-report-default.log:PASS 11: Separate Identity B credential works: a
+/private/tmp/kcops-metrics-report-default.log:PASS 12: Target credential cannot authenticate to the platform: a
+/private/tmp/kcops-metrics-report-default.log:PASS 13: Identity B can inspect target clients: a
+/private/tmp/kcops-metrics-report-default.log:PASS 14: Foreign Identity B credential denied: a
+/private/tmp/kcops-metrics-report-default.log:PASS 15: Real authenticated MCP initializes: a
+/private/tmp/kcops-metrics-report-default.log:PASS 16: MCP target listing isolated: a
+/private/tmp/kcops-metrics-report-default.log:PASS 17: MCP foreign target denied: a
+/private/tmp/kcops-metrics-report-default.log:PASS 18: MCP report retains target identity and schema: a
+/private/tmp/kcops-metrics-report-default.log:OBSERVED: MCP a performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-default.log:PASS 19: MCP performance section matches explicit configuration: a
+/private/tmp/kcops-metrics-report-default.log:PASS 20: MCP report preserves inconclusive score and unavailable replay: a
+/private/tmp/kcops-metrics-report-default.log:PASS 21: MCP report contains deterministic Markdown without fixture secrets: a
+/private/tmp/kcops-metrics-report-default.log:PASS 22: MCP report rejects foreign target: a
+/private/tmp/kcops-metrics-report-default.log:PASS 23: Real signed Identity A accepted: b
+/private/tmp/kcops-metrics-report-default.log:PASS 24: Target listing isolated: b
+/private/tmp/kcops-metrics-report-default.log:PASS 25: Own target readable: b
+/private/tmp/kcops-metrics-report-default.log:PASS 26: Foreign target denied: b
+/private/tmp/kcops-metrics-report-default.log:PASS 27: Authenticated SSE connects: b
+/private/tmp/kcops-metrics-report-default.log:PASS 28: Reader cannot plan a write: b
+/private/tmp/kcops-metrics-report-default.log:PASS 29: Separate Identity B credential works: b
+/private/tmp/kcops-metrics-report-default.log:PASS 30: Target credential cannot authenticate to the platform: b
+/private/tmp/kcops-metrics-report-default.log:PASS 31: Identity B can inspect target clients: b
+/private/tmp/kcops-metrics-report-default.log:PASS 32: Foreign Identity B credential denied: b
+/private/tmp/kcops-metrics-report-default.log:PASS 33: Real authenticated MCP initializes: b
+/private/tmp/kcops-metrics-report-default.log:PASS 34: MCP target listing isolated: b
+/private/tmp/kcops-metrics-report-default.log:PASS 35: MCP foreign target denied: b
+/private/tmp/kcops-metrics-report-default.log:PASS 36: MCP report retains target identity and schema: b
+/private/tmp/kcops-metrics-report-default.log:OBSERVED: MCP b performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-default.log:PASS 37: MCP performance section matches explicit configuration: b
+/private/tmp/kcops-metrics-report-default.log:PASS 38: MCP report preserves inconclusive score and unavailable replay: b
+/private/tmp/kcops-metrics-report-default.log:PASS 39: MCP report contains deterministic Markdown without fixture secrets: b
+/private/tmp/kcops-metrics-report-default.log:PASS 40: MCP report rejects foreign target: b
+/private/tmp/kcops-metrics-report-default.log:PASS 41: SSE delivers own persisted health events: a
+/private/tmp/kcops-metrics-report-default.log:PASS 42: SSE excludes foreign target events: a
+/private/tmp/kcops-metrics-report-default.log:PASS 43: SSE delivers own persisted health events: b
+/private/tmp/kcops-metrics-report-default.log:PASS 44: SSE excludes foreign target events: b
+/private/tmp/kcops-metrics-report-default.log:PASS 45: Authenticated report retains target identity: a
+/private/tmp/kcops-metrics-report-default.log:OBSERVED: REST a performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-default.log:PASS 46: REST performance section matches explicit configuration: a
+/private/tmp/kcops-metrics-report-default.log:PASS 47: Unconfigured metrics do not leak other target telemetry: a
+/private/tmp/kcops-metrics-report-default.log:PASS 48: Scoped readable fixture is not mislabeled as Admin API outage: a
+/private/tmp/kcops-metrics-report-default.log:OBSERVED: a admin health=HEALTHY; reason=NONE; versionAvailable=false
+/private/tmp/kcops-metrics-report-default.log:PASS 49: Uncollected infrastructure counts stay unknown: a
+/private/tmp/kcops-metrics-report-default.log:PASS 50: Report does not claim retained replay: a
+/private/tmp/kcops-metrics-report-default.log:PASS 51: Report assessment history is readable by owner: a
+/private/tmp/kcops-metrics-report-default.log:PASS 52: Report assessment history denied to foreign caller: a
+/private/tmp/kcops-metrics-report-default.log:PASS 53: Report omits known fixture credentials: a
+/private/tmp/kcops-metrics-report-default.log:PASS 54: Authenticated report retains target identity: b
+/private/tmp/kcops-metrics-report-default.log:OBSERVED: REST b performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-default.log:PASS 55: REST performance section matches explicit configuration: b
+/private/tmp/kcops-metrics-report-default.log:PASS 56: Unconfigured metrics do not leak other target telemetry: b
+/private/tmp/kcops-metrics-report-default.log:PASS 57: Scoped readable fixture is not mislabeled as Admin API outage: b
+/private/tmp/kcops-metrics-report-default.log:OBSERVED: b admin health=HEALTHY; reason=NONE; versionAvailable=false
+/private/tmp/kcops-metrics-report-default.log:PASS 58: Uncollected infrastructure counts stay unknown: b
+/private/tmp/kcops-metrics-report-default.log:PASS 59: Report does not claim retained replay: b
+/private/tmp/kcops-metrics-report-default.log:PASS 60: Report assessment history is readable by owner: b
+/private/tmp/kcops-metrics-report-default.log:PASS 61: Report assessment history denied to foreign caller: b
+/private/tmp/kcops-metrics-report-default.log:PASS 62: Report omits known fixture credentials: b
+/private/tmp/kcops-metrics-report-default.log:PASS 63: Authenticated principal without grants sees no targets
+/private/tmp/kcops-metrics-report-default.log:PASS 64: Wrong audience denied
+/private/tmp/kcops-metrics-report-default.log:PASS 65: Tampered signature denied
+/private/tmp/kcops-metrics-report-default.log:PASS 66: Expired real token denied
+/private/tmp/kcops-metrics-report-default.log:Identity validation: 66 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+/private/tmp/kcops-metrics-report-default.log:PASS: no compact JWT found in platform logs
+/private/tmp/kcops-metrics-report-final1.log:PASS 1: Real Prometheus scrapes both separately labelled local targets
+/private/tmp/kcops-metrics-report-final1.log:PASS 2: Anonymous denied /api/v1/me
+/private/tmp/kcops-metrics-report-final1.log:PASS 3: Anonymous denied /api/v1/targets
+/private/tmp/kcops-metrics-report-final1.log:PASS 4: Anonymous denied /api/v1/events
+/private/tmp/kcops-metrics-report-final1.log:PASS 5: Anonymous denied /mcp
+/private/tmp/kcops-metrics-report-final1.log:PASS 6: Real signed Identity A accepted: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 7: Target listing isolated: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 8: Own target readable: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 9: Foreign target denied: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 10: Authenticated SSE connects: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 11: Reader cannot plan a write: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 12: Separate Identity B credential works: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 13: Target credential cannot authenticate to the platform: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 14: Identity B can inspect target clients: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 15: Foreign Identity B credential denied: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 16: Real authenticated MCP initializes: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 17: MCP target listing isolated: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 18: MCP foreign target denied: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 19: MCP report retains target identity and schema: a
+/private/tmp/kcops-metrics-report-final1.log:OBSERVED: MCP a performance=COMPLETE; message=Semantic performance summary collected
+/private/tmp/kcops-metrics-report-final1.log:PASS 20: MCP performance section matches explicit configuration: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 21: MCP report preserves inconclusive score and unavailable replay: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 22: MCP report contains deterministic Markdown without fixture secrets: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 23: MCP report rejects foreign target: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 24: Real signed Identity A accepted: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 25: Target listing isolated: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 26: Own target readable: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 27: Foreign target denied: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 28: Authenticated SSE connects: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 29: Reader cannot plan a write: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 30: Separate Identity B credential works: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 31: Target credential cannot authenticate to the platform: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 32: Identity B can inspect target clients: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 33: Foreign Identity B credential denied: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 34: Real authenticated MCP initializes: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 35: MCP target listing isolated: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 36: MCP foreign target denied: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 37: MCP report retains target identity and schema: b
+/private/tmp/kcops-metrics-report-final1.log:OBSERVED: MCP b performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-final1.log:PASS 38: MCP performance section matches explicit configuration: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 39: MCP report preserves inconclusive score and unavailable replay: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 40: MCP report contains deterministic Markdown without fixture secrets: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 41: MCP report rejects foreign target: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 42: SSE delivers own persisted health events: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 43: SSE excludes foreign target events: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 44: SSE delivers own persisted health events: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 45: SSE excludes foreign target events: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 46: Authenticated report retains target identity: a
+/private/tmp/kcops-metrics-report-final1.log:OBSERVED: REST a performance=COMPLETE; message=Semantic performance summary collected
+/private/tmp/kcops-metrics-report-final1.log:PASS 47: REST performance section matches explicit configuration: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 48: REST report contains real scoped JVM metrics
+/private/tmp/kcops-metrics-report-final1.log:PASS 49: Missing container metrics are not invented as zero
+/private/tmp/kcops-metrics-report-final1.log:PASS 50: Available telemetry does not make incomplete assessment conclusive
+/private/tmp/kcops-metrics-report-final1.log:PASS 51: Scoped readable fixture is not mislabeled as Admin API outage: a
+/private/tmp/kcops-metrics-report-final1.log:OBSERVED: a admin health=HEALTHY; reason=NONE; versionAvailable=false
+/private/tmp/kcops-metrics-report-final1.log:PASS 52: Uncollected infrastructure counts stay unknown: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 53: Report does not claim retained replay: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 54: Report assessment history is readable by owner: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 55: Report assessment history denied to foreign caller: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 56: Report omits known fixture credentials: a
+/private/tmp/kcops-metrics-report-final1.log:PASS 57: Authenticated report retains target identity: b
+/private/tmp/kcops-metrics-report-final1.log:OBSERVED: REST b performance=SKIPPED; message=Metrics provider is not configured for this target
+/private/tmp/kcops-metrics-report-final1.log:PASS 58: REST performance section matches explicit configuration: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 59: Unconfigured metrics do not leak other target telemetry: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 60: Scoped readable fixture is not mislabeled as Admin API outage: b
+/private/tmp/kcops-metrics-report-final1.log:OBSERVED: b admin health=HEALTHY; reason=NONE; versionAvailable=false
+/private/tmp/kcops-metrics-report-final1.log:PASS 61: Uncollected infrastructure counts stay unknown: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 62: Report does not claim retained replay: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 63: Report assessment history is readable by owner: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 64: Report assessment history denied to foreign caller: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 65: Report omits known fixture credentials: b
+/private/tmp/kcops-metrics-report-final1.log:PASS 66: Authenticated principal without grants sees no targets
+/private/tmp/kcops-metrics-report-final1.log:PASS 67: Wrong audience denied
+/private/tmp/kcops-metrics-report-final1.log:PASS 68: Tampered signature denied
+/private/tmp/kcops-metrics-report-final1.log:PASS 69: Expired real token denied
+/private/tmp/kcops-metrics-report-final1.log:Identity validation: 69 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+/private/tmp/kcops-metrics-report-final1.log:PASS: no compact JWT found in platform logs

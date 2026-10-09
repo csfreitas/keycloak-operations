@@ -4,8 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.github.keycloakmcp.adapter.infrastructure.InfrastructureClientFactory;
-import io.github.keycloakmcp.domain.inventory.CollectionWarning;
 import io.github.keycloakmcp.domain.inventory.InfrastructureInventory;
+import io.github.keycloakmcp.domain.inventory.InfrastructureCoverage;
 import io.github.keycloakmcp.domain.platform.HealthStatus;
 import io.github.keycloakmcp.service.platform.InventoryService;
 import io.github.keycloakmcp.target.Target;
@@ -38,52 +38,43 @@ public class InfrastructureApiHealthCheck implements HealthCheck {
                     name(),
                     HealthStatus.UNKNOWN,
                     "No infrastructure configuration",
-                    Map.of("configured", false),
+                    Map.of("configured", false, "reasonCode", "NOT_CONFIGURED", "collectionComplete", false),
                     System.currentTimeMillis() - start);
         }
 
         Map<String, Object> details = new LinkedHashMap<>();
         details.put("type", target.infrastructureTypeOrNone().name());
-        boolean clientPresent = clientFactory.resolve(target).isPresent();
-        details.put("clientResolved", clientPresent);
-        if (!clientPresent) {
-            return HealthComponentResult.of(
-                    name(),
-                    HealthStatus.CRITICAL,
-                    "Infrastructure client unavailable",
-                    details,
-                    System.currentTimeMillis() - start);
-        }
-
         try {
+            boolean clientPresent = clientFactory.resolve(target).isPresent();
+            details.put("clientResolved", clientPresent);
+            if (!clientPresent) {
+                return unknown(start, details, "CLIENT_UNAVAILABLE", "Infrastructure client unavailable; health is inconclusive");
+            }
             InfrastructureInventory inventory = inventoryService.collect(target.id().value());
-            details.put("runtime", inventory.runtime());
+            if (inventory == null) {
+                return unknown(start, details, "EVIDENCE_UNAVAILABLE", "Infrastructure evidence unavailable; health is inconclusive");
+            }
+            if (!target.id().value().equals(inventory.targetId())) {
+                return unknown(start, details, "EVIDENCE_SCOPE_MISMATCH", "Infrastructure evidence scope could not be verified");
+            }
+            if (inventory.runtime() != null) details.put("runtime", inventory.runtime());
             int warningCount = inventory.warnings() == null ? 0 : inventory.warnings().size();
             details.put("warningCount", warningCount);
-            boolean notConfigured = inventory.warnings() != null
-                    && inventory.warnings().stream()
-                            .anyMatch(w -> w.code() == CollectionWarning.WarningCode.NOT_CONFIGURED);
-            if (notConfigured) {
-                return HealthComponentResult.of(
-                        name(),
-                        HealthStatus.UNKNOWN,
-                        "Infrastructure not fully configured",
-                        details,
-                        System.currentTimeMillis() - start);
+            boolean complete = InfrastructureCoverage.isComplete(inventory);
+            details.put("collectionComplete", complete);
+            if (!complete) {
+                return unknown(start, details, "EVIDENCE_INCOMPLETE", "Infrastructure collection is incomplete; health is inconclusive");
             }
-            HealthStatus status = warningCount > 0 ? HealthStatus.WARNING : HealthStatus.HEALTHY;
-            String message = warningCount > 0
-                    ? "Infrastructure API reachable with collection warnings"
-                    : "Infrastructure API reachable";
-            return HealthComponentResult.of(name(), status, message, details, System.currentTimeMillis() - start);
-        } catch (RuntimeException e) {
-            details.put("error", e.getMessage());
-            return HealthComponentResult.of(
-                    name(),
-                    HealthStatus.CRITICAL,
-                    e.getMessage() == null ? "Infrastructure API unreachable" : e.getMessage(),
-                    details,
+            return HealthComponentResult.of(name(), HealthStatus.HEALTHY, "Infrastructure API reachable", details,
                     System.currentTimeMillis() - start);
+        } catch (RuntimeException e) {
+            return unknown(start, details, "CHECK_FAILED", "Infrastructure collection failed; health is inconclusive");
         }
+    }
+
+    private HealthComponentResult unknown(long start, Map<String, Object> details, String reason, String message) {
+        details.put("reasonCode", reason);
+        details.put("collectionComplete", false);
+        return HealthComponentResult.of(name(), HealthStatus.UNKNOWN, message, details, System.currentTimeMillis() - start);
     }
 }

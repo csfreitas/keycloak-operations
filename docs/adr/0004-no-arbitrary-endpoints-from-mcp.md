@@ -9,7 +9,13 @@ Agent tools that accept free-form URLs, kubectl, or queries create SSRF and priv
 
 ## Decision
 
-MCP and REST **must not** accept arbitrary Keycloak, Kubernetes/OpenShift, Prometheus, or shell endpoints/commands. Only registered target bindings and semantic operations are allowed.
+Operational MCP and REST **must not** accept arbitrary Keycloak, Kubernetes/OpenShift, Prometheus, or shell endpoints/commands. Only registered target bindings and semantic operations are allowed.
+
+[ADR 0013](0013-registry-preflight-before-registration.md) clarifies a narrow
+administrative exception: an explicitly authorized, default-closed REST preflight
+accepts a bounded candidate URL as inert draft data. It performs no candidate DNS,
+credential resolution, requests or writes. This is not an operational endpoint/proxy
+or destination approval and adds no MCP capability.
 
 ## Consequences
 

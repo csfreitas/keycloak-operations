@@ -1,15 +1,14 @@
 package io.github.keycloakmcp.mcp.inventory;
 
 import io.github.keycloakmcp.audit.AuditService;
-import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.inventory.InfrastructureInventory;
+import io.github.keycloakmcp.mcp.McpToolErrorProjector;
 import io.github.keycloakmcp.observability.McpMetrics;
-import io.github.keycloakmcp.security.SensitiveDataFilter;
+import io.github.keycloakmcp.security.ReadMetadataProjection;
 import io.github.keycloakmcp.security.ToolAuthorization;
 import io.github.keycloakmcp.service.platform.InventoryService;
 import io.quarkiverse.mcp.server.Tool;
 import io.quarkiverse.mcp.server.ToolArg;
-import io.quarkiverse.mcp.server.ToolCallException;
 import jakarta.inject.Inject;
 
 public class InventoryTools {
@@ -24,7 +23,7 @@ public class InventoryTools {
     InventoryService inventoryService;
 
     @Inject
-    SensitiveDataFilter sensitiveDataFilter;
+    ReadMetadataProjection readProjection;
 
     @Inject
     AuditService auditService;
@@ -34,6 +33,9 @@ public class InventoryTools {
 
     @Inject
     ToolAuthorization toolAuthorization;
+
+    @Inject
+    McpToolErrorProjector errorProjector;
 
     @Tool(
             name = TOOL_NAME,
@@ -48,10 +50,11 @@ public class InventoryTools {
         try {
             toolAuthorization.assertReadOnlyOperation(TOOL_NAME);
             InfrastructureInventory inventory = inventoryService.collect(targetId);
+            InfrastructureInventory projected = readProjection.inventory(inventory);
             success = true;
-            return sensitiveDataFilter.redact(inventory);
-        } catch (McpException e) {
-            throw new ToolCallException(e.getError().code() + ": " + e.getMessage());
+            return projected;
+        } catch (Exception e) {
+            throw errorProjector.project(e);
         } finally {
             long duration = System.currentTimeMillis() - start;
             metrics.recordToolInvocation(TOOL_NAME, duration, success);

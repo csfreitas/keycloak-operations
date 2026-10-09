@@ -41,22 +41,30 @@ public class ConfigCredentialProvider implements CredentialProvider {
         McpRuntimeConfig.CredentialEntry entry = requireEntry(credentialRef);
         LOG.debugf("Resolving infrastructure credentials for ref=%s", credentialRef);
 
-        // Kubeconfig path takes precedence
         var kubeconfigOpt = entry.kubeconfig();
+        var tokenOpt = entry.token();
+        int modes = (kubeconfigOpt.filter(s -> !s.isBlank()).isPresent() ? 1 : 0)
+                + (tokenOpt.filter(s -> !s.isBlank()).isPresent() ? 1 : 0)
+                + (entry.inCluster() ? 1 : 0);
+        if (modes != 1) {
+            throw McpException.authenticationFailed("Configure exactly one infrastructure authentication mode");
+        }
         if (kubeconfigOpt.isPresent() && !kubeconfigOpt.get().isBlank()) {
             return InfrastructureCredentials.kubeconfig(kubeconfigOpt.get());
         }
 
         // Token-based auth
-        var tokenOpt = entry.token();
         if (tokenOpt.isPresent() && !tokenOpt.get().isBlank()) {
             String apiServerUrl = entry.apiServerUrl().orElse(null);
+            if (apiServerUrl == null || apiServerUrl.isBlank()) {
+                throw McpException.authenticationFailed("Token authentication requires an explicit API server URL");
+            }
             String caCertData = entry.caCertData().orElse(null);
             boolean trustInsecure = entry.trustInsecure();
             return InfrastructureCredentials.token(tokenOpt.get(), apiServerUrl, caCertData, trustInsecure);
         }
 
-        // No credential material → fall back to in-cluster
+        // Only the explicit in-cluster=true mode reaches this branch.
         return InfrastructureCredentials.inCluster();
     }
 

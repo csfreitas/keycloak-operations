@@ -1,0 +1,29 @@
+# DESIGN EXAMPLE ONLY — contract draft 0.1, NOT an installed/served CRD.
+# Do not apply. The reserved .example API group and release placeholder are deliberate.
+# All URLs/names are synthetic; references contain no credentials.
+apiVersion: operations.keycloak-operations.example/v1alpha1
+kind: KeycloakOperations
+metadata:
+  name: operations
+  namespace: keycloak-operations
+spec:
+  release:
+    version: APPROVED_RELEASE_REQUIRED
+  replicas: 1
+  operationalMode: ReadOnly
+  identity:
+    issuer: https://idp.example.invalid/realms/operations
+    audience: keycloak-operations
+    backendClientId: keycloak-operations-api
+    uiClientId: keycloak-operations-ui
+  database:
+    existingConnectionSecretRef:
+      name: operations-database
+  exposure:
+    apiHost: operations-api.example.invalid
+    uiHost: operations-ui.example.invalid
+    tls:
+      mode: Reencrypt
+  trust:
+    caBundleConfigMapRef:
+      name: operations-installation-ca

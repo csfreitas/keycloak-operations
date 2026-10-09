@@ -1,0 +1,877 @@
+{
+  "capturedAt": "2026-09-18T19:35:57.376Z",
+  "scope": "Unsigned local final Maven reports. Nine opt-in integrations skipped; Kubernetes HTTP evidence uses synthetic loopback fixtures.",
+  "sourceManifest": {
+    "path": "docs/development/evidence/h1-inventory-envelopes-source-2026-09-18.json",
+    "sha256": "8dbf1ce0974430d89538d3a50f9694b520ec0ef38655e37a72bc8fe3d3e50fd7",
+    "aggregateSha256": "838b08901744a957673d0177d8bf11336ad17c227671698f801cd42304740f34"
+  },
+  "command": "JENV_VERSION=21 jenv exec mvn clean verify",
+  "exitCode": 0,
+  "log": {
+    "path": "/private/tmp/kcops-h1-inventory-envelopes-verify-20260918.log",
+    "sha256": "7b7b8812e9d13da0b5514b0d04750a1016e81bce8549ee56c3f4d47621f72fb1"
+  },
+  "suites": {
+    "unit": {
+      "reports": [
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.BoundedKubernetesReaderTest.txt",
+          "sha256": "93ca994dafed0c4e3716eeab646585674b3bf53ca604d7424a8f31cc6d0ca57c",
+          "tests": 77,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.ExplicitInfrastructureConfigTest.txt",
+          "sha256": "f73f1d9dfad4f8a3de65283c118fee0a8d8f868dc04c192c5b16e2e754a0ea7a",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.InfrastructureClientFactoryIsolationTest.txt",
+          "sha256": "893f464039545eb473b9feb209cf263e21b889d6ce5ad407b2c81d4338114469",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.RedirectRejectingHttpClientFactoryTest.txt",
+          "sha256": "6a409f2f391fc0aee5b5916d07318c2c572b4785b9cf17675185d57581c10c66",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakCapabilitiesTest.txt",
+          "sha256": "e42235738d9e019a513cf3bd409252753bf1c3be7a22c312367a3ea07b3d0283",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakClientFactoryTest.txt",
+          "sha256": "3a1d0ca26a6defb19ed6cc8593e798a179f67ee4a94a7ae9938ab2cb73dcbec9",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakVersionDetectorTest.txt",
+          "sha256": "c50c27b1af956db545fe72321057d60e17794c617db1c8b54ce1a8b66a310e7b",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.ChangeResourceDelegationTest.txt",
+          "sha256": "2233695803d6b155456f4ea0caca395557a85e6779fe32ce82fcea8cd76b72cf",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.ChangeResourceTest.txt",
+          "sha256": "4fb98d3cc01a26eae6f6b6ff44eee1ea410f232d554968f3e651940e4e72dbb0",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.EventsAuthorizationTest.txt",
+          "sha256": "f74528253529f36423226b0d16c6b5d5e66c5d7c26b411b5be0ba8cd4524be52",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.FleetResourceEnrichedTest.txt",
+          "sha256": "a1acc47b6b1335f6574c2c18ff86bba438b0cb2941179b8473a8e08439c1c54f",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.FleetResourceTest.txt",
+          "sha256": "f3c1dcea6853e9b592f7e92a5ff3b899c0439b6fa5caa4252177c32cbad4de0d",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.MeResourceTest.txt",
+          "sha256": "ab10f9a321f7a40d4e1d678915651812516088cf6cd29d678bf0d73b53693f06",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.OperationsReportResourceTest.txt",
+          "sha256": "060082aae5e58c80ff6b87f5a8f6e2c2d1e41a7e8a62172397708a7cf5da1b85",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.TargetResourceTest.txt",
+          "sha256": "651138baef156c72474e9f7f18c49fed774b3d3dcebf99899a222d297076e63d",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.ConditionEvaluatorTest.txt",
+          "sha256": "80a37fc79fcbc60b229049d693d6d45ffd3e53fcebf740b77463412c1204e6a0",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.DeclarativeRuleValidationTest.txt",
+          "sha256": "9ce710add9b0a9857212d5f4c8cabcd1d6fe00633a10594cd48451b1fdec0651",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.MultiTargetAssessmentIsolationTest.txt",
+          "sha256": "a843efb9dbb9486cc16d47104aa11f374ba6af091e3db74debbec82baba984d7",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.RuleEngineTest.txt",
+          "sha256": "bd9b671e3ac05e132d5a0ca6b6ec39a1cc6f3a0c9f0f74d78bb3921162dd85d0",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.RulePackFixtureTest.txt",
+          "sha256": "3942cf7ffca96209b11824997d67d8a256fde1316cfe4e17734e50feed477967",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.YamlRuleLoaderTest.txt",
+          "sha256": "3a3bebf9c211aed989e9b6fc7c513a0c25c48b4ecb44915be4538b2e00843b9e",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.assessment.scoring.AssessmentScoringTest.txt",
+          "sha256": "aca5792fca23d017f3074c98620a9aa7aa06a4b73425d85406ee108a4b6f1307",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.collector.AssessmentCollectionCompletenessTest.txt",
+          "sha256": "f1f41f001360103e98358e9ab425b27719053cdc41b0ccdb3e2466e51cbfa4cf",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.collector.keycloak.KeycloakEvidenceCollectorTest.txt",
+          "sha256": "0f5439d40c27e14cd0c66d08fc02d96428aec0389d367aeee96a88283e28b3df",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.collector.metrics.MetricsEvidenceCollectorTest.txt",
+          "sha256": "f7dadf3ee3eeb91474f67042fe0b050d240e1ace96437b7c28d0636dd6d9e039",
+          "tests": 24,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.credential.ConfigCredentialProviderTest.txt",
+          "sha256": "2e834b5f6a91d296aecc0c14bd217514a93a09c28d3cf9650ff49858c2764dae",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.deploy.KubernetesAssessorRbacManifestTest.txt",
+          "sha256": "63233484dac267936ed309a63148daf98bf62519f0a3417b651f8899ee2bcd22",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.deploy.UiDeployManifestTest.txt",
+          "sha256": "732c505e22c11f7b95beda999b7fe7787e9d2f5964471ee3e3296c59ece2a917",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.discovery.EnvironmentDiscoveryTest.txt",
+          "sha256": "c87c6ffdfb1ccfa33d1992360cbbd227751f56739e46155dcbb928f38a9530d5",
+          "tests": 52,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.domain.metrics.PerformanceSummaryTest.txt",
+          "sha256": "29441396998caa0c45e23703c0518bf80f65dbe4848163451ba5e16fac0fc253",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.health.DefaultKeycloakManagementHealthProviderTest.txt",
+          "sha256": "b4c736077cb64b3994986f3f299530971a4fbde882ef56c82c3282d399a08df6",
+          "tests": 57,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.health.HealthCheckEngineTest.txt",
+          "sha256": "81baf2ce3c645c858f3434e7f3510a360d298c2d29e650029e2a182bff2ebd83",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.health.InventoryHealthChecksTest.txt",
+          "sha256": "1e2f2e2f42d2120fdbda067380c33f4948a5e58f0c5764d1026a58e1d9f445f2",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.health.KeycloakAdminApiHealthCheckTest.txt",
+          "sha256": "6f2bc20c96f4223005c5e0adee3e89cc2a92545811fdda99740fa40464ebbd9b",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.http.BoundedBodyHandlerTest.txt",
+          "sha256": "7f0f16b2b9341ec40ff744424c4afa3683fe8bc7534d4da0156c5c1febbef89f",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.it.DisposableRhbkGuardTest.txt",
+          "sha256": "0386402868d43718c6ae0666f58fd131cf6dcee8e5265e71d01ac368cdcb95e6",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.mcp.assessment.AssessmentToolsOperationsReportTest.txt",
+          "sha256": "6c5abec5f6256cad9ab307212340f580e0f9208131a0678b823206b4e4b4aa7d",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.mcp.assessment.AssessmentToolsScoreAvailabilityTest.txt",
+          "sha256": "5e0885cfe2ac464698b492e62a4a9c9d6c0293afb09ff932799917d1fc7a75a1",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientLifecycleTest.txt",
+          "sha256": "1a865d13de9c214f23a9538a61a6a1d9817dd07e1b4a1dc1b8adbce9e2a3b3c2",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientSecurityTest.txt",
+          "sha256": "d2994ef81550f8c3fad64f2d26b364ac8b7fa01809c96f8091177a6f0507f14b",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientUrlsTest.txt",
+          "sha256": "6c4eca8e62ffc4c1aba90bb26b44862f6e0acfc74d485afce1f6b3e9888a62ad",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricAvailabilityServiceTest.txt",
+          "sha256": "45cccd8009bab4dac5f0ec5d224ff4917d33a4a27dd48033818da5ded78b3381",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricWindowTest.txt",
+          "sha256": "7c733018b63e55c498187c3e2c6615564b6fa87e67e24f92ba5d75622930e1f2",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsCredentialIsolationTest.txt",
+          "sha256": "808c2bcb4b095fa56cd8c831d4c2b428557516cac7127f9941a40725ddaf72ca",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsOperationBudgetTest.txt",
+          "sha256": "ba46f7691694183e569ec07c606aff19b8fc9f760178f0a77f1b1fd0fa394b2d",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsProviderFailureTest.txt",
+          "sha256": "da5523f1fbcbf4940b3e8baa088488d7f42d215f59b4fd6c0958acdc557b5ed6",
+          "tests": 17,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsProviderOperationBudgetTest.txt",
+          "sha256": "86bf39107abe9a7f90f30c2ebac7a45ea1647536c0920609ff35cf1b80f9c911",
+          "tests": 15,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryBoundsTest.txt",
+          "sha256": "49c36b822d3ee15391edefc2b1a0abe608ba6c51233485b59f4e7dbbc333fe27",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryBuilderTest.txt",
+          "sha256": "4a07ac4c3ac018057d3f440ece3e1f31f5e8b68a8a7d79303ac10e173a11f331",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryContextIsolationTest.txt",
+          "sha256": "0facdeb3c56acba20bbac1b1bc9f37621473754ee3fa679ad3dda3ef8fb680db",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.PromQlEscaperTest.txt",
+          "sha256": "1f8d99eb8799adf72fb0c0836795f1581d2e8ca37859f58f52313c3200cfcc66",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.ScrapeObservationHttpIsolationTest.txt",
+          "sha256": "d0e9c1ce39be295a1e081b1725ce441c1a8a9edb9d40d51b13f195bafeb2a942",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.ScrapeObservationProviderTest.txt",
+          "sha256": "c0382b0d5c0fca816c37ec8ccd7ed6d65612bf6d94cba3da0b091b9d59bfd4fc",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.ServiceMonitorProbeTest.txt",
+          "sha256": "3be68da01de54339ecff8302b62f5938d04c66413ae753c32e79e630180435fe",
+          "tests": 91,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.prometheus.PrometheusApiClientTest.txt",
+          "sha256": "dd9b653496995049566263f8bbe18a7f5af81c1a2cbc1d717851233120dbffda",
+          "tests": 35,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.AssessmentRepositoryTest.txt",
+          "sha256": "f0912044f3f388fc55767dacf59cb87eae0ffd02cb089592a3518609cf58ef4e",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.AuditRepositoryTest.txt",
+          "sha256": "2aec284970b7eb51a66261ad9a6798d73039efb8879257da189f331d7605d1da",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.FindingRepositoryTest.txt",
+          "sha256": "3a60c2dab60bee2cc6b044c4c467d046b3b893f5773fc45868453412ed33eb2c",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.HealthCheckRepositoryTest.txt",
+          "sha256": "bcdfc254948e2b4f7dd8cbfd693e7ca94a6fb877d73b4ce8714a96e32b9c12e6",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.MultiTargetPersistenceIsolationTest.txt",
+          "sha256": "21c95499d6b992d6420a866c3f4f619d55be67d0d5ed0cf058bcb970c5f6cc08",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.SecretLeakagePersistenceTest.txt",
+          "sha256": "e1af888a5fbea953f4d3920d8f27536e9ad11f88f5f51cff02e564b2b37c85f3",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.SnapshotRepositoryTest.txt",
+          "sha256": "eba65e0b9b86a8c0ce4d6c4ba37ed5dd8217f125f104fbc7a76ccca05d08d2da",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.TargetRepositoryTest.txt",
+          "sha256": "0a96de141fc609709b86e6103cb1fda3924bbc91a4adf80b796bfbf6b22ca74d",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.mapper.AssessmentPersistenceMapperTest.txt",
+          "sha256": "d87cef4c11aabb985a8c3349c7a2de1a3a290068461cc47623faaa14ffa7a704",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.persistence.mapper.ChangePersistenceMapperTest.txt",
+          "sha256": "0c4b5979b1dd2ba2c67652c06e70b3e3572e23f7bdbd49c19557c420dd511fcf",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.security.AuthenticatedBoundaryTest.txt",
+          "sha256": "62296470ae4431f43c9ad8c8039999544103811bb0ed9a4b3caab171db2fb716",
+          "tests": 7,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.security.SensitiveDataFilterTest.txt",
+          "sha256": "6d17f9bd34717c0d7a6a3667728401515b7923051960cf39103cbd268b9cc1eb",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.security.ToolAuthorizationChangeTest.txt",
+          "sha256": "aeed74b3e6c9899aaee1eed713e07bf646a2172c6432adece4375cac01ae4863",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.ClientServiceTest.txt",
+          "sha256": "631f928c93edad2d84d6fddd6ac9c83889d6bdad3882b3e29da6326d8b91e198",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.MultiTargetIsolationTest.txt",
+          "sha256": "78b34513e2987af8d1d2009d551bb29597b5a6b8bfe81861ba531fbaa89b95eb",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.RealmServiceTest.txt",
+          "sha256": "2323d19739ba495dc106d3e7e446f7038f214ca5b291294720d2be65587c3661",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.UserServiceTest.txt",
+          "sha256": "41941a57807fd78ba44f34232f7fa821cf9c03a7ae6acf9980aebb8d5a157771",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ChangeManagementServiceTest.txt",
+          "sha256": "26d2c7de0c252f2f35c05286882e1e35a6610883df436dad77e660a5c755aeec",
+          "tests": 34,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ChangePolicyAndRiskTest.txt",
+          "sha256": "81fba210981200575e699cb1114d60188891d15661984f7da55b326298af64ab",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientConfigChangeSupportTest.txt",
+          "sha256": "4703763a82478c37bfed6d5cf5cdb518641f6ee90f1539e41ffe2ee8793539ce",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientLifecycleChangeSupportTest.txt",
+          "sha256": "b461f98c1fcc5a3168c13331d42b12b0291b24dfaca4b075a81626a9dfa9dba6",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientSecuritySettingsChangeSupportTest.txt",
+          "sha256": "028279d55131be0031b411ff9b0e9c96d107afd0daf583b8c34446c55b0e06ad",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientUrlSettingsChangeSupportTest.txt",
+          "sha256": "64f0c08d905a37ce2cd7e64aaf5a4485fcf6184c0f268501be516feb75b977e3",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.BundledRuleCatalogRevisionTest.txt",
+          "sha256": "1c4e64de4a3b7e260fa759d0bca0f3952c51c9a4e8dce80bba49ec901a698f01",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.FleetScoreAvailabilityTest.txt",
+          "sha256": "52e5ff111f379ed97734f157fd08c4e6cdcf47e3c412883ed7ee609e0bee585f",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationCandidateCollectorTest.txt",
+          "sha256": "c118c85e4627ce724e2b5a3e65aa53c0dee0af6fcedd9246cdba005ff41a88d5",
+          "tests": 41,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationNetworkingCollectorTest.txt",
+          "sha256": "fda640e7c21825159366bc4766fdabe6aa48007167eabaea7408af653d86fefb",
+          "tests": 26,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationOnboardingServiceTest.txt",
+          "sha256": "666555f44327ea8c4ed33f64ea720a11c8801a90ff3ba38ddbbb838a5a94e132",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationServiceAssociationTest.txt",
+          "sha256": "657af7b8c96354f8a4b6d2f2e14c06d72d9e7f68250dd08b58a787102e426b68",
+          "tests": 37,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryEnvelopeTest.txt",
+          "sha256": "d60a56af2c0c465bec600c31f76bdb6df13f1aa053c67103c02094001412d0d1",
+          "tests": 27,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryEvidenceMappingTest.txt",
+          "sha256": "e50d9e71b9258c5779e187bf6be625ceafffe15bfa429255a6340cadabfe42af",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryServiceMockTest.txt",
+          "sha256": "4bd84be50817f54bf9093d452d9dfd40d106199ed21f10e934ffb672a6d4ed29",
+          "tests": 20,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.MultiTargetMetricsIsolationTest.txt",
+          "sha256": "5bb6ba5fb746e92e6f76c8c8cdb0b1784f60fd6205edbf21e3ac43126e76c091",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.OperationsReportServiceTest.txt",
+          "sha256": "4f9b0e1303e485313eb8727b93376a8a6dab9f372e8bdb0ac52fe19d394d9b25",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.PerformanceSummaryServiceTest.txt",
+          "sha256": "4e13bf67263b349836e6f3afeeeebfcf8d3951bfed8059b4e40bc6ca6c2c83cb",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.ReportInventoryProjectionTest.txt",
+          "sha256": "fafd0821333c104b1e617dc580e0429cddd27aac2ab312d129aa2375d64fb834",
+          "tests": 14,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.SnapshotServiceTest.txt",
+          "sha256": "2b43ed33d2939d66951dd7247a92bbd3874763c7b13a3f32c7a81d5feecd3404",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.TargetOverviewSignalsTest.txt",
+          "sha256": "f3f9b636b50891c07b576e2201252442933f84445dab732dd5d312a8c60350c0",
+          "tests": 8,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.target.InstallationConfigMappingTest.txt",
+          "sha256": "7cf5da48ab20335fe56098dd178ae83fe6d7d0610eeb08aa46f3b1e033d1db7b",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.target.KubernetesInstallationBindingTest.txt",
+          "sha256": "aa1025803c7ae035a245d84ce2e5332b317b83bc7b8a53132917247f951aa06a",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.target.ManagedInstallationBootstrapTest.txt",
+          "sha256": "baaa3ae7b26876eaaffdd36bddcb50d87e1abcb1f8d9531a4567c47ef02d1483",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetAuthorizationTest.txt",
+          "sha256": "eba15425e5ed8a2530f97f57ec3f5cad93e59e25ccae2aa11143d3d9e1d2a5a1",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetRegistryTest.txt",
+          "sha256": "05374b74022ade49590336f6e0baa2f83bbf7c1e7747a6b21703c61f63996912",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetResolverTest.txt",
+          "sha256": "066fda95e5de97cf1eff21c88c49ece8cd5feba3de00053aa3a1b9493add7bb5",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetSanitizationTest.txt",
+          "sha256": "7907d53f266cb4e562b8c8036bfe82743021fb950c60d187ea35c89373a40296",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "totals": {
+        "tests": 970,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "integration": {
+      "reports": [
+        {
+          "path": "target/failsafe-reports/io.github.keycloakmcp.it.ControlledClientChangeIT.txt",
+          "sha256": "ce09cf4f9e044dbdc47232d91498f5436f54efa40f58e381dea6ca62a961327b",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 4
+        },
+        {
+          "path": "target/failsafe-reports/io.github.keycloakmcp.it.KeycloakCommunity26_6IT.txt",
+          "sha256": "9da52ad185fc2cd99211c78198b069d58e9b92dd6e45f6c031043a40f2eb6e04",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        },
+        {
+          "path": "target/failsafe-reports/io.github.keycloakmcp.it.KeycloakCommunity26_7IT.txt",
+          "sha256": "a2bfbe20ea1d1a5a0862ad22756732f8245711df886a07aa8ff8986487caa0de",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        },
+        {
+          "path": "target/failsafe-reports/io.github.keycloakmcp.it.PrometheusMetricsIT.txt",
+          "sha256": "032c66bdb9f10b8c693dbc9ee878b6fb6df4d131d122ea93f79aa3904d4d6bba",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 1
+        },
+        {
+          "path": "target/failsafe-reports/io.github.keycloakmcp.it.Rhbk26_6IT.txt",
+          "sha256": "8452e09016e1330170494f93fc2b583166e9c3b67bb73023e693b291e94b5661",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 2
+        }
+      ],
+      "totals": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 9
+      }
+    }
+  }
+}

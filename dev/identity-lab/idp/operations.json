@@ -1,0 +1,505 @@
+{
+  "realm": "operations",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      {
+        "name": "ops-a"
+      },
+      {
+        "name": "ops-b"
+      },
+      {
+        "name": "setup-a"
+      },
+      {
+        "name": "setup-b"
+      },
+      {
+        "name": "setup-both"
+      },
+      {
+        "name": "bind-only"
+      },
+      {
+        "name": "config-realm"
+      },
+      {
+        "name": "config-client"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "keycloak-operations",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false
+    },
+    {
+      "clientId": "keycloak-ops-ui",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://127.0.0.1:18300/"
+      ],
+      "webOrigins": [
+        "http://127.0.0.1:18300"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "45",
+        "post.logout.redirect.uris": "http://127.0.0.1:18300/"
+      },
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "keycloak-ops-ui-wrong-audience",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://127.0.0.1:18300/"
+      ],
+      "webOrigins": [
+        "http://127.0.0.1:18300"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "45",
+        "post.logout.redirect.uris": "http://127.0.0.1:18300/"
+      },
+      "protocolMappers": []
+    },
+    {
+      "clientId": "keycloak-ops-ui-expired",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://127.0.0.1:18300/"
+      ],
+      "webOrigins": [
+        "http://127.0.0.1:18300"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "2",
+        "post.logout.redirect.uris": "http://127.0.0.1:18300/"
+      },
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "keycloak-config-mcp",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://127.0.0.1:18300/"],
+      "webOrigins": ["http://127.0.0.1:18300"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "120",
+        "post.logout.redirect.uris": "http://127.0.0.1:18300/"
+      },
+      "protocolMappers": [{
+        "name": "platform-audience",
+        "protocol": "openid-connect",
+        "protocolMapper": "oidc-audience-mapper",
+        "config": {
+          "included.client.audience": "keycloak-operations",
+          "access.token.claim": "true",
+          "id.token.claim": "false"
+        }
+      }]
+    },
+    {
+      "clientId": "assessor-a",
+      "secret": "local-fixture-a",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "assessor-b",
+      "secret": "local-fixture-b",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "assessor-unmapped",
+      "secret": "local-fixture-unmapped",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "attributes": {},
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "assessor-wrong-audience",
+      "secret": "local-fixture-wrong-audience",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "attributes": {},
+      "protocolMappers": []
+    },
+    {
+      "clientId": "assessor-expired",
+      "secret": "local-fixture-expired",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "attributes": {
+        "access.token.lifespan": "2"
+      },
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "installer-a",
+      "secret": "local-installer-a",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "installer-a2",
+      "secret": "local-installer-a2",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "installer-b",
+      "secret": "local-installer-b",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "installer-both",
+      "secret": "local-installer-both",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "installer-bind-only",
+      "secret": "local-installer-bind-only",
+      "enabled": true,
+      "publicClient": false,
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "protocolMappers": [
+        {
+          "name": "platform-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "keycloak-operations",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "rhea-realm",
+      "enabled": true,
+      "firstName": "Local",
+      "lastName": "Restricted realm operator",
+      "email": "realm-operator@example.invalid",
+      "emailVerified": true,
+      "realmRoles": ["config-realm"],
+      "credentials": [{"type": "password", "value": "Local-fixture-only-2026!", "temporary": false}]
+    },
+    {
+      "username": "chris-client",
+      "enabled": true,
+      "firstName": "Local",
+      "lastName": "Restricted client operator",
+      "email": "client-operator@example.invalid",
+      "emailVerified": true,
+      "realmRoles": ["config-client"],
+      "credentials": [{"type": "password", "value": "Local-fixture-only-2026!", "temporary": false}]
+    },
+    {
+      "username": "service-account-assessor-a",
+      "enabled": true,
+      "serviceAccountClientId": "assessor-a",
+      "realmRoles": [
+        "ops-a"
+      ]
+    },
+    {
+      "username": "service-account-assessor-b",
+      "enabled": true,
+      "serviceAccountClientId": "assessor-b",
+      "realmRoles": [
+        "ops-b"
+      ]
+    },
+    {
+      "username": "service-account-assessor-unmapped",
+      "enabled": true,
+      "serviceAccountClientId": "assessor-unmapped",
+      "realmRoles": [
+        "offline_access"
+      ]
+    },
+    {
+      "username": "service-account-assessor-wrong-audience",
+      "enabled": true,
+      "serviceAccountClientId": "assessor-wrong-audience",
+      "realmRoles": [
+        "ops-a"
+      ]
+    },
+    {
+      "username": "service-account-assessor-expired",
+      "enabled": true,
+      "serviceAccountClientId": "assessor-expired",
+      "realmRoles": [
+        "ops-a"
+      ]
+    },
+    {
+      "username": "alice-a",
+      "enabled": true,
+      "firstName": "Local",
+      "lastName": "Reader a",
+      "email": "reader-a@example.invalid",
+      "emailVerified": true,
+      "realmRoles": [
+        "ops-a"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Local-fixture-only-2026!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "bob-b",
+      "enabled": true,
+      "firstName": "Local",
+      "lastName": "Reader b",
+      "email": "reader-b@example.invalid",
+      "emailVerified": true,
+      "realmRoles": [
+        "ops-b"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Local-fixture-only-2026!",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "service-account-installer-a",
+      "enabled": true,
+      "serviceAccountClientId": "installer-a",
+      "realmRoles": [
+        "setup-a"
+      ]
+    },
+    {
+      "username": "service-account-installer-a2",
+      "enabled": true,
+      "serviceAccountClientId": "installer-a2",
+      "realmRoles": [
+        "setup-a"
+      ]
+    },
+    {
+      "username": "service-account-installer-b",
+      "enabled": true,
+      "serviceAccountClientId": "installer-b",
+      "realmRoles": [
+        "setup-b"
+      ]
+    },
+    {
+      "username": "service-account-installer-both",
+      "enabled": true,
+      "serviceAccountClientId": "installer-both",
+      "realmRoles": [
+        "setup-both"
+      ]
+    },
+    {
+      "username": "service-account-installer-bind-only",
+      "enabled": true,
+      "serviceAccountClientId": "installer-bind-only",
+      "realmRoles": [
+        "bind-only"
+      ]
+    },
+    {
+      "username": "sam-setup-a",
+      "enabled": true,
+      "firstName": "Local",
+      "lastName": "Installation setup",
+      "email": "setup-a@example.invalid",
+      "emailVerified": true,
+      "realmRoles": [
+        "setup-a"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Local-fixture-only-2026!",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

@@ -3,16 +3,16 @@ package io.github.keycloakmcp.discovery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.jboss.logging.Logger;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.openshift.client.OpenShiftClient;
+import io.github.keycloakmcp.adapter.infrastructure.BoundedKubernetesReader;
 import io.github.keycloakmcp.adapter.infrastructure.ClusterClient;
 import io.github.keycloakmcp.adapter.infrastructure.InfrastructureClientFactory;
 import io.github.keycloakmcp.config.DiscoveryConfig;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.target.InfrastructureType;
 import io.github.keycloakmcp.target.Target;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -23,271 +23,121 @@ public class EnvironmentDiscovery {
 
     private static final Logger LOG = Logger.getLogger(EnvironmentDiscovery.class);
 
-    private final DiscoveryConfig discoveryConfig;
     private final InfrastructureClientFactory clientFactory;
+
+    @ConfigProperty(name = "collection.operation-timeout-ms", defaultValue = "30000")
+    long collectionTimeoutMs = CollectionBudget.DEFAULT_TIMEOUT_MS;
 
     @Inject
     public EnvironmentDiscovery(DiscoveryConfig discoveryConfig, InfrastructureClientFactory clientFactory) {
-        this.discoveryConfig = discoveryConfig;
         this.clientFactory = clientFactory;
     }
 
     /**
      * Target-aware discovery: uses the infrastructure client bound to the target.
-     * Falls back to global discovery when the target has no configured infrastructure.
+     * Missing or unsupported infrastructure stays target-scoped UNKNOWN; never
+     * probe an unrelated cluster from the process's ambient configuration.
      */
     public EnvironmentInfo discover(Target target) {
-        if (target == null || !target.hasInfrastructure()) {
-            return discover();
-        }
-        InfrastructureType type = target.infrastructureTypeOrNone();
-        if (type == InfrastructureType.NONE || type == InfrastructureType.VM) {
-            return discover();
-        }
+        EnvironmentInfo observed = discoverObserved(target);
+        return new EnvironmentInfo(observed.runtime(), observed.confidence(), observed.platform(), observed.namespace(),
+                observed.evidence(), observed.targetId(), observed.clusterVersion(), observed.clusterPlatform(),
+                target == null ? null : target.infrastructureTypeOrNone(), observed.apiCapabilities());
+    }
 
+    private EnvironmentInfo discoverObserved(Target target) {
+        if (target == null) {
+            return unknownInfo(null, List.of("No registered target supplied; infrastructure discovery was not attempted"));
+        }
         String targetId = target.id().value();
-        Optional<ClusterClient> clientOpt = clientFactory.resolve(target);
-        if (clientOpt.isEmpty()) {
-            return unknownInfo(targetId, List.of("Infrastructure client unavailable for target " + targetId));
+        InfrastructureType type = target.infrastructureTypeOrNone();
+        if (type != InfrastructureType.OPENSHIFT && type != InfrastructureType.KUBERNETES) {
+            return unknownInfo(targetId, List.of(type == InfrastructureType.NONE
+                    ? "Target has no infrastructure binding; runtime cannot be confirmed"
+                    : "Infrastructure collector is not implemented for the configured hosting type; runtime cannot be confirmed"));
         }
-
-        ClusterClient clusterClient = clientOpt.get();
-        KubernetesClient k8s = clusterClient.kubernetes();
+        String credentialRef = target.infrastructure().credentialRef();
+        if (credentialRef == null || credentialRef.isBlank()) {
+            return unknownInfo(targetId, List.of(
+                    "Target has no explicit infrastructure credential reference; ambient cluster discovery is disabled"));
+        }
+        String namespace = target.infrastructure().namespace();
+        String clusterId = target.infrastructure().clusterId();
+        if (namespace == null || namespace.isBlank() || clusterId == null || clusterId.isBlank()) {
+            return unknownInfo(targetId, List.of(
+                    "Target has no explicit infrastructure connection and namespace; ambient cluster discovery is disabled"));
+        }
+        if (Thread.currentThread().isInterrupted()) {
+            return unknownInfo(targetId, List.of("Infrastructure discovery was interrupted before collection"));
+        }
         List<String> evidence = new ArrayList<>();
-
-        try {
-            if (clusterClient.type() == InfrastructureType.OPENSHIFT) {
-                return buildOpenShiftInfo(k8s, clusterClient.namespace(), targetId, evidence);
-            } else {
-                return buildKubernetesInfo(k8s, clusterClient.namespace(), targetId, evidence);
+        try (var scope = CollectionBudget.open(targetId, collectionTimeoutMs)) {
+            scope.budget().checkpoint();
+            Optional<ClusterClient> clientOpt = clientFactory.resolve(target);
+            scope.budget().checkpoint();
+            if (clientOpt.isEmpty()) {
+                return unknownInfo(targetId, List.of("Infrastructure client unavailable for the registered target"));
             }
+            ClusterClient clusterClient = clientOpt.get();
+            if (!namespace.equals(clusterClient.namespace())) {
+                return unknownInfo(targetId, List.of("Infrastructure client scope does not match the registered target"));
+            }
+            KubernetesClient k8s = clusterClient.kubernetes();
+            // Read one complete API-group snapshot. A configured type (or a failed probe)
+            // is not an observed runtime and must not trigger optimistic classification.
+            var groups = BoundedKubernetesReader.apiGroups(k8s);
+            boolean hasRouteApi = groups.stream().anyMatch(group -> "route.openshift.io".equals(group.getName()));
+            boolean hasConfigApi = groups.stream().anyMatch(group -> "config.openshift.io".equals(group.getName()));
+            if (hasRouteApi) evidence.add("API group present: route.openshift.io");
+            if (hasConfigApi) evidence.add("API group present: config.openshift.io");
+            boolean isOpenShift = hasRouteApi || hasConfigApi;
+            var capabilities = new ClusterApiCapabilities(
+                    servedV1(groups, "route.openshift.io"), servedV1(groups, "config.openshift.io"));
+            if (!isOpenShift) evidence.add("Complete API-group observation contains no OpenShift route or config API group");
+            String version = readVersion(k8s, evidence);
+            evidence.add("Current namespace: " + namespace);
+            String platform = isOpenShift ? "openshift" : "kubernetes";
+            return new EnvironmentInfo(isOpenShift ? RuntimeType.OPENSHIFT : RuntimeType.KUBERNETES,
+                    DetectionConfidence.CONFIRMED, platform, namespace, List.copyOf(evidence), targetId,
+                    version, platform, type, capabilities);
+        } catch (CollectionBudget.Aborted e) {
+            evidence.add(e.reason());
+            return unknownInfo(targetId, List.copyOf(evidence));
         } catch (RuntimeException e) {
-            LOG.debugf(e, "Target-aware discovery failed for target=%s", targetId);
-            evidence.add("Discovery probe failed: " + e.getMessage());
+            LOG.debug("Target-scoped infrastructure discovery was unavailable");
+            evidence.add("Infrastructure discovery unavailable; runtime could not be confirmed");
             return unknownInfo(targetId, List.copyOf(evidence));
         }
     }
 
+    private static ClusterApiCapabilities.ApiAvailability servedV1(
+            List<io.fabric8.kubernetes.api.model.APIGroup> groups, String name) {
+        var group = groups.stream().filter(candidate -> name.equals(candidate.getName())).findFirst();
+        if (group.isEmpty()) return ClusterApiCapabilities.ApiAvailability.NOT_SERVED;
+        return group.get().getVersions().stream().anyMatch(version -> "v1".equals(version.getVersion()))
+                ? ClusterApiCapabilities.ApiAvailability.SERVED : ClusterApiCapabilities.ApiAvailability.UNSUPPORTED_VERSION;
+    }
+
     /**
-     * Global discovery (no specific target).
-     * Uses direct KubernetesClientBuilder (in-cluster or KUBECONFIG env var).
-     *
-     * @deprecated Prefer {@link #discover(Target)} for multi-target environments.
+     * Legacy source-compatible entry point; global probing is intentionally disabled.
+     * Configure and authorize a registered target instead.
      */
+    @Deprecated
     public EnvironmentInfo discover() {
-        if (discoveryConfig.openshift().enabled()) {
-            EnvironmentInfo openshift = tryOpenShift();
-            if (openshift != null) {
-                return openshift;
-            }
-        }
-
-        if (discoveryConfig.kubernetes().enabled()) {
-            EnvironmentInfo kubernetes = tryKubernetes();
-            if (kubernetes != null) {
-                return kubernetes;
-            }
-        }
-
-        List<String> evidence = new ArrayList<>();
-        if (!discoveryConfig.openshift().enabled() && !discoveryConfig.kubernetes().enabled()) {
-            evidence.add("discovery.openshift.enabled=false");
-            evidence.add("discovery.kubernetes.enabled=false");
-            evidence.add("Cluster API probing is disabled; runtime cannot be confirmed");
-        } else {
-            evidence.add("Configured discovery probes did not return usable API evidence");
-        }
-
-        return new EnvironmentInfo(
-                RuntimeType.UNKNOWN,
-                DetectionConfidence.UNKNOWN,
-                "unknown",
-                null,
-                List.copyOf(evidence));
-    }
-
-    private EnvironmentInfo tryOpenShift() {
-        List<String> evidence = new ArrayList<>();
-        try (OpenShiftClient client = new KubernetesClientBuilder().build().adapt(OpenShiftClient.class)) {
-            if (client == null) {
-                evidence.add("OpenShift client adapt() returned null");
-                LOG.debug("OpenShift discovery skipped: client unavailable");
-                return null;
-            }
-
-            boolean hasRouteApi = hasApiGroup(client, "route.openshift.io");
-            boolean hasConfigApi = hasApiGroup(client, "config.openshift.io");
-            if (!hasRouteApi && !hasConfigApi) {
-                evidence.add("OpenShift APIs not found (route.openshift.io / config.openshift.io)");
-                LOG.debug("OpenShift discovery: API groups not present");
-                return null;
-            }
-
-            if (hasRouteApi) {
-                evidence.add("API group present: route.openshift.io");
-            }
-            if (hasConfigApi) {
-                evidence.add("API group present: config.openshift.io");
-            }
-
-            String namespace = client.getNamespace();
-            if (namespace != null && !namespace.isBlank()) {
-                evidence.add("Current namespace: " + namespace);
-            }
-
-            String version = null;
-            try {
-                version = client.getKubernetesVersion() == null ? null : client.getKubernetesVersion().getGitVersion();
-            } catch (RuntimeException e) {
-                LOG.debugf(e, "Unable to read OpenShift/Kubernetes version");
-            }
-            if (version != null) {
-                evidence.add("Cluster version: " + version);
-            }
-
-            return new EnvironmentInfo(
-                    RuntimeType.OPENSHIFT,
-                    DetectionConfidence.CONFIRMED,
-                    "openshift",
-                    namespace,
-                    List.copyOf(evidence),
-                    null,
-                    version,
-                    "openshift");
-        } catch (RuntimeException e) {
-            LOG.debugf(e, "OpenShift discovery failed");
-            return null;
-        }
-    }
-
-    private EnvironmentInfo tryKubernetes() {
-        List<String> evidence = new ArrayList<>();
-        try (KubernetesClient client = new KubernetesClientBuilder().build()) {
-            boolean hasRouteApi = hasApiGroup(client, "route.openshift.io");
-            boolean hasConfigApi = hasApiGroup(client, "config.openshift.io");
-            if (hasRouteApi || hasConfigApi) {
-                evidence.add("OpenShift API groups detected while probing Kubernetes");
-                if (hasRouteApi) {
-                    evidence.add("API group present: route.openshift.io");
-                }
-                if (hasConfigApi) {
-                    evidence.add("API group present: config.openshift.io");
-                }
-                String namespace = client.getNamespace();
-                return new EnvironmentInfo(
-                        RuntimeType.OPENSHIFT,
-                        DetectionConfidence.CONFIRMED,
-                        "openshift",
-                        namespace,
-                        List.copyOf(evidence),
-                        null,
-                        null,
-                        "openshift");
-            }
-
-            var version = client.getKubernetesVersion();
-            if (version == null || version.getGitVersion() == null) {
-                evidence.add("Kubernetes API reachable but version payload missing");
-                return new EnvironmentInfo(
-                        RuntimeType.KUBERNETES,
-                        DetectionConfidence.DETECTED,
-                        "kubernetes",
-                        client.getNamespace(),
-                        List.copyOf(evidence));
-            }
-
-            evidence.add("Kubernetes API reachable");
-            evidence.add("Cluster version: " + version.getGitVersion());
-            String namespace = client.getNamespace();
-            if (namespace != null && !namespace.isBlank()) {
-                evidence.add("Current namespace: " + namespace);
-            }
-
-            return new EnvironmentInfo(
-                    RuntimeType.KUBERNETES,
-                    DetectionConfidence.CONFIRMED,
-                    "kubernetes",
-                    namespace,
-                    List.copyOf(evidence),
-                    null,
-                    version.getGitVersion(),
-                    "kubernetes");
-        } catch (RuntimeException e) {
-            LOG.debugf(e, "Kubernetes discovery failed");
-            return null;
-        }
-    }
-
-    private EnvironmentInfo buildOpenShiftInfo(
-            KubernetesClient k8s, String namespace, String targetId, List<String> evidence) {
-
-        boolean hasRouteApi = hasApiGroup(k8s, "route.openshift.io");
-        boolean hasConfigApi = hasApiGroup(k8s, "config.openshift.io");
-
-        if (hasRouteApi) {
-            evidence.add("API group present: route.openshift.io");
-        }
-        if (hasConfigApi) {
-            evidence.add("API group present: config.openshift.io");
-        }
-
-        if (!hasRouteApi && !hasConfigApi) {
-            evidence.add("Target configured as OPENSHIFT but OpenShift API groups not found — treating as KUBERNETES");
-            return buildKubernetesInfo(k8s, namespace, targetId, evidence);
-        }
-
-        String version = readVersion(k8s, evidence);
-        if (namespace != null && !namespace.isBlank()) {
-            evidence.add("Current namespace: " + namespace);
-        }
-
-        return new EnvironmentInfo(
-                RuntimeType.OPENSHIFT,
-                DetectionConfidence.CONFIRMED,
-                "openshift",
-                namespace,
-                List.copyOf(evidence),
-                targetId,
-                version,
-                "openshift");
-    }
-
-    private EnvironmentInfo buildKubernetesInfo(
-            KubernetesClient k8s, String namespace, String targetId, List<String> evidence) {
-
-        // Check if it is actually OpenShift despite being configured as KUBERNETES
-        boolean hasRouteApi = hasApiGroup(k8s, "route.openshift.io");
-        boolean hasConfigApi = hasApiGroup(k8s, "config.openshift.io");
-        if (hasRouteApi || hasConfigApi) {
-            evidence.add("OpenShift API groups detected; re-classifying as OPENSHIFT");
-            return buildOpenShiftInfo(k8s, namespace, targetId, evidence);
-        }
-
-        String version = readVersion(k8s, evidence);
-        if (namespace != null && !namespace.isBlank()) {
-            evidence.add("Current namespace: " + namespace);
-        }
-
-        return new EnvironmentInfo(
-                RuntimeType.KUBERNETES,
-                DetectionConfidence.CONFIRMED,
-                "kubernetes",
-                namespace,
-                List.copyOf(evidence),
-                targetId,
-                version,
-                "kubernetes");
+        return unknownInfo(null, List.of("Global discovery is disabled; select a registered target"));
     }
 
     private String readVersion(KubernetesClient k8s, List<String> evidence) {
         try {
-            var ver = k8s.getKubernetesVersion();
-            if (ver != null && ver.getGitVersion() != null) {
-                evidence.add("Cluster version: " + ver.getGitVersion());
-                return ver.getGitVersion();
-            }
+            String version = BoundedKubernetesReader.version(k8s);
+            evidence.add("Cluster version: " + version);
+            return version;
+        } catch (CollectionBudget.Aborted e) {
+            evidence.add(e.reason());
+            evidence.add("Cluster version unavailable; observed runtime classification is retained");
         } catch (RuntimeException e) {
-            LOG.debugf(e, "Unable to read cluster version");
+            LOG.debug("Cluster version observation was unavailable");
+            evidence.add("Cluster version unavailable; observed runtime classification is retained");
         }
         return null;
     }
@@ -304,14 +154,4 @@ public class EnvironmentDiscovery {
                 null);
     }
 
-    private static boolean hasApiGroup(KubernetesClient client, String apiGroup) {
-        try {
-            Set<String> groups = client.getApiGroups().getGroups().stream()
-                    .map(g -> g.getName())
-                    .collect(java.util.stream.Collectors.toSet());
-            return groups.contains(apiGroup);
-        } catch (RuntimeException e) {
-            return false;
-        }
-    }
 }

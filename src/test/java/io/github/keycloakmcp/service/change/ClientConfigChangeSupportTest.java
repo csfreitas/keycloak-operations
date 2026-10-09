@@ -80,4 +80,22 @@ class ClientConfigChangeSupportTest {
                 .isInstanceOf(McpException.class).hasMessageContaining("REPLAN_REQUIRED");
         assertThat(rep.getAttributes()).containsEntry("pkce.code.challenge.method", "S256");
     }
+
+    @Test
+    void metadataOutputProjectionDoesNotSilentlyRewritePlansAppliedStateOrDrift() {
+        ClientRepresentation current = new ClientRepresentation();
+        current.setName("client");
+        current.setDescription("token=before");
+
+        var planned = support.plan(current, Map.of("description", "token=after"));
+
+        assertThat(planned.baselineState()).containsEntry("description", "token=before");
+        assertThat(planned.desiredState()).containsEntry("description", "token=after");
+        assertThat(planned.operations()).containsExactly(
+                new ChangeOperation("description", ChangeOperationType.UPDATE, "token=before", "token=after"));
+        assertThat(support.compareDesired(current, planned.desiredState())).hasSize(1);
+        support.applyToRepresentation(current, planned.operations());
+        assertThat(current.getDescription()).isEqualTo("token=after");
+        assertThat(support.compareDesired(current, planned.desiredState())).isEmpty();
+    }
 }

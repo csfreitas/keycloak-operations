@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.logging.Logger;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.assessment.engine.Evidence;
 import io.github.keycloakmcp.collector.EvidenceCollector;
 import io.github.keycloakmcp.config.PerformanceConfig;
@@ -40,6 +42,8 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
     private final MetricAvailabilityService availabilityService;
     private final InventoryService inventoryService;
     private final ServiceMonitorProbe serviceMonitorProbe;
+    @ConfigProperty(name = "collection.operation-timeout-ms", defaultValue = "30000")
+    long collectionTimeoutMs = 30000;
 
     @Inject
     public MetricsEvidenceCollector(
@@ -65,23 +69,49 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
         if (target == null || !target.hasMetrics()) {
             return List.of();
         }
+        try (var scope = CollectionBudget.open(target.id().value(), collectionTimeoutMs)) {
+            return collectScoped(target);
+        }
+    }
+
+    private List<Evidence> collectScoped(Target target) {
         Instant now = Instant.now();
         String targetId = target.id().value();
+        if (CollectionBudget.current().exhausted()) {
+            return List.of(ev(targetId, "metrics.collection.complete", false, now));
+        }
         PerformanceSummary summary;
         try {
             summary = metricsService.summaryForAssessment(target);
         } catch (RuntimeException e) {
-            LOG.warnf(e, "Metrics summary failed for target=%s", targetId);
+            if (CollectionBudget.current().exhausted()) {
+                return List.of(ev(targetId, "metrics.collection.complete", false, now));
+            }
+            LOG.warnf("Metrics summary failed for target=%s", targetId);
             throw e;
         }
 
+        // A cooperative summary marks its own partial values. An unmarked late
+        // result has no per-observation provenance and cannot establish evidence.
+        if (CollectionBudget.current().exhausted() && !collectionAborted(summary)) {
+            return List.of(ev(targetId, "metrics.collection.complete", false, now));
+        }
+
         List<Evidence> out = new ArrayList<>();
+        boolean collectionAborted = collectionAborted(summary);
         boolean sourceAvailable = summary.providerStatus() == MetricsProviderStatus.AVAILABLE
                 || summary.providerStatus() == MetricsProviderStatus.DEGRADED;
-        out.add(ev(targetId, "metrics.source.available", sourceAvailable, now));
+        // DEGRADED can mean that the budget expired before reachability was checked.
+        // A summary abort does not retain separate reachability provenance.
+        if (!collectionAborted) {
+            out.add(ev(targetId, "metrics.source.available", sourceAvailable, now));
+        }
         out.add(ev(targetId, "metrics.window", summary.window().label(), now));
         out.add(ev(targetId, "metrics.source", summary.source(), now));
         out.add(ev(targetId, "metrics.provider.status", summary.providerStatus().name(), now));
+        if (collectionAborted) {
+            out.add(ev(targetId, "metrics.collection.complete", false, now));
+        }
 
         PerformanceSummary.Http http = summary.http();
         putDouble(out, targetId, "metrics.http.requestRate", http.requestRate(), now);
@@ -91,8 +121,12 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
         putDouble(out, targetId, "metrics.http.p95Ms", http.p95Ms(), now);
         putDouble(out, targetId, "metrics.http.p99Ms", http.p99Ms(), now);
         putDouble(out, targetId, "metrics.http.activeRequests", http.activeRequests(), now);
-        out.add(ev(targetId, "metrics.http.histogram.available", http.histogramAvailable(), now));
-        out.add(ev(targetId, "metrics.http.noTrafficInWindow", http.noTrafficInWindow(), now));
+        if (histogramObserved(summary)) {
+            out.add(ev(targetId, "metrics.http.histogram.available", http.histogramAvailable(), now));
+            if (!collectionAborted || http.noTrafficInWindow()) {
+                out.add(ev(targetId, "metrics.http.noTrafficInWindow", http.noTrafficInWindow(), now));
+            }
+        }
 
         PerformanceSummary.Database db = summary.database();
         putDouble(out, targetId, "metrics.db.poolAvailable", db.poolAvailable(), now);
@@ -116,25 +150,44 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
         putDouble(out, targetId, "metrics.runtime.cpuUsage", summary.runtime().cpuUsage(), now);
         putDouble(out, targetId, "metrics.runtime.memoryWorkingSetBytes", summary.runtime().memoryWorkingSetBytes(), now);
 
-        Map<MetricAvailabilityService.SeriesKey, Boolean> series = availabilityService.detect(target);
-        out.add(ev(targetId, "metrics.series.httpCount", Boolean.TRUE.equals(series.get(MetricAvailabilityService.SeriesKey.HTTP_COUNT)), now));
-        out.add(ev(targetId, "metrics.series.httpBucket", Boolean.TRUE.equals(series.get(MetricAvailabilityService.SeriesKey.HTTP_BUCKET)), now));
-        out.add(ev(targetId, "metrics.series.agroal", Boolean.TRUE.equals(series.get(MetricAvailabilityService.SeriesKey.AGROAL)), now));
-        out.add(ev(targetId, "metrics.series.jvmHeap", Boolean.TRUE.equals(series.get(MetricAvailabilityService.SeriesKey.JVM_HEAP)), now));
-        out.add(ev(targetId, "metrics.series.events", Boolean.TRUE.equals(series.get(MetricAvailabilityService.SeriesKey.EVENTS)), now));
-        out.add(ev(targetId, "metrics.series.cluster", Boolean.TRUE.equals(series.get(MetricAvailabilityService.SeriesKey.CLUSTER)), now));
-
         emitStaleFlags(out, targetId, summary, now);
-        emitClusterConsistency(out, target, summary, now);
-        emitServiceMonitor(out, target, now);
         emitSloFindings(out, targetId, summary, now);
+        // Keep already observed metrics, but never start more remote work after an abort.
+        // Follow-on sources share the outer collection deadline, including when
+        // a successful metrics summary used less than its own configured budget.
+        if (!collectionAborted) {
+            try {
+                CollectionBudget.checkpoint(targetId);
+                Map<MetricAvailabilityService.SeriesKey, Boolean> series = availabilityService.detect(target);
+                CollectionBudget.checkpoint(targetId);
+                emitSeries(out, targetId, "httpCount", series.get(MetricAvailabilityService.SeriesKey.HTTP_COUNT), now);
+                emitSeries(out, targetId, "httpBucket", series.get(MetricAvailabilityService.SeriesKey.HTTP_BUCKET), now);
+                emitSeries(out, targetId, "agroal", series.get(MetricAvailabilityService.SeriesKey.AGROAL), now);
+                emitSeries(out, targetId, "jvmHeap", series.get(MetricAvailabilityService.SeriesKey.JVM_HEAP), now);
+                emitSeries(out, targetId, "events", series.get(MetricAvailabilityService.SeriesKey.EVENTS), now);
+                emitSeries(out, targetId, "cluster", series.get(MetricAvailabilityService.SeriesKey.CLUSTER), now);
+                emitClusterConsistency(out, target, summary, now);
+                CollectionBudget.checkpoint(targetId);
+                emitServiceMonitor(out, target, now);
+            } catch (CollectionBudget.Aborted e) {
+                // Retain evidence completed before the deadline, not the late source result.
+            } catch (RuntimeException e) {
+                if (!CollectionBudget.current().exhausted()) throw e;
+                // Custom providers may throw rather than return a marked partial result.
+            }
+        }
+        if (!collectionAborted && CollectionBudget.current().exhausted()) {
+            out.add(ev(targetId, "metrics.collection.complete", false, now));
+        }
         return List.copyOf(out);
     }
 
     private void emitStaleFlags(List<Evidence> out, String targetId, PerformanceSummary summary, Instant now) {
         boolean anyStale = summary.availability().values().stream()
                 .anyMatch(a -> a == MetricAvailability.STALE);
-        out.add(ev(targetId, "metrics.stale.present", anyStale, now));
+        if (anyStale || !collectionAborted(summary)) {
+            out.add(ev(targetId, "metrics.stale.present", anyStale, now));
+        }
     }
 
     private void emitClusterConsistency(
@@ -144,7 +197,9 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
             return;
         }
         try {
+            CollectionBudget.checkpoint(target.id().value());
             InfrastructureInventory inventory = inventoryService.collect(target.id().value());
+            CollectionBudget.checkpoint(target.id().value());
             KeycloakWorkloadInfo kc = inventory == null ? null : inventory.keycloak();
             if (kc == null || kc.readyReplicas() < 0) {
                 return;
@@ -153,12 +208,14 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
             boolean mismatch = Math.abs(clusterSize - kc.readyReplicas()) >= 0.5;
             out.add(ev(target.id().value(), "metrics.cluster.sizeMismatch", mismatch, now));
         } catch (RuntimeException e) {
-            LOG.debugf(e, "Cluster consistency inventory unavailable for target=%s", target.id().value());
+            LOG.debugf("Cluster consistency inventory unavailable for target=%s", target.id().value());
         }
     }
 
     private void emitServiceMonitor(List<Evidence> out, Target target, Instant now) {
+        CollectionBudget.checkpoint(target.id().value());
         ServiceMonitorProbe.Result r = serviceMonitorProbe.probe(target);
+        CollectionBudget.checkpoint(target.id().value());
         out.add(ev(target.id().value(), "metrics.scrape.readiness", r.readiness().name(), now));
         if (r.serviceMonitorPresent() != null) {
             out.add(ev(target.id().value(), "metrics.serviceMonitor.present", r.serviceMonitorPresent(), now));
@@ -175,24 +232,20 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
     }
 
     private void emitSloFindings(List<Evidence> out, String targetId, PerformanceSummary summary, Instant now) {
-        boolean anyStale = summary.availability().values().stream()
-                .anyMatch(a -> a == MetricAvailability.STALE);
-
         boolean p99Configured = performanceConfig.latencyP99Ms().isPresent();
         out.add(ev(targetId, "metrics.slo.p99Configured", p99Configured, now));
         if (p99Configured) {
             double slo = performanceConfig.latencyP99Ms().getAsDouble();
             out.add(ev(targetId, "metrics.slo.latencyP99Ms", slo, now));
             out.add(ev(targetId, "performance.policy.latencyP99Ms", slo, now));
-            if (!summary.http().histogramAvailable()) {
-                out.add(ev(targetId, "metrics.http.histogram.requiredButMissing", true, now));
-            } else if (summary.http().noTrafficInWindow()) {
-                out.add(ev(targetId, "metrics.http.histogram.requiredButMissing", false, now));
-            } else {
-                out.add(ev(targetId, "metrics.http.histogram.requiredButMissing", false, now));
-                Double p99 = summary.http().p99Ms();
-                if (p99 != null && !staleMetric(summary, "HTTP_P99_LATENCY")) {
-                    out.add(ev(targetId, "metrics.slo.p99Exceeded", p99 > slo, now));
+            // An unobserved histogram is not evidence that histograms are disabled.
+            if (histogramObserved(summary)) {
+                out.add(ev(targetId, "metrics.http.histogram.requiredButMissing", !summary.http().histogramAvailable(), now));
+                if (summary.http().histogramAvailable() && !summary.http().noTrafficInWindow()) {
+                    Double p99 = summary.http().p99Ms();
+                    if (p99 != null && !staleMetric(summary, "HTTP_P99_LATENCY")) {
+                        out.add(ev(targetId, "metrics.slo.p99Exceeded", p99 > slo, now));
+                    }
                 }
             }
         }
@@ -204,7 +257,7 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
             out.add(ev(targetId, "metrics.slo.latencyP95Ms", slo, now));
             out.add(ev(targetId, "performance.policy.latencyP95Ms", slo, now));
             Double p95 = summary.http().p95Ms();
-            if (summary.http().histogramAvailable()
+            if (histogramObserved(summary) && summary.http().histogramAvailable()
                     && !summary.http().noTrafficInWindow()
                     && p95 != null
                     && !staleMetric(summary, "HTTP_P95_LATENCY")) {
@@ -221,7 +274,7 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
             }
         }
 
-        emitDbAwaiting(out, targetId, summary, now, anyStale);
+        emitDbAwaiting(out, targetId, summary, now);
 
         if (performanceConfig.heapUtilizationWarningPercent().isPresent()) {
             double warn = performanceConfig.heapUtilizationWarningPercent().getAsDouble() / 100.0;
@@ -250,33 +303,29 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
     }
 
     private void emitDbAwaiting(
-            List<Evidence> out, String targetId, PerformanceSummary summary, Instant now, boolean anyStale) {
+            List<Evidence> out, String targetId, PerformanceSummary summary, Instant now) {
         boolean warnCfg = performanceConfig.dbAwaitingWarning().isPresent();
         boolean critCfg = performanceConfig.dbAwaitingCritical().isPresent();
         if (!warnCfg && !critCfg) {
             return;
         }
-        if (staleMetric(summary, "DB_POOL_AWAITING") || staleMetric(summary, "DB_POOL_AWAITING_RANGE")) {
+        // Sustained findings require a validated range, never an instant fallback.
+        if (summary.availability().get("DB_POOL_AWAITING_RANGE") != MetricAvailability.AVAILABLE) {
             return;
         }
         Double awaitingMax = summary.database().poolAwaitingMax();
         Double awaitingAvg = summary.database().poolAwaitingAverage();
-        Double awaitingCurrent = summary.database().poolAwaiting();
-        Double signalMax = awaitingMax != null ? awaitingMax : awaitingCurrent;
-        Double signalAvg = awaitingAvg != null ? awaitingAvg : awaitingCurrent;
-        if (signalMax == null) {
+        if (awaitingMax == null || awaitingAvg == null
+                || !Double.isFinite(awaitingMax) || !Double.isFinite(awaitingAvg)
+                || awaitingAvg < 0 || awaitingMax < awaitingAvg) {
             return;
         }
 
         if (critCfg) {
             int crit = performanceConfig.dbAwaitingCritical().getAsInt();
-            boolean critical = signalMax >= crit
-                    && (signalAvg == null || signalAvg >= Math.min(crit, warnCfg
-                            ? performanceConfig.dbAwaitingWarning().orElse(crit)
-                            : crit));
             // Sustained: max >= critical AND average >= warning (or critical if warning unset)
             int sustainFloor = warnCfg ? performanceConfig.dbAwaitingWarning().getAsInt() : crit;
-            critical = signalMax >= crit && (signalAvg == null || signalAvg >= sustainFloor);
+            boolean critical = awaitingMax >= crit && awaitingAvg >= sustainFloor;
             out.add(ev(targetId, "metrics.db.awaitingCritical", critical, now));
             if (critical) {
                 // Prefer critical over warning — avoid duplicate findings
@@ -287,8 +336,7 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
 
         if (warnCfg) {
             int warn = performanceConfig.dbAwaitingWarning().getAsInt();
-            boolean warning = signalMax >= warn
-                    && (signalAvg == null || signalAvg >= warn * 0.5);
+            boolean warning = awaitingMax >= warn && awaitingAvg >= warn * 0.5;
             out.add(ev(targetId, "metrics.db.awaitingWarning", warning, now));
         }
     }
@@ -298,8 +346,26 @@ public class MetricsEvidenceCollector implements EvidenceCollector {
         return a == MetricAvailability.STALE;
     }
 
-    private static void putDouble(List<Evidence> out, String targetId, String key, Double value, Instant now) {
+    private static boolean collectionAborted(PerformanceSummary summary) {
+        MetricAvailability budget = summary.availability().get("COLLECTION_BUDGET");
+        return budget != null && budget != MetricAvailability.AVAILABLE;
+    }
+
+    private static boolean histogramObserved(PerformanceSummary summary) {
+        MetricAvailability availability = summary.availability().get("HTTP_BUCKET_SERIES");
+        // Summaries created before the explicit presence marker retain their legacy behavior.
+        return availability == MetricAvailability.AVAILABLE
+                || (availability == null && !collectionAborted(summary));
+    }
+
+    private static void emitSeries(List<Evidence> out, String targetId, String name, Boolean value, Instant now) {
         if (value != null) {
+            out.add(ev(targetId, "metrics.series." + name, value, now));
+        }
+    }
+
+    private static void putDouble(List<Evidence> out, String targetId, String key, Double value, Instant now) {
+        if (value != null && Double.isFinite(value)) {
             out.add(ev(targetId, key, value, now));
         }
     }

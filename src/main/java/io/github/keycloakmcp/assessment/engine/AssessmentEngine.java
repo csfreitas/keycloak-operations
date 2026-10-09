@@ -225,7 +225,7 @@ public class AssessmentEngine {
                 : (int) Math.floor(evaluation.rulesEvaluated() * 100.0 / applicable);
         int completeness = Math.min(sourceCompleteness, ruleCompleteness);
         // Partial sources have an unknown/uninspected denominator. Never label them complete.
-        return collection.partialSources().isEmpty() ? completeness : Math.min(99, completeness);
+        return hasMaterialPartialSource(profile, collection) ? Math.min(99, completeness) : completeness;
     }
 
     private static List<String> defaultRequiredSources(Target target) {
@@ -252,14 +252,16 @@ public class AssessmentEngine {
         }
         if (target.hasInfrastructure()) {
             boolean infraOk = collection.collectedSources().contains("infrastructure")
-                    && !collection.failedSources().contains("infrastructure");
+                    && !collection.failedSources().contains("infrastructure")
+                    && !collection.partialSources().contains("infrastructure");
             if (!infraOk) {
                 return AssessmentConfidence.MEDIUM;
             }
         }
         if (profileRequiresMetrics(profile)) {
             boolean metricsOk = collection.collectedSources().contains("metrics")
-                    && !collection.failedSources().contains("metrics");
+                    && !collection.failedSources().contains("metrics")
+                    && !collection.partialSources().contains("metrics");
             return metricsOk ? AssessmentConfidence.HIGH : AssessmentConfidence.MEDIUM;
         }
         // Metrics failure alone does not downgrade confidence when optional
@@ -278,7 +280,7 @@ public class AssessmentEngine {
         List<String> materialFailures = collection.failedSources().stream()
                 .filter(s -> !"metrics".equals(s) || profileRequiresMetrics(profile))
                 .toList();
-        if (!materialFailures.isEmpty() || !collection.partialSources().isEmpty() || rulesNotEvaluated > 0) {
+        if (!materialFailures.isEmpty() || hasMaterialPartialSource(profile, collection) || rulesNotEvaluated > 0) {
             return AssessmentStatus.PARTIAL;
         }
         if (profileRequiresMetrics(profile) && !collection.collectedSources().contains("metrics")) {
@@ -287,11 +289,16 @@ public class AssessmentEngine {
         return AssessmentStatus.COMPLETE;
     }
 
+    private static boolean hasMaterialPartialSource(AssessmentProfile profile, EvidenceCollectionResult collection) {
+        return collection.partialSources().stream()
+                .anyMatch(source -> !"metrics".equals(source) || profileRequiresMetrics(profile));
+    }
+
     private AssessmentProfile requireProfile(String resolvedProfile) {
         try {
             return profileRegistry.require(resolvedProfile);
         } catch (IllegalArgumentException e) {
-            throw McpException.assessmentFailed(e.getMessage());
+            throw McpException.assessmentFailed("Assessment profile is not available");
         }
     }
 

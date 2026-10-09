@@ -1,0 +1,14 @@
+.fixture-header, .fixture-log {
+  padding: 1rem 1.5rem;
+  overflow-wrap: anywhere;
+}
+.fixture-header {
+  background: var(--color-bg-surface);
+  border-bottom: 3px solid var(--color-accent);
+}
+.fixture-header p, .fixture-log p { margin: 0.6rem 0; }
+.fixture-controls { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.fixture-header :focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.fixture-log { border-top: 1px solid var(--color-border); }
+.fixture-log h2 { font-size: 1rem; }
+.fixture-log ol { padding-left: 1.5rem; }

@@ -17,8 +17,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.keycloakmcp.domain.common.ServerInfo;
+import io.github.keycloakmcp.collection.CollectionBudget;
 import io.github.keycloakmcp.domain.error.McpException;
 import io.github.keycloakmcp.domain.inventory.InfrastructureInventory;
+import io.github.keycloakmcp.domain.inventory.InfrastructureCoverage;
 import io.github.keycloakmcp.domain.platform.PageResult;
 import io.github.keycloakmcp.domain.platform.SnapshotDetail;
 import io.github.keycloakmcp.domain.platform.SnapshotSummary;
@@ -48,6 +50,9 @@ public class SnapshotService {
     private final SensitiveDataFilter sensitiveDataFilter;
     private final ObjectMapper objectMapper;
 
+    @org.eclipse.microprofile.config.inject.ConfigProperty(name = "collection.operation-timeout-ms", defaultValue = "30000")
+    long collectionTimeoutMs = CollectionBudget.DEFAULT_TIMEOUT_MS;
+
     @Inject
     public SnapshotService(
             TargetResolver targetResolver,
@@ -73,6 +78,13 @@ public class SnapshotService {
         Target target = targetResolver.require(targetId);
         targetAuthorization.assertAllowed(target, TargetPermission.READ);
 
+        try (var scope = CollectionBudget.open(targetId, collectionTimeoutMs)) {
+            return createWithinBudget(targetId, target, scope.budget());
+        }
+    }
+
+    private SnapshotSummary createWithinBudget(String targetId, Target target, CollectionBudget budget) {
+
         Map<String, Object> summary = new LinkedHashMap<>();
         summary.put("targetId", target.id().value());
         summary.put("displayName", target.displayName());
@@ -84,7 +96,9 @@ public class SnapshotService {
         summary.put("tags", target.tags());
 
         try {
+            budget.checkpoint();
             ServerInfo info = serverInfoService.getServerInfo(targetId);
+            budget.checkpoint();
             if (info != null && info.product() != null) {
                 summary.put("serverProduct", info.product().name());
             }
@@ -95,25 +109,38 @@ public class SnapshotService {
             } else {
                 summary.put("serverVersion", info.version());
             }
+        } catch (CollectionBudget.Aborted e) {
+            summary.put("serverInfoError", e.reason());
         } catch (RuntimeException e) {
             summary.put("serverInfoError", "SERVER_METADATA_UNAVAILABLE");
         }
 
         Map<String, Object> inventorySummary = new LinkedHashMap<>();
         try {
+            budget.checkpoint();
             InfrastructureInventory inventory = inventoryService.collect(targetId);
-            inventorySummary = toInventorySummary(inventory);
+            if (budget.exhausted() && (inventory == null || inventory.warnings() == null
+                    || inventory.warnings().stream().noneMatch(w -> "collection-budget".equals(w.resource())))) {
+                budget.checkpoint();
+            }
+            // Drift fingerprints describe retained, sanitized observations, not secret-bearing metadata.
+            inventorySummary = sensitiveDataFilter.redactMetadata(toInventorySummary(inventory));
             summary.put("inventory", inventorySummary);
             summary.put("configurationHash", sha256(normalizeJson(configurationSlice(inventorySummary))));
             summary.put("runtimeStateHash", sha256(normalizeJson(runtimeSlice(inventorySummary))));
+        } catch (CollectionBudget.Aborted e) {
+            inventorySummary = Map.of("collectionError", e.reason());
+            summary.put("inventory", inventorySummary);
         } catch (RuntimeException e) {
             inventorySummary = Map.of(
                     "collectionError", "INFRASTRUCTURE_EVIDENCE_UNAVAILABLE");
             summary.put("inventory", inventorySummary);
         }
 
-        Map<String, Object> redacted = sensitiveDataFilter.redact(summary);
-        Map<String, Object> redactedInventory = sensitiveDataFilter.redact(inventorySummary);
+        if (budget.exhausted()) summary.put("collectionError", budget.reason());
+        // Persist the explicit partial outcome synchronously; persistence is not a remote collection.
+        Map<String, Object> redacted = sensitiveDataFilter.redactMetadata(summary);
+        Map<String, Object> redactedInventory = sensitiveDataFilter.redactMetadata(inventorySummary);
         String hash = sha256(normalizeJson(redacted));
 
         String envId = UUID.randomUUID().toString();
@@ -179,7 +206,7 @@ public class SnapshotService {
                 entity.snapshotHash,
                 entity.createdAt,
                 entity.summary == null ? Map.of()
-                        : java.util.Collections.unmodifiableMap(new LinkedHashMap<>(entity.summary)));
+                        : java.util.Collections.unmodifiableMap(sensitiveDataFilter.redactMetadata(entity.summary)));
     }
 
     public Optional<EnvironmentSnapshotEntity> findEntity(String targetId, String snapshotId) {
@@ -190,6 +217,8 @@ public class SnapshotService {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("targetId", inventory.targetId());
         map.put("runtime", inventory.runtime());
+        map.put("discovery", inventory.discovery());
+        map.put("collectionComplete", InfrastructureCoverage.isComplete(inventory));
         map.put("cluster", inventory.cluster());
         map.put("keycloak", inventory.keycloak());
         map.put("topology", inventory.topology());

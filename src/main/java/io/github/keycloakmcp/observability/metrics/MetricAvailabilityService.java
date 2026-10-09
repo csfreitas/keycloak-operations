@@ -26,7 +26,7 @@ public class MetricAvailabilityService {
         CLUSTER
     }
 
-    private record CacheEntry(Map<SeriesKey, Boolean> flags, Instant expiresAt) {
+    private record CacheEntry(Target target, Map<SeriesKey, Boolean> flags, Instant expiresAt) {
     }
 
     private final MetricsConfig metricsConfig;
@@ -40,18 +40,26 @@ public class MetricAvailabilityService {
     }
 
     public Map<SeriesKey, Boolean> detect(Target target) {
-        if (target == null) {
-            return emptyFlags();
+        return detect(target, MetricsOperationBudget.fromConfig(metricsConfig));
+    }
+
+    /** Only observed keys are returned. A missing key means unknown, not false. */
+    public Map<SeriesKey, Boolean> detect(Target target, MetricsOperationBudget budget) {
+        if (target == null || budget.exhausted()) {
+            return Map.of();
         }
         String id = target.id().value();
         CacheEntry cached = cache.get(id);
         Instant now = Instant.now();
-        if (cached != null && cached.expiresAt().isAfter(now)) {
+        if (cached != null && cached.target().equals(target) && cached.expiresAt().isAfter(now)) {
             return cached.flags();
         }
-        Map<SeriesKey, Boolean> flags = probe(target);
+        Map<SeriesKey, Boolean> flags = probe(target, budget);
         int ttl = Math.max(1, metricsConfig.availabilityCacheTtlSeconds());
-        cache.put(id, new CacheEntry(flags, now.plusSeconds(ttl)));
+        // Failed/aborted probes are not negative observations and must not poison the cache.
+        if (!budget.exhausted() && flags.size() == SeriesKey.values().length) {
+            cache.put(id, new CacheEntry(target, flags, Instant.now().plusSeconds(ttl)));
+        }
         return flags;
     }
 
@@ -69,34 +77,26 @@ public class MetricAvailabilityService {
         }
     }
 
-    private Map<SeriesKey, Boolean> probe(Target target) {
+    private Map<SeriesKey, Boolean> probe(Target target, MetricsOperationBudget budget) {
         MetricsProvider provider = providerFactory.forTarget(target);
-        Map<SeriesKey, Boolean> flags = emptyFlags();
+        Map<SeriesKey, Boolean> flags = new EnumMap<>(SeriesKey.class);
         if (!provider.supported(target)) {
             return flags;
         }
-        flags.put(SeriesKey.HTTP_COUNT, seriesPresent(provider.probeSeries(target, "http_server_requests_seconds_count")));
-        flags.put(SeriesKey.HTTP_BUCKET, seriesPresent(provider.probeSeries(target, "http_server_requests_seconds_bucket")));
-        flags.put(SeriesKey.AGROAL, seriesPresent(provider.probeSeries(target, "agroal_active_count")));
-        flags.put(SeriesKey.JVM_HEAP, seriesPresent(provider.probeSeries(target, "jvm_memory_used_bytes")));
-        flags.put(SeriesKey.EVENTS, seriesPresent(provider.probeSeries(target, "keycloak_user_events_total")));
-        flags.put(SeriesKey.CLUSTER, seriesPresent(provider.probeSeries(target, "vendor_cluster_size")));
-        return Map.copyOf(flags);
-    }
-
-    private static boolean seriesPresent(SemanticMetricResult result) {
-        return result != null
-                && (result.availability() == MetricAvailability.AVAILABLE
-                        || result.availability() == MetricAvailability.STALE)
-                && result.value() != null
-                && result.value() > 0;
-    }
-
-    private static Map<SeriesKey, Boolean> emptyFlags() {
-        Map<SeriesKey, Boolean> m = new EnumMap<>(SeriesKey.class);
+        String[] families = { "http_server_requests_seconds_count", "http_server_requests_seconds_bucket",
+                "agroal_active_count", "jvm_memory_used_bytes", "keycloak_user_events_total", "vendor_cluster_size" };
         for (SeriesKey key : SeriesKey.values()) {
-            m.put(key, false);
+            if (budget.exhausted()) break;
+            SemanticMetricResult result = provider.probeSeries(target, families[key.ordinal()], budget);
+            if (budget.exhausted()) break;
+            if (result != null && result.availability() == MetricAvailability.AVAILABLE
+                    && result.value() != null && Double.isFinite(result.value()) && result.value() >= 0) {
+                flags.put(key, result.value() > 0);
+            } else if (result != null && result.availability() == MetricAvailability.NOT_AVAILABLE
+                    && SemanticMetricResult.REASON_NO_SERIES.equals(result.reason())) {
+                flags.put(key, false);
+            }
         }
-        return m;
+        return Map.copyOf(flags);
     }
 }

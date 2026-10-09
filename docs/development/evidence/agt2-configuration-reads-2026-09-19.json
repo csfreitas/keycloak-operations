@@ -1,0 +1,3998 @@
+{
+  "capturedAt": "2026-09-19T23:54:57.481Z",
+  "head": "572cb7ba5aa9a132f3e04280de9378da08cc61e3",
+  "branch": "feature/0.8.1-client-lifecycle",
+  "scope": "AGT2 partial: default-closed exact configured realm/client Boolean reads shared by console/REST/MCP. Synthetic identity/provider contracts, not live OIDC/RHBK or model acceptance.",
+  "source": {
+    "fileCount": 655,
+    "aggregateSha256": "d368b33ef4a39d4d5dd2acf59ac68955debfcb71731af87d1fd0f9a604d2cdae",
+    "files": [
+      {
+        "path": ".github/workflows/ci.yml",
+        "sha256": "9baaeec0d49405f6115e3b41f7748dfea70bae4dd1c83ba560bceeefb96bb3ed"
+      },
+      {
+        "path": "deploy/kubernetes/deployment.yaml",
+        "sha256": "55fff6e8f2f36e3379d62f5c1b729eac8715ee5e7e9f0121ac04b059b75495a1"
+      },
+      {
+        "path": "deploy/openshift/00-namespace.yaml",
+        "sha256": "acbc1a24e649920a34f1a249bb39e9f90484091d069e9c2a6d44686dea0b43f2"
+      },
+      {
+        "path": "deploy/openshift/10-serviceaccount.yaml",
+        "sha256": "5ec9e7e589706ee9ced6cab93f90e98235f0a526dc067cb3a134851071514b03"
+      },
+      {
+        "path": "deploy/openshift/100-ui-deployment.yaml",
+        "sha256": "25e04351a3dd137a7fd75700161b9f41346e6229a5c5643946bf80151dea292f"
+      },
+      {
+        "path": "deploy/openshift/110-ui-service.yaml",
+        "sha256": "cd388a71f71c075bbd0588eda7872d0dac0b3a4c890ce60f6ad4f0c058cc0f9a"
+      },
+      {
+        "path": "deploy/openshift/120-ui-route.yaml",
+        "sha256": "fe8aa9e5d97aafbe76406767569f0c5600d90701367dafa06ba886f898578ece"
+      },
+      {
+        "path": "deploy/openshift/20-clusterrole.yaml",
+        "sha256": "2005cb7c431a9988c48abc8ac5216cdd4e5e8a1efa5fc37cb8a8ac8a8bf6c941"
+      },
+      {
+        "path": "deploy/openshift/30-clusterrolebinding.yaml",
+        "sha256": "48b3baae10e8b51caccdf48dfc18707fdfa0c2b683066e83705a0fbb67a384e2"
+      },
+      {
+        "path": "deploy/openshift/35-rolebinding.yaml",
+        "sha256": "12a8bc78612f80c5313f13da72b8f294e3daa0b4b152524f22ffde2e4237cebb"
+      },
+      {
+        "path": "deploy/openshift/40-configmap.yaml",
+        "sha256": "ebe1d7867fa7ceab0c5d226ffed9cc0f652bf7cb70314e6c2dda436742bbb947"
+      },
+      {
+        "path": "deploy/openshift/50-secret.yaml",
+        "sha256": "70f0ebbae58b2fd2ff665c29ac84c1b42279faec7389795c2b4c0c92cb1d7b37"
+      },
+      {
+        "path": "deploy/openshift/60-deployment.yaml",
+        "sha256": "13265be25ab6df0bc62d38a6b06d3fce81ae177180e2b00f74ec296ef8909c5c"
+      },
+      {
+        "path": "deploy/openshift/70-service.yaml",
+        "sha256": "7d857d43d2cf2c9a750f232da42808199f4fe28c7f2b457e397ca7ee9757c6be"
+      },
+      {
+        "path": "deploy/openshift/80-route.yaml",
+        "sha256": "20a9df76077fbc8abcbff918c8a4b59cace97c6ec319894816f7f2a315773c3f"
+      },
+      {
+        "path": "deploy/openshift/90-networkpolicy.yaml",
+        "sha256": "ed9e50ea7b4298ecd68b0a442028e2b8ecd818119e0b8cf6dbaec899740b3725"
+      },
+      {
+        "path": "deploy/openshift/README.md",
+        "sha256": "c552afd02370fcefd22ec644c954646b92710b5b2e3bdb3c8fba3600028a42c4"
+      },
+      {
+        "path": "dev/compose.validation.yaml",
+        "sha256": "2bc4fc6e7b7f8a7f53edab15416f73f0a44535eccbdd09087dacdfdf7e22ee82"
+      },
+      {
+        "path": "dev/compose.yaml",
+        "sha256": "e6688eb7dabbac8847787a5b1a427636e0ed5fa977a7d59ec54827e44c57eda7"
+      },
+      {
+        "path": "dev/configuration-browser/README.md",
+        "sha256": "6699ad0087f8331e3a36a85c569f16ccabed7e5dbe6ac13684b01ce046bdf5ef"
+      },
+      {
+        "path": "dev/configuration-browser/fixture.css",
+        "sha256": "6aed055975bebda86c21e017032fa9302d5319df087423843c69c245e162b887"
+      },
+      {
+        "path": "dev/configuration-browser/index.html",
+        "sha256": "8921df2055ff4affaa20616c28b71347df79dadfce421932a35c5b763c3a29ae"
+      },
+      {
+        "path": "dev/configuration-browser/main.tsx",
+        "sha256": "9503bf0b65f8024b1b72f8d8d5f11d2e3a836c6963e62fee356243b766dea7e4"
+      },
+      {
+        "path": "dev/configuration-browser/vite.config.mjs",
+        "sha256": "c227366ab80553f2eda71666847c232a676183e62805f0510ea82df9b9e926fe"
+      },
+      {
+        "path": "dev/identity-lab/README.md",
+        "sha256": "90e52a29a7842b86c23d7df6613d57e2c7ae4029d4240d3104dfee8617428e22"
+      },
+      {
+        "path": "dev/identity-lab/browser-fixture-contract.test.mjs",
+        "sha256": "30a2fe9478a69f48a3dd0ca7404bdd2b0f8f7421458c906adbe0d81a1575a364"
+      },
+      {
+        "path": "dev/identity-lab/compose.yaml",
+        "sha256": "508a805611085d9e6b3241091dd5a50c4ba77ac78ff94eb6cfa6090c5c464fc2"
+      },
+      {
+        "path": "dev/identity-lab/idp/operations.json",
+        "sha256": "690f4608c01991b8a5c448f183009502d9eaa639f6ad8c7ad79484fa49716f72"
+      },
+      {
+        "path": "dev/identity-lab/installation.properties",
+        "sha256": "56465280efdb3de3c06cb02c9ea7c8917f4cec9e008ef83aeddec7599384478d"
+      },
+      {
+        "path": "dev/identity-lab/platform.properties",
+        "sha256": "b434f89225c4eb6cf1968efb323dcd0d5951fb939dc7fe90c6160ee08c2d273c"
+      },
+      {
+        "path": "dev/identity-lab/prometheus.yml",
+        "sha256": "5195a8ad1c314c0a81c0dd88702743792ace7274ace146df618c32e22f7a4ceb"
+      },
+      {
+        "path": "dev/identity-lab/target-a/target.json",
+        "sha256": "523a971cf367f7c684c2f956f3e2e3722fd18d0cbd53ca10844c1789b3410901"
+      },
+      {
+        "path": "dev/identity-lab/target-b/target.json",
+        "sha256": "1a57c69863d800dd154ef7a9f96205b5e002ca46579c588e1bdf79bb0c05f282"
+      },
+      {
+        "path": "dev/keycloak-b/import/company-b-realm.json",
+        "sha256": "4624b19117147e1a42dc47b584887c6754b3d93ae60cf821df03dfd6ff129a1b"
+      },
+      {
+        "path": "dev/keycloak/import/mcp-demo-realm.json",
+        "sha256": "b0c799432728c1e1cc9668fb1b342a135a25c383e2517b827fdf29e008b8349e"
+      },
+      {
+        "path": "dev/prometheus/prometheus.yml",
+        "sha256": "7748e8b8d0d65b3d2b872f063145a4310391dff1adfec832214f0f12f2b6a1a5"
+      },
+      {
+        "path": "dev/reference-agent/INSTRUCTIONS.md",
+        "sha256": "5801d8d2f7b32cd8d9ab659f728e767c81c90a9334b99bc8cf3f4763bc176829"
+      },
+      {
+        "path": "dev/reference-agent/README.md",
+        "sha256": "983f794ef8052bbf598fa1cbdef7eea96deed0b8255b594f52011887be2ae75f"
+      },
+      {
+        "path": "dev/reference-agent/cli.mjs",
+        "sha256": "1a45abc26682770b1a937b17b77f8f3b6a2cc5e5abf043f1fb53a882acbeed0a"
+      },
+      {
+        "path": "dev/reference-agent/cli.test.mjs",
+        "sha256": "59c3f64f1971645842743bd7f75b0d59e7580191b4b103cee73c86fdc4b29395"
+      },
+      {
+        "path": "dev/reference-agent/core.mjs",
+        "sha256": "11967fc592a14294771a7053f09a08fa082c0af4aaec1a8536e903824871d0bc"
+      },
+      {
+        "path": "dev/reference-agent/explanation-contract.mjs",
+        "sha256": "00258e92d884f508d335356ec2acc40639089b1f4e96f2a57b4306450ef60c50"
+      },
+      {
+        "path": "dev/reference-agent/explanation-contract.test.mjs",
+        "sha256": "47a33d6d1898aac449e55df60a836ba51f674fa7eee1126c1ca16483a28e8655"
+      },
+      {
+        "path": "dev/reference-agent/finding-details.mjs",
+        "sha256": "995d90d81b654ffc0b1eaf4bc919a77a6b448b8fb6119009a601e91a386ff5c5"
+      },
+      {
+        "path": "dev/reference-agent/finding-details.test.mjs",
+        "sha256": "60df7c7289f0a8faba3156776b2b2fa06f0272f5d170f9a5d4634bc870145e01"
+      },
+      {
+        "path": "dev/reference-agent/fixtures/report-partial.json",
+        "sha256": "249da1b1aa03ba2c5e90fbc5dea4a25a291e0cb06dfdfd722acd3b50c23879a2"
+      },
+      {
+        "path": "dev/reference-agent/packet-budget.mjs",
+        "sha256": "899641866abf16bc349da891310bff286eab582efb9bb568f9407994b3bbdbda"
+      },
+      {
+        "path": "dev/reference-agent/profile.json",
+        "sha256": "a2880cd2ba4c627d76446202351c0ffae25984c991af5679050469582a585db8"
+      },
+      {
+        "path": "dev/reference-agent/reference-agent.test.mjs",
+        "sha256": "9303d7b6a8ce98d8572d0514a60ddbd41405962521532894462b53165df2ff54"
+      },
+      {
+        "path": "dev/reference-agent/trial-events.mjs",
+        "sha256": "2b0a9e4ed84e38544f4bd2fc2f02a64faa9c22cd2a1a7559ac52691b7ad62c4a"
+      },
+      {
+        "path": "dev/reference-agent/trial-events.test.mjs",
+        "sha256": "e94c2903d581128c339821a332edbc60b8cc21fd5957643bcbbe15202d64afa9"
+      },
+      {
+        "path": "dev/secops-scenarios/README.md",
+        "sha256": "2d4d52efb0b699eca3a299efeb5726eacdd74e2f174ea069ca90bbaadde3d7db"
+      },
+      {
+        "path": "dev/secops-scenarios/catalog.test.mjs",
+        "sha256": "4960a127af82e86e533bbbb12274b54e3f0819d1e5f24f2f31e9bdac67b24f50"
+      },
+      {
+        "path": "dev/secops-scenarios/identity-investigation.json",
+        "sha256": "3f389cd9d23c527d4590a55e9f8111dfe7584c17744b78fc260b6fa1673c311a"
+      },
+      {
+        "path": "dev/secops-scenarios/password-age.json",
+        "sha256": "6670ee36682c3d5a4cd811585fb3dc93e4f9ef793bf4790f5097b51747a9f0df"
+      },
+      {
+        "path": "dev/secops-scenarios/temporary-access.json",
+        "sha256": "c5b6256ca164fa7c2e7d4a44682880e72cee9502532103e2952c56d377a7e039"
+      },
+      {
+        "path": "dev/ui-browser-negatives/README.md",
+        "sha256": "be1753790755057636ff6bc1e62b93af118c79e964715fd2c187103a8a84b96e"
+      },
+      {
+        "path": "dev/ui-browser-negatives/index.html",
+        "sha256": "1acf356ab9839cda8c141afc7e8d884b20999357e34fa7e25b1003285cf791f8"
+      },
+      {
+        "path": "dev/ui-browser-negatives/main.tsx",
+        "sha256": "c59cb6ee39307d07e2cc52efb9d17c2b82bf1ec9c61d79bfbef31f71fb0ca413"
+      },
+      {
+        "path": "dev/ui-browser-negatives/transport.mjs",
+        "sha256": "d3f3a4eeb8299e5067fb4ca85e6514989481df6a420782a96348d36cb81324e1"
+      },
+      {
+        "path": "dev/ui-browser-negatives/transport.test.mjs",
+        "sha256": "ccf44ffda23923c20524be39a68f97885fbb9348f0a3bb1a16c1a1f87ef26058"
+      },
+      {
+        "path": "dev/ui-browser-negatives/vite.config.mjs",
+        "sha256": "9e32282b157d2ef15cb7882bd994879439963abc980d7d57e5a6f8335d2cf83d"
+      },
+      {
+        "path": "dev/ui-change-navigation/README.md",
+        "sha256": "48e1499d007f135d62576805633741caa23050ecdf190753f47ef9ddfa0e6d9b"
+      },
+      {
+        "path": "dev/ui-change-navigation/fixture.css",
+        "sha256": "3aeca0038d9fa84e9a10feb9f59ffb6b0ffd44137632b07e3a124bec2235d438"
+      },
+      {
+        "path": "dev/ui-change-navigation/index.html",
+        "sha256": "8cf216a5053eff567bb8b5cc140614e4cab4f4e6a7cf698e93e77ed99e046bcd"
+      },
+      {
+        "path": "dev/ui-change-navigation/main.tsx",
+        "sha256": "532962805eb47c504af7d6e7781162e27b5d0f9fdfdb890863e1249797ee4d28"
+      },
+      {
+        "path": "dev/ui-change-navigation/vite.config.mjs",
+        "sha256": "324850763aff01324ee0a39bbdcf7c5c537b2a742512d25774b13c6eae6b656f"
+      },
+      {
+        "path": "pom.xml",
+        "sha256": "fd4161a98f991309e626a206990c7ffafa658ad8f2c519303042c896d498be26"
+      },
+      {
+        "path": "scripts/identity-lab-runner-common.sh",
+        "sha256": "663f8876bdb89033226be310ea02f29e63be73f2cace2d19c21c8e2d423bbff2"
+      },
+      {
+        "path": "scripts/identity-lab-runner-common.test.mjs",
+        "sha256": "7b6bd42ed0dc4fe816444950589047dca6eaefc6bd72218df66be1d16b8ac58e"
+      },
+      {
+        "path": "scripts/identity-lab-runtime.mjs",
+        "sha256": "c8f6d7f6e568369a9f03e84d7c36e5a5221de2647e1e7ae23fe89c6cbd1c1b34"
+      },
+      {
+        "path": "scripts/identity-lab-runtime.test.mjs",
+        "sha256": "08cd48b90bb739297ab80425fff483c81d54145ab54ff2af5b845a83d84b6c83"
+      },
+      {
+        "path": "scripts/installation-cluster-fixture.mjs",
+        "sha256": "27bffbedd2f6b77d01eb03d32d5f443df4e316b0112e868fd99e245e813effb8"
+      },
+      {
+        "path": "scripts/installation-cluster-fixture.test.mjs",
+        "sha256": "3986f001a1ae064100a6f7aeec310ce4e24292c0aa55c7a5b9c791f3ff476175"
+      },
+      {
+        "path": "scripts/lab-process.mjs",
+        "sha256": "f9fbe7902e4c441709106b9196a9950273d4ec1dd5c108a3399fa8de0e62a52e"
+      },
+      {
+        "path": "scripts/lab-process.test.mjs",
+        "sha256": "498f93e3146c6b3d241b1202077bdf38444f342cf3961f5710f20cf0704ad0ed"
+      },
+      {
+        "path": "scripts/setup-dev.sh",
+        "sha256": "56b0e34088c98012fba752284babd926f66bb2d654d1edbc0147c2c993f09ad0"
+      },
+      {
+        "path": "scripts/setup-mcp-client.sh",
+        "sha256": "07031b95f7ca0cabe38a6d0f36260984cefbf64d287fedd3befc08bf00fd4131"
+      },
+      {
+        "path": "scripts/smoke-mcp.sh",
+        "sha256": "b6e809e7753ff93a8f30290cd9b34bb876eeb2c309ed5d3c378966356ae6636c"
+      },
+      {
+        "path": "scripts/smoke-metrics.sh",
+        "sha256": "4fb1784623e8a50e7f03d61de3f39b90e62386b1252ed25da0d31d4a2fbe6b60"
+      },
+      {
+        "path": "scripts/validate-identity-lab.mjs",
+        "sha256": "eb09fb801ba29823246df3e75eadf9cdb783aea8fee3bed8650964f14a9080c8"
+      },
+      {
+        "path": "scripts/validate-identity-lab.sh",
+        "sha256": "e15ff7adefb928a3b0daaf35c65a170d7ae56ab5428db7258a9180b45313535b"
+      },
+      {
+        "path": "scripts/validate-installation-lab.mjs",
+        "sha256": "79ef89830ac85e7ec02e1cfc35e20b3e48e5d61ac75462798f762d7f8f3b9793"
+      },
+      {
+        "path": "scripts/validate-installation-lab.sh",
+        "sha256": "823b405d33b850e586df9c561a871e4979baf7215eeef99cd17bb1c356c69f69"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/infrastructure/BoundedKubernetesReader.java",
+        "sha256": "ef0cd2474601c691b60dc3fe1557649840a900cb663bd78e53ef0e4df6536e5e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/infrastructure/ClusterClient.java",
+        "sha256": "318155065978be720e69ada285102269d8d041afe3f06b0048c085f776d805f0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/infrastructure/DefaultClusterClient.java",
+        "sha256": "9c43738146f0dc567f61055b2ea048d3bda8d29d521b9b218278d69246f31ee6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/infrastructure/ExplicitInfrastructureConfig.java",
+        "sha256": "b870cfe662d9557003154d7231ab2d58a9be440547cbc71489ceecdc69661931"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/infrastructure/InfrastructureClientFactory.java",
+        "sha256": "7b0b526cb77171d815f54cc50b3ef559e0a9f18bd1bf5a9d78d6ee9b3635c791"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/infrastructure/RedirectRejectingHttpClientFactory.java",
+        "sha256": "b0c3e02a2ad6772257d768b887e4cc1952f65c5d56d215ad210f7f2d1c067238"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/AdminApiV2Adapter.java",
+        "sha256": "89bb3bdd5315161dd7a888cffbd2e58419cd52f105269b3e88ba4b4aed96c7bb"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/CollectionAdminTransport.java",
+        "sha256": "3c3f681a2eab141d97c70865e40ade76bebaceda3502b9c99556f317f81f61f2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/CollectionDiagnosticPolicy.java",
+        "sha256": "4c5c517d0c03bc40782d7be649f0e77ac813b45e37c218b0780759d7cfcb11aa"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/CollectionJsonProvider.java",
+        "sha256": "046e54e14308b2e32d4c448554f1ae5c7d2cac5e0248d177b88351dcb1eafa19"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/KeycloakCapabilities.java",
+        "sha256": "98b80661a6e4247339faec67dbe433f2e047b39e5d30e6d2256f7617653b00be"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/KeycloakClientFactory.java",
+        "sha256": "19a0f7043dae04e8a7368e22943a7b1919ca164738b8c5ffd7b80f2525512af6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/KeycloakRepresentationMapper.java",
+        "sha256": "1b5baa80419d8649b15c943f5477feb16563373d54708a96ef7eddee4f5dac63"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/KeycloakVersionDetector.java",
+        "sha256": "0c9253331b8bf2ff6a5b18b899c77a6292d5d8a92c23145d123695b68a472daa"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/adapter/keycloak/StableAdminApiAdapter.java",
+        "sha256": "12eb4619fd0718100c6dc2363b53f635e37be95e5d9775653376eceab58352b8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/McpExceptionMapper.java",
+        "sha256": "99e7f9825c1e0fa0beb7eed0eca79033b75e23a89481da40dd46909d07b99472"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/AssessmentLookupResource.java",
+        "sha256": "c08bcd382e6c6682c3f0257f74680d8372e1afb1c7b75ade81ca1d52a296d42b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/AssessmentProfileResource.java",
+        "sha256": "ee6619ce4707f7a45a465660f9afac88b9537b38dce10da3d39d32cd0dc37e2e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/AssessmentResource.java",
+        "sha256": "243c17ba6491dc120e260ffb2419e00a99472eb1016a9d99071e83d513bd1586"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/AuditResource.java",
+        "sha256": "236513c99346adde765ef472dbf8678ff619033823fc58ad663d0d2b982ed0c2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/ChangeResource.java",
+        "sha256": "9aa408ac38744a7448c19eef571271b20e2e37d6a0221f34e0db1dad1a8685d3"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/ConfigurationReadCacheFilter.java",
+        "sha256": "deb07efd3cdc384178c2f3bd33505a86a401b0c5baf77caf301d69f67367ab0e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/ConfigurationReadResource.java",
+        "sha256": "b6cc4a5a30405a5c2351220d6b182c46af8582483236373edc48aee15283256d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/EventsResource.java",
+        "sha256": "757db4b41895e5b30fd4d5b961a39c6231d6790f2ba88d2c38ce5b9328c8a9f0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/FindingResource.java",
+        "sha256": "b7eaba80b637731e34a8b546f8bbb902d719a33b30d246dd498cebcf1efb928b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/FleetResource.java",
+        "sha256": "423d7e140ef6996d23f05e77eac2c7b1ecc30b8a4e4a4c8c38aace354a23a611"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/HealthCheckResource.java",
+        "sha256": "26ffc4f72b2d3dd3e088157278b14faf48a4fd3884db8a361535151cec9edace"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/InstallationResource.java",
+        "sha256": "336923e6e23c3bb3a2440b652f5a0d78aaa8581a052a23a1352effd95a2844ed"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/InventoryResource.java",
+        "sha256": "6908418444ddf4a541ae2d0fd0e08bb2d9c747e784d07ff73d1ef4b91e5e059e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/MeResource.java",
+        "sha256": "7c1258c5874361769b7da2633d8fb80286683343bae6fc27eaa3b98dc3a21e2d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/MetricsResource.java",
+        "sha256": "ce8fbe7df1b1d8f68c21e5b422c8785d6559986d755b15901328ace99841d542"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/OperationsReportResource.java",
+        "sha256": "20f7a2bed0e3541875db2b1be1377965bc60e73d989a01b37a929e9d7746e58d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/SnapshotResource.java",
+        "sha256": "7dd47603e025ffd0ac4da866962b4975adc890e8730fe105c3bbb7b192be4de1"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/TargetOverviewResource.java",
+        "sha256": "0ebc8df2068e446bd582127a75fc4cbaaeed4addb235286d65c2639e67d58c3a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/api/v1/TargetResource.java",
+        "sha256": "dda0dd4b9f4a3574c5031f61c373232d8c2bb1fcfaf91e044a3e658a2128d05f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/AssessmentConfidence.java",
+        "sha256": "6f4e0d0547269cad4df47143ff5beedf77d27586ef4a253c2752d52cae959cf9"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/AssessmentEngine.java",
+        "sha256": "a5f3ad72c9304ec79575a2fffa0fb21765d9c47b7ab029f99f4ca1eb3001d4a8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/AssessmentResult.java",
+        "sha256": "a3a2b1ea7f57467832cd6a1cf284177837754c8e73655166bc12f2e869df6123"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/AssessmentScope.java",
+        "sha256": "d9173847395dfb22839e1325f14440f92b2fd3d4b4aff483c75a754467b471c2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/AssessmentScopeType.java",
+        "sha256": "e2a84c3f6620b7932d3fd2cbd2140b3ea743410a8e58c7e9c8b047a2aafd5107"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/AssessmentStatus.java",
+        "sha256": "198aeb101c756abc7db4698c4300eb3a7cb58118397a42d29626466f261548b0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/ConditionEvaluator.java",
+        "sha256": "6d6f0823c9a568330b8bb32c70a3f72d05df4ce70f89ec151b46928e6d2ac726"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/DeclarativeRule.java",
+        "sha256": "d64dbbf30920385f4aa0c5bc3d4018ea93a28f55f6a856727a7f4efc997e2c97"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/Evidence.java",
+        "sha256": "689a1e9aa19bd3a0599a7c7c79c49613f46dd94aa18baf4be07ec2dd6d6272c8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/EvidenceContext.java",
+        "sha256": "f223a34fe03ffe0908206afab366e2d7ec7059d62fe74fa8550f8834d6650adf"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/EvidenceSubject.java",
+        "sha256": "19af54ae66c1120d7f4a180f1f7da2045c05a3a80ad6fa113db41197a7b8d625"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/Finding.java",
+        "sha256": "9e2f1af31e952b4d6b6d1186a22858b3b604a519550e574f82c4a06302fbc189"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/FindingStatus.java",
+        "sha256": "97884b2b4dfe827312fa9929cd7a37211ac889a1de65b2b8a52f38ba0440dbf2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/Rule.java",
+        "sha256": "6520fd630045398bb323ef5f65f01a630d4788e6ac649ba02279fb1688a3c526"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/RuleEngine.java",
+        "sha256": "78a2d625fe817305820cafb9397a2cdb1b86013e34467324ec9d2542296b3716"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/RuleEvaluationResult.java",
+        "sha256": "9071f89dd7e83aa3acfe355773cbbb1740a1ac9b70a24ef10030c70529234f1b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/Severity.java",
+        "sha256": "c5130be20c229d19a6a64f97af26ad3202e79777a3350bed0178d3069c905dab"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/SubjectType.java",
+        "sha256": "7b7613c3af214a52efff9e9cbd880accf1e34a111b26e8ab08930da7510fd4cc"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/YamlRuleLoader.java",
+        "sha256": "c18ba50011cd6f383427256b5736e4a77d29f2000239ce663e66f03bfb91070f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/engine/rules/MinimumReplicasRule.java",
+        "sha256": "4179ba0614f33715293f7b943b13b0b5a4f4abd9abf614414eaba69788d33883"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/profile/AssessmentProfile.java",
+        "sha256": "58ffe3fa8b07ce18e93572a3a338ef70ba8059ba0af6b59298ece1d9585a2e62"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/profile/AssessmentProfileResolver.java",
+        "sha256": "d3d94d0466486d3e5a49fa685af25cfa67d5c4e7667fcceaa7b8f65cc0dddc9b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/profile/CapacityProfile.java",
+        "sha256": "e3831962136f26844135b68a63397c3569ecad4b79ffc9cca8d0d748693127ac"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/profile/HealthCheckProfile.java",
+        "sha256": "87839427dc8f10123dd1239e35f28a81aa5336f86b8036b169c0e40ccd4a8de6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/profile/PerformanceProfile.java",
+        "sha256": "b0c9d4e2cc620acd8785ab03029ec53da3ac0463ef610eb1f8b8544ba76a9209"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/profile/ProfileRegistry.java",
+        "sha256": "193cb042bb3131c0a6bc4a67c9d40dbf96abcf3874faa087889f485153bbb59c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/assessment/scoring/AssessmentScoring.java",
+        "sha256": "78a0adbf0256fb1e6b1f9a1e988438c00f7e8c48e505acde44eb8b75a1498283"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/audit/AuditEventPersister.java",
+        "sha256": "eecd54c0fc3d2af06d2f73970ad143d05edf10243796d8cf21533eddfc36ed1c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/audit/AuditService.java",
+        "sha256": "5c985756edd4c455ef004111ef63801925d421d1da10a4f20832143aa53d72d3"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collection/CollectionBudget.java",
+        "sha256": "6dda191e82f572cfd846ae3b5a455b2f9a3743ef40df4298c3d32fcf69c94195"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/AssessmentEvidenceService.java",
+        "sha256": "4ca3548595cef8dba8585fbeb5f6cd69500d8ac3dc1d32fdec565e7ebc67476c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/EvidenceCollector.java",
+        "sha256": "9dba2f07b5359acdb9f59fc6e4c84ad66e72451a074359eb38f9d6ad84820251"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/infrastructure/InfrastructureEvidenceCollector.java",
+        "sha256": "2add6d19ea831023e37ff6d6cf1959c5c37d12a94f7da1dc3ab401a0da73d409"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/keycloak/KeycloakEvidenceCollector.java",
+        "sha256": "4051e362f2c809fc72573be4bafa2c42c4cc3d77cb07a08dac3c92f0cbd770f3"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/kubernetes/KubernetesEvidenceCollector.java",
+        "sha256": "7310f55bc88f9cfc30cfc8f75dabcdc56fe77fc2ea47ec3ca9df077a75081ae7"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/metrics/MetricsEvidenceCollector.java",
+        "sha256": "0a01478cd2bc7e56b3199cb0be9f67719ebbb3f60c64173b6e0f3f28ff688b89"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/openshift/OpenShiftEvidenceCollector.java",
+        "sha256": "94dcbdd5abcdb765259a9bab8d8c08e25c27d541d3c78dbdef93832d465d7737"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/collector/vm/VmEvidenceCollector.java",
+        "sha256": "7f967169e592dcecedb3785ec64f1b03d7d17bdb5b8f75006581929b690be59f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/AssessmentConfig.java",
+        "sha256": "8e5255971a2ea34febdc3d4c9ba52105723f0f52be7b667d94ee7556b7b6b665"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/ConfigurationReadConfig.java",
+        "sha256": "e6cf2013f31d98715888e514eab9c3629e34bc9029a064246da910375b36b808"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/DiscoveryConfig.java",
+        "sha256": "3a4432b86a53e3db9437430f65243dbd787f961177958d678582815fd20d2f95"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/HealthConfig.java",
+        "sha256": "dd42e6d1d712ea529b7b46bf2f7196ce31086062374eb88c14e99fe3124763f2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/McpRuntimeConfig.java",
+        "sha256": "fc16265db5b84d76ce2d63d63d175ac8db0f57db41c8168337e53b2ec89f1bd9"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/MetricsConfig.java",
+        "sha256": "aeff7483a970a2e4403836a818ca4494d752c801c02b8b865fcc1ff65ff18465"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/PerformanceConfig.java",
+        "sha256": "c84b1535a2d4cb264496c4c1d15dae0a9f141c35378fcaf0d917972d718da620"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/PlatformAuthorizationConfig.java",
+        "sha256": "01b717e8851fbc700effb04a3af415fb0442befe9135c3a3d06dbac85b520dc8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/config/PlatformConfig.java",
+        "sha256": "a69f322988e9cc1bef07286b8ff525433605266561f4ccdcbeed413f29097910"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/credential/ConfigCredentialProvider.java",
+        "sha256": "8e957bc009f452925c42e981d0ea94f21a7bedce2f4a35f7a4c9f07338fb0387"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/credential/CredentialProvider.java",
+        "sha256": "e1595ba6739a23ff7e6473fa7df817130824d6d564d44de35480f383dcb8fd2b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/credential/InfrastructureCredentials.java",
+        "sha256": "0d6d16addc9f20503a6c9b35dd97d607250ddd9692f14424a17bd40cc656ce51"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/credential/KeycloakCredentials.java",
+        "sha256": "7acf138e907c2509792f117fc9160370e11a050309c00c6f5b48779b294b5a5c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/credential/MetricsCredentials.java",
+        "sha256": "b8e1cb7e4d83bd53639baadbccd6122407ffe9017b39cdaa71f24440b04968af"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/discovery/ClusterApiCapabilities.java",
+        "sha256": "61ab98172c320e700f488e55571d8d6240f9a92251a9f43fe54af1355e21a610"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/discovery/DetectionConfidence.java",
+        "sha256": "5d10876804d32ac1505d721f455762164239982c2beb2c3dc270c740720bd382"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/discovery/EnvironmentDiscovery.java",
+        "sha256": "210a6a1e9285ab39f9bcda3e02104682b50ded32a90fef4316c6ad73f2756667"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/discovery/EnvironmentInfo.java",
+        "sha256": "68742d46d3560b9fb09780716cc899ad050ccd80488311b01fba4af2dc547e4c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/discovery/RuntimeType.java",
+        "sha256": "2b94eeee39f9c108e1f03d0bfb9bfa1ae270a16a2576a7376e95e3a7afaaff32"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeDiffEntry.java",
+        "sha256": "7973394599ea95006ffe5ee6a35322d458a8437b59b213cf7a5454ae6e880351"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeOperation.java",
+        "sha256": "3e8af761e0f2268b20557481d35de5dc2653098cd7728db5a37d9b38045ce489"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeOperationType.java",
+        "sha256": "17826ac1dd37b3df8105530baf1a31d37d1934b017689f8491ce08c214570a15"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangePolicyDecision.java",
+        "sha256": "309ab77dabe22b3d52b70fb8efca90b06087262174638b2028f671f74a51aafc"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeRecord.java",
+        "sha256": "9645c984a4831a93f4418151d07eda6ec5758f9a4b4d4036001c2425065cfd23"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeResourceType.java",
+        "sha256": "142e8323219dc93cd344fe4e4a6322c202a8fec69eb8057483f57bf0409038e8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeRisk.java",
+        "sha256": "4c0a670159a9cff4576ab4ed6e3156c527d15d04714d01165a5fb1061cc06662"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeStatus.java",
+        "sha256": "8e838289a15db3a99e797ee772938b0de3175e09b80466a7938f8c517cc6b8be"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ChangeVerificationResult.java",
+        "sha256": "75dc1f8fc692fdd7f0ad75b4380fefdcbbb74d8a31635634a1e0693478b4c8e8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ClientCreateChangeRequest.java",
+        "sha256": "934c1e4d61d99db42d34ca5d710627a667d873eb727cf22cea7bca36fab88664"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ClientEnabledChangeRequest.java",
+        "sha256": "43d6e13d4cdf6a353e1defd6e34b6f2c625f8198e760c24720f718f9b112623d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ClientSecurityChangeRequest.java",
+        "sha256": "2d8549b35f32253732526c4142ddae6b343c66ab2ecd06b94a457eb04bcb732c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/ClientUrlChangeRequest.java",
+        "sha256": "9e07ad33942d52f42f7b58aa3da7ce825def0f28c360b618445151f4be6a12fe"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/change/DiffKind.java",
+        "sha256": "d4c5529ab53ae661cd09bc6cd446191a38ad365be4ac30741e51f9e41d22d0f5"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/client/ClientDetails.java",
+        "sha256": "941d8af839f2fc7ab0c3c356fbd1fefeffc531870de41987ba3a6cb8d320c0b8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/client/ClientSummary.java",
+        "sha256": "d742f1fa358dad86e0522fd3250e9ac3acb81d2de6c308aa42774f025149e387"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/common/ServerInfo.java",
+        "sha256": "ac3abd444086d7595f81c567513fc50f36723208e6293f6405c4cfbb973bded9"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/configuration/ConfigurationKind.java",
+        "sha256": "8fc59a96fc79a62eded15d6133f931d251608ccaa636394cb3d0fccd12c27a03"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/configuration/ConfigurationObservation.java",
+        "sha256": "12dd36c778df995facbd6e6e8b581af69dbb3edb561ae222dd38dfc726bc9ec7"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/configuration/ConfigurationScope.java",
+        "sha256": "a0008860790fc7b56532da615777e65e1b1d78205541c3529aa1c240ddd1f1a6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/error/ErrorCode.java",
+        "sha256": "a8c0208bb2775ccc560397e2b74dd4f89253f9cda408a49c47ef68b55bc97263"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/error/McpError.java",
+        "sha256": "cbe195fafd7fb2439e8bfb08cb10a992e108918fb86995bf8717a07316430e9f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/error/McpException.java",
+        "sha256": "10b263bc15e187269033d18561ba0ca27138a7133e47ae95ea50ecaa20508e8f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/group/GroupDetails.java",
+        "sha256": "f19120ec63543e55b78e209bb120e6f31d6a419ec13e4f16a489dafc8fb86d62"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/group/GroupSummary.java",
+        "sha256": "8cd9c48ae98720db369bfc7a745576d944c95612bfeca94b8488c8d430170edb"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/ClusterInfo.java",
+        "sha256": "6790d04db86efa375e09d2c427474866da74c5bb9ee2f5263fcaae053399f68d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/CollectionWarning.java",
+        "sha256": "ec415b735d9a8fcf61a185ea9d52f3fcd388b7ade7145e440c92d2d51d79b9ed"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/DeploymentMethod.java",
+        "sha256": "e53b2140a1f40e2400718a26870f8ddfb92cfed6b3579309e1d302ba8f94da14"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/HpaInfo.java",
+        "sha256": "b182ca613390228981d27853e41b6951204316a8704276237053e48e994f61ea"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/InfrastructureCoverage.java",
+        "sha256": "a2f1c5fd97d8880a52395f683ed84d60aa2b195fac4e7b87a73803d12a702fe1"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/InfrastructureInventory.java",
+        "sha256": "e999b6005861435f0c5fffe5c99ca3e368a9daa6a0249f334f6415c513d1ffa1"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/KeycloakWorkloadInfo.java",
+        "sha256": "57e7ae7cb81f99e39acc85955fdbc019e0a47dbc338c21c0f8a1c46ff7cd816e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/NetworkingInfo.java",
+        "sha256": "4e1163e73d3a4af6c3572592d00eb8902c80d0ed2aa52d2ed8be08aae1863b7c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/PdbInfo.java",
+        "sha256": "3aa0f7a9faf28802d547b9c3726dd16c0a5796111d88501fe19c06c7d395ec16"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/PodInventoryItem.java",
+        "sha256": "1ce4be93bab438103ac3cd26c61c063620641bba71ed028590de8c74e8e22999"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/ProbeInfo.java",
+        "sha256": "d52d6f9177dfdc102667a03cdb701d7c32af34ac11ad8619c585a7c7b66201a7"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/ResourceConfig.java",
+        "sha256": "67cb8b240d2b66b3ac6ab5515b4822ef0fea9a57be9a1aaf00f84713ff278922"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/SchedulingInfo.java",
+        "sha256": "3b106405c0f6384d1a16d3428ceca4cdecfdddd71363e3e0b74aad724454907d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/inventory/TopologyInfo.java",
+        "sha256": "279427b7ee6a7f72cb3e60494ad1c8ffc875cb306c7836d1d9edeba805266900"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/metrics/MetricsStatusView.java",
+        "sha256": "c49d239e185d94d829c1a341c2b951f9fbf25b79870f138789b37d27ad080703"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/metrics/PerformanceSummary.java",
+        "sha256": "554991f858482e4eb9234a2638a8421a3b3a386ef4f9588b8afe719c676dc92b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/AssessmentRunSummary.java",
+        "sha256": "1d4a3ac805995d4363ce85a9f4321d95b72c712ea2c8ff9163ca489db162f939"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/AuditEventSummary.java",
+        "sha256": "ec21f7496617bae61374bc48788b2ab562055c3529507d144a67313cee1226ac"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/AuditMode.java",
+        "sha256": "4faf59806c8456b1dde0e342cc73ea2430bc2e5323387ef9ece5679773afbed8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/AuditSource.java",
+        "sha256": "706c0ea7009711df09da10c52e7e8df4da86517093ca9682906e53a0b61ad755"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/EnvironmentChange.java",
+        "sha256": "51dd5e1f35e86948223466dd0b6d8f5bdc894a4c387d740107a105a252a590c6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/FindingLifecycleStatus.java",
+        "sha256": "6719483725f2a8ee65f395c82fc973070e75c5ddc78b6c785cf55604bd9a5864"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/FleetItem.java",
+        "sha256": "17da066711a13339d647045526ffcffd959f2338f4c17da065d159c82cfef3ee"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/HealthCheckDetail.java",
+        "sha256": "dc6ddc5f863c4c6c45c54dae42d0cf7073d5829cc906e68595ff78e9e02b1fcc"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/HealthCheckSummary.java",
+        "sha256": "8e7980a6da1bb2698d4af00828d8238c7620aa7920d7ece31fa7c8e4999514bf"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/HealthComponentView.java",
+        "sha256": "21b2eec177b50d8b78c1ff003ba220e6951bb5364f0acb7074350f1e5d50ee83"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/HealthStatus.java",
+        "sha256": "eb30751a866bd670390a42b1914c86d9721259ee90ce8587f651159fc35e2ae6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/OperationalEvent.java",
+        "sha256": "4370a8970d9f0034c79f3b611456e32cee33bc34e88cf122f625b413afaca679"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/PageResult.java",
+        "sha256": "572335303ed8656c7082acd4ed51423ebeae03bd62fd089315df6f6b2e165dfc"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/SnapshotDetail.java",
+        "sha256": "fc770f915d4548c5e5d38bd7d29cec21fedcc08672d711215247743529fdbf31"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/SnapshotSummary.java",
+        "sha256": "676f1b7069076f15de3fa5fa30788258c6124a75ba5f2ed1155a229ed6e67eb0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/TargetOverview.java",
+        "sha256": "4d2781e3ab1e4bd4f39152147c947a2dcf292504e35d9de3d2bc642f29f9ca11"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/platform/TriggerType.java",
+        "sha256": "b779460e68b6a9b9a1f432ae043765cf0fe617bcb081d5dbc0f425b00a640102"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/realm/RealmDetails.java",
+        "sha256": "c6440a73635017d9e35abe2c6ec7fcc95150373a97e8432ae0ae3e016c16eb88"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/realm/RealmSummary.java",
+        "sha256": "8f403b2fc37ab5c651b1d003521f50ce7e7149f1f7e28c0c33aed2a69a220002"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/report/AssessmentReport.java",
+        "sha256": "b63cd5299c28c6da4aed49e321bf4f2fdf1838f7aac8b2e706e0ddf8b9fca650"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/report/OperationsReport.java",
+        "sha256": "67caa4b7d50a72c53be01ccb55dcbd00fb48e252250b102c4523fd998ab835ab"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/report/ReportFinding.java",
+        "sha256": "bf52e93563e7f9146882da41ec8b9d46673d441b1aa4e3cbc63b5b597e8dc8a5"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/report/ReportProvenance.java",
+        "sha256": "4636313cfd68a82cb0537fb81039133000564fac98a706a3880eb1d119fe4ecd"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/report/ReportSection.java",
+        "sha256": "c8ace755a03f0d546596ef0492dfef9c73c0b9c13975983a43bede404c9c7e65"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/report/ReportSectionStatus.java",
+        "sha256": "62b38309d00cf70a0d7b49253fab4c03bc88ce287ed02b34e308d607f294115b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/report/ReportStatus.java",
+        "sha256": "5326c792a8e2116d63a88c8b116bbd0f855b4bac80c3bc535eb777638e3d9400"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/role/RoleDetails.java",
+        "sha256": "02de051cd70e994752f3793111b11a8d28da2de9c064c6bcdd5ddfd6ff6c40ce"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/role/RoleSummary.java",
+        "sha256": "f480ca9b6c6562ea93f85c8f4631428cbe6e62db057dd4d930ad70d118ada398"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/user/UserDetails.java",
+        "sha256": "3a3501543493684d9b16a9690826d39c2e4254092f9411c39d707e748fb495dd"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/domain/user/UserSummary.java",
+        "sha256": "7bed8fadacdb4a2bf00b76b09f3728a2c0e0317e5554400224d43fba4f67097b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/DefaultKeycloakManagementHealthProvider.java",
+        "sha256": "7f935f5ae517b1799c21c696cd1a85c35c83be08604594230c2c5c71df9c7a4c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/HealthCheck.java",
+        "sha256": "e294995f65676f9d8f9a794da5f59955aaf42d79394f9c7e6f1591ae09b849cf"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/HealthCheckEngine.java",
+        "sha256": "2002a3c24011d078e25bb260d2bbf1c67d58414f2475c6118f65c3f88f93aa0e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/HealthComponentResult.java",
+        "sha256": "5716d77e9ad319f202fbea4bda16dc4b34b0b22e6520e29cdaee254c60b19664"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/InfrastructureApiHealthCheck.java",
+        "sha256": "8ff88b9d8dab7064fedfe5857a4b77faac69ac7f3f5d618ad436cbd4ee29631e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/InventoryHealthEvidence.java",
+        "sha256": "5e2b49800b5c02c32ae196a293e956e45967e2f9512b53d006019f157cbb8523"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/KeycloakAdminApiHealthCheck.java",
+        "sha256": "d6fa8ae23ffa66b4aea6e9ffa12c02e4ff57db991821361df946f0d33a5daa02"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/KeycloakManagementHealthCheck.java",
+        "sha256": "9c19c5f490d66a26d5246fe9f4908ac63109d686d547490edf8c422a03e5eff0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/KeycloakManagementHealthProvider.java",
+        "sha256": "c0e5d42ed2cf4bbec410e34958636a15e20ece43536e8a8cbca2e9408adcd257"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/PodHealthCheck.java",
+        "sha256": "fa679cae477283ac076079f606b7bbd28fd75a5c5e0bb95459fe42fba5a48f93"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/health/WorkloadHealthCheck.java",
+        "sha256": "747ff8ee6add977f9ea6924900d313dbe863a485102450708cfd6700657daa56"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/http/BoundedBodyHandler.java",
+        "sha256": "43a2ff84c1d57a56e6aef56cf8f6b4e7c3b0274635867f9f68f5155faa19e39a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/McpToolErrorProjector.java",
+        "sha256": "d1393f4fb46d94a57c5113a8d688b40249e21c41db8d3fd67e31b3267cfb1686"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/assessment/AssessmentTools.java",
+        "sha256": "114b06d9036b641371edc487ced5f0ac41150b03c99987541278189ac43491e2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/assessment/ReportFindingDetails.java",
+        "sha256": "3338dd1d3b2e07aa8bf91dbd31455f66cc22556dfc8a8dfaf3235a053453d0be"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/change/ChangeTools.java",
+        "sha256": "66e3ae827a77d3184c6232f859bc5c4fd0013167c73be958f203b93c39e13614"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/client/ClientTools.java",
+        "sha256": "10c0b75f36b8d1ff2f0ab82646cd81d7faa2cd64942b7bff04820e95411b0257"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/configuration/ConfigurationReadTools.java",
+        "sha256": "e7aac010780f533216295d16ac206485cd533cfae26d6e87aec22996192fa964"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/group/GroupTools.java",
+        "sha256": "455476c727ee9b8850787996c122df5a5eac49ba098103820b0784967d2f455c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/inventory/InventoryTools.java",
+        "sha256": "f298a0cde27bf78b250f3935a7e2dc68574513d88854966525f025efcfed513d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/metrics/MetricsTools.java",
+        "sha256": "b713a9a9f39df942bfbd9798b994591ded58fe47e22145f0a9abbee4c330b23c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/realm/RealmTools.java",
+        "sha256": "77894fc4110952d1b65e44246a7da4101eee4b8f733a9d0121527f7f007b192b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/role/RoleTools.java",
+        "sha256": "f7df4051a41a4655ae99081cb5f8f13d1068d6c0773e8e3f60072a4360196373"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/server/ServerInfoTools.java",
+        "sha256": "fd6b3426981d23ea16c4430be3a8a47893f9c6fb9d7abda3ffa7122222cbe1f6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/target/TargetTools.java",
+        "sha256": "09ed47004a8deeedac7cfca9e0fcd03ee57f63bd719aeea7ac21d196d498a83b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/mcp/user/UserTools.java",
+        "sha256": "155eb378fb64cd0fddf2b734f1120831cdf42c1a6fda60ade04c8227050344ed"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/McpMetrics.java",
+        "sha256": "a7a25a828db48155fc023ceb14718669e2bb95eb6a13ea842a1f2f791861114e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/AbstractPrometheusMetricsProvider.java",
+        "sha256": "24e9ffdb4551fd189c2e0f7c3083861c6d9fb18b8f075031ac222c8ac65fd69c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/HttpMetricScope.java",
+        "sha256": "7cad3205da043944678886c80abdff0ee0067f5b9b51d01c0c98e16c2ab0bb53"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricAvailability.java",
+        "sha256": "cf165e441b1fb5d3a1afdc162d508bbe209dd3b58ca58640f5a8a18f83153fc6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricAvailabilityService.java",
+        "sha256": "a7910a4c9cbe00a86e1d2430d58c44ef875917b95580537e68ade4da92d5373d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricCategory.java",
+        "sha256": "de44f557eb45755a3872a5b0427442dd64468741a88c7cfa9fda82849b826448"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricSample.java",
+        "sha256": "880cf1b160d9a9b310824e57090c79eb1141b0fe4352c122acdf14a3deb860e4"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricSeries.java",
+        "sha256": "b30bbccf235e95af7ade0ce46e160a9f74e9e53d45673f5c87abb19f490fbf14"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricStability.java",
+        "sha256": "c77a0427248f496081bcb80b8cd0ad64aecae3cf29097d2e44535953e1d7163c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricWindow.java",
+        "sha256": "1711bb1dcd36ccd8481dfc18ff99c8cda8624a84aeaf359a06216caf721008f4"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsCatalog.java",
+        "sha256": "f3d345889f45b315768e1807f761cfa59c8e4882063a0764675dd34bd14f8ac8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsEndpointResolver.java",
+        "sha256": "2f9dc9a0c594d19964f7656bae9741243a2c5570e777fadb260339084e7ad32d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsOperationBudget.java",
+        "sha256": "388fa7c45da8d6630612caa0e7108c28aba1f7d1983a8d5e54b0676eaf1ee064"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsProvider.java",
+        "sha256": "302db99b05526300d8c5dfb17ec94d82674c7ebd6dffaa90c27a27a567e0e35b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsProviderFactory.java",
+        "sha256": "61dc65dd5c815487ae79774808bcefb389ee6d0b7bf32576049520de58505857"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsProviderStatus.java",
+        "sha256": "3a77fe1f081d761c5a688421a9c84042d3238149303ff9552c21699cb3308299"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsQuery.java",
+        "sha256": "324a3c0a2bb958a3648b9dee3d921078e208108ddb5ce5088fb819e5ce0d2139"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsQueryBounds.java",
+        "sha256": "70b05e69ec7ec47ae341b90aa998eea52861f98de8c5ea201356b9b69f615865"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsQueryBuilder.java",
+        "sha256": "930cad94268d7a6ecf722f09a828ba7c794c9493a39a76d3fea350bb768590c4"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsQueryContext.java",
+        "sha256": "59d545b6b98f7271cc443c8161a4de26266ec264c38f02753638baae85d6d254"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsResult.java",
+        "sha256": "f591a73cc85c58cd24646bfff6b3b0c2f1bdd11e9849b9cde724245b6267d082"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsScope.java",
+        "sha256": "654e7e4c0df0d427c61d8130fb7b224ee70acb4be94eea4551b306f3309b5125"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/MetricsTemporalValidation.java",
+        "sha256": "b99bfee092b0bed08e2e2629ca9cc4b23b1452558ae357ee80aa573fc44b8df1"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/NoOpMetricsProvider.java",
+        "sha256": "99c8e4ca32331d8fa3b218ae0c7ce6d705c6493aa1040f79eb1bd927a0dd67e8"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/PromQlEscaper.java",
+        "sha256": "30d696444ccb25aa2aa21269720c425f910e521c8bdcaf00a674f0b5fc849f4b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/PrometheusMetricsProvider.java",
+        "sha256": "d248d577b1d413abe93cd221762d5d1c17e070a2259ab5f9780d259e1927e20d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/RangeMetricSummary.java",
+        "sha256": "c742a31a83422b8be9b437f37073a36688fe2339d37d96b454c7caccc29aff5a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/ScrapeObservation.java",
+        "sha256": "e217ea1ae141d1026ac5c4bcefa0c6e1e1b6478ccd01d237f180ab6d2a4b803e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/ScrapeReadiness.java",
+        "sha256": "ae952feb6b9c0fddd6aa331fe6f8056bac0d33cb86b3b385cefc7ced8972f92c"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/SemanticMetric.java",
+        "sha256": "d3b8608613abb94cc15ced1e1afcdea4f29f0a0e1479bd1955b3921a848bffde"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/SemanticMetricResult.java",
+        "sha256": "4c1d1e5ce64fa2572f475eb88ee558ad7f9177951180e79f87a02481c5e72e18"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/ServiceMonitorProbe.java",
+        "sha256": "dec4041a3c40a982cec3cceef78fa448b2b2e1e286b1127fbba3dc74cab9d2c4"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/openshift/OpenShiftMonitoringMetricsProvider.java",
+        "sha256": "33b6f5ae7092e1763ace5e0f1ee862e8f5b3df51124b8533a45cf02eb57d00c5"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/metrics/prometheus/PrometheusApiClient.java",
+        "sha256": "fc921e8b3f51cd5c5ddcb063eb9d4c7ee7793f0e5f5358e0a4ee0976172a49f0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/tracing/LoggingProvider.java",
+        "sha256": "f9de604e30f9f7ded5174b59b968c1d519510f8fcf57ea948967316d65a2edfd"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/observability/tracing/TracingProvider.java",
+        "sha256": "1044a79d73f2967722000a859d52b15dc2dc9149a0a35188ecf664f2e15a2e28"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/AssessmentFindingEntity.java",
+        "sha256": "b4e29a96500f8160bca4be71b2b6c861c1e81abd723f24363658eaff2987ee1f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/AssessmentRunEntity.java",
+        "sha256": "2590c29f676117ef3e90f7e00e1e62e6d6fe18f9e40a7ac4b9d13dd143b5287a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/AuditEventEntity.java",
+        "sha256": "1b115fd757c59dc4ba1966f9c5a13c2f297e2b402633957a09eac506303e8058"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/ChangeRecordEntity.java",
+        "sha256": "c3dcf5a8fc372bd79e8194c15b86b8b6cf7176380a82ca3352c2361f74fdb0a3"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/EnvironmentSnapshotEntity.java",
+        "sha256": "c32a84c1cc9eac61359446e37a6c0deaf6cd579866f0fd4415b791a52ff415c6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/HealthCheckResultEntity.java",
+        "sha256": "abc08ff09e6ccf219cdfd5159367f0826fbf3c6584b7abe4e172b5703f1294fb"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/HealthCheckRunEntity.java",
+        "sha256": "fb8cb75f646ecd5900a321f9326783fd6581ae1d80b586e6024bafb6a9723096"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/InstallationDiscoveryRunEntity.java",
+        "sha256": "947b20f213eb2e53d1f9816586c3b302ef83dc326932f35453ae475bdbe23a9a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/InventorySnapshotEntity.java",
+        "sha256": "21fc4534ac707074577d99940ad11633006db3511d13eb3cdf4bcd9529a7bed2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/entity/TargetEntity.java",
+        "sha256": "4f76f08da40751c47a117988ccc51538981ab1c127007696c8145c34b80b4086"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/mapper/AssessmentPersistenceMapper.java",
+        "sha256": "29541fd4edbc10644f65cc51b738f392ababe9b93037ff41662a85ffc4439739"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/mapper/ChangePersistenceMapper.java",
+        "sha256": "4029a86710b0b797fdf6d948703c46787980cd7cfad545eb2e14047ab73f96e5"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/mapper/PlatformPersistenceMapper.java",
+        "sha256": "15bb913964d6672f8552f9f2a6bf33ee63ac6f141e563e5bd5f21383b01adecb"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/mapper/TargetPersistenceMapper.java",
+        "sha256": "e354832e556bb66fc392038b873b9b1859353654917ebf0b35c95b0458d8de03"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/repository/AssessmentRepository.java",
+        "sha256": "878c014d54fdcf4b51b5a2abe939b3b409beea8ac46eb2c84967655f464e485b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/repository/AuditRepository.java",
+        "sha256": "425e5bfc58671d3a6acb4cfa9d1c0bdf594b43544b214c1056db1fbfb25bc84d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/repository/ChangeRepository.java",
+        "sha256": "69fa8ba85dfe5e9534f089d51a2c1150c73bf1d5e6229e9d66f1f84cdd5104a3"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/repository/FindingRepository.java",
+        "sha256": "ea83b8ae71c655cc9f3814e41f0bcf4a933716d4877600db0e22bbd12fd3ae9e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/repository/HealthCheckRepository.java",
+        "sha256": "3934e37680ee54e7d64d4bf55df2d2720384434286a1030e29992a00835b0cc0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/repository/SnapshotRepository.java",
+        "sha256": "71699c8c39cf3d9702a3c79ab39a650bb16559f9c42952cb76cbcd25be1dc183"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/persistence/repository/TargetRepository.java",
+        "sha256": "39ad27e95f5b83e547543daf12563bacf4ee59a15abd7e0b2f3828ce7e001997"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/security/ReadMetadataProjection.java",
+        "sha256": "e77b74217301ea606757b2b818c65d3f8866b170ba2323f01bfc11d9b8e57c42"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/security/SensitiveDataFilter.java",
+        "sha256": "3395227446083bcc6185239ef1f4363715455c258ccad9649360124d6f7c7573"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/security/ToolAuthorization.java",
+        "sha256": "3fdd9baa6091194d6cabffc5406d5d366b24cc2e86dc6a3cda8272201f1e6c4e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/ClientService.java",
+        "sha256": "2fc469566f5da38ffe4398fe147a43112c38a98694137bb792f0ef2581399ac0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/GroupService.java",
+        "sha256": "e81340827736c09281e1b8c6d6b24d3be63eb3ec8acf6e36a25178ecc537b40f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/RealmService.java",
+        "sha256": "ddde7e6ffb3b66a382abf3ae7afb8935c77d955814b8505d6f398851abe71b39"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/RoleService.java",
+        "sha256": "ce0c6d498f337b8ca89ddb981b67037070783dbf43c010a6bf87670a539e1a2d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/ServerInfoService.java",
+        "sha256": "0855c8f02941f73fea901bc6dc29b3f0aab777bf4da4cd587ae54b4af14512c3"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/UserService.java",
+        "sha256": "b684657c29945277f12bf76d86b951c62ed1ba35aa48ea10906ee02e39d53bcd"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ChangeManagementService.java",
+        "sha256": "8fd124b6c7eed3890bad247ed6760de62154ec8171afff6b7bad3c2db04d500a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ChangeMetadataGuard.java",
+        "sha256": "11e7afeaf6e9bf92f6c7087812ab6b551338599afb480a3fe294bc429298c76e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ChangePlanFingerprinter.java",
+        "sha256": "c0a16ebe6d98ad2a61d6baf522f12db3ebb6465aa8cc3607290f2751a7e67609"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ChangePolicyEvaluator.java",
+        "sha256": "656d4abe8529c3c76cb39eba7cdb4a49d1d3715a4c84be269c5ecf9b6e21f7cf"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ChangeRiskClassifier.java",
+        "sha256": "2f76dc2ab4c9ac4ce3329c47e60849eb19d455f7e25e10b072d5792304a9cdf7"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ClientConfigChangeSupport.java",
+        "sha256": "903bff3d6cdc6123ab28ec9a45dff1b4de6780447f215202e2ee4373fda34627"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ClientLifecycleChangeSupport.java",
+        "sha256": "70944063e8f6bc845f7e729e7513e41c63a34fb0c92995c869790d6f84a41853"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ClientSecuritySettingsChangeSupport.java",
+        "sha256": "61989ae95cb459f08e9c686d5fb977c28c949f0e075e6a12b2ea5419af3a55be"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/change/ClientUrlSettingsChangeSupport.java",
+        "sha256": "b792b3828b9226bab47606690e70958e2b6f9bb10c2b675611e15847be7dadba"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/configuration/ConfigurationReadPolicy.java",
+        "sha256": "07591db0c2e15190bb8390b08a3644f9a93e81c14c82b66c127e2612a921601f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/configuration/ConfigurationReadService.java",
+        "sha256": "cd8b5cc3408e2e269f95fc0972d860852ef6a1f874034fb14cb1c5dffde55562"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/AssessmentHistoryService.java",
+        "sha256": "7f11a474018dd048093d59cc13f934dc999c2859bdc69b48178d451586965f66"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/AuditQueryService.java",
+        "sha256": "1a0fc5136cdd3b824b81db44eb54f4cf21ab146f19930c668f89883e18910cdb"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/BundledRuleCatalogRevision.java",
+        "sha256": "717e65756773eaafb00e1f1d3b58ecb6ce15171fb73bd886e9ee663bffa2196d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/ComparisonService.java",
+        "sha256": "817b184e4c36e212cd7d7a945a145733bd2b274edbe5cd05907eece7e51a3492"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/EnvironmentChangeService.java",
+        "sha256": "7531f0ba44d7420ae13080340f6223cbc53f3626e27a615ad6b07489e0bd32e5"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/FleetService.java",
+        "sha256": "7c4d07b6824d44c398e48c1087b49c1ab2546f558c75882a0809c3fab830b8dc"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/HealthCheckService.java",
+        "sha256": "8fcc7177f3cbcf593c892bc4e7d27f8cb09c301a3be47a7373c6b2a241dbf9c3"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/InstallationCandidateCollector.java",
+        "sha256": "e825339ca49991adc69e07791193e230ccab02664b40291a056639526dbf9edc"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/InstallationNetworkingCollector.java",
+        "sha256": "0b5f0c0d597ec601ff33c970a5c3077d7d0b8117baa4b7d77bf63230beb8e71f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/InstallationOnboardingService.java",
+        "sha256": "020f90ee8f6685d9294488597f1edc4f8b1010aed949fa3e0ccb36680e458c57"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/InstallationServiceCollector.java",
+        "sha256": "8493b57bd47151e422c5fd6670f0c9ac31bfe56535f2cada3a39bb346b57ae8f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/InventoryService.java",
+        "sha256": "deb10b3461051be1d4565028fb359895e18b60d4079bd19d5e16094b1b051f03"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/LoggingScheduledOperationService.java",
+        "sha256": "1e702199b8dd5e6e601b8967468c8e8696272c4cda3fe31318fdadb82b5aebdb"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/MetricsService.java",
+        "sha256": "f6abe671858b0a55cb5490cf583292f327a8eb9a97b345f2e39e891d240faa87"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/OperationalEventBus.java",
+        "sha256": "b9d8e20413792060c79bd781dc1891cdb9f7f60ff283031110ad740a2c262b5f"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/OperationsReportService.java",
+        "sha256": "241eb1d2905b1c580f8e6da9731b32946cb6df0de6f9893a132b0204a187a3f0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/PerformanceSummaryService.java",
+        "sha256": "6aea025a83ebef97a7470099785a6f40d4c147fcb2de52230a194cf5bd48b37d"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/ReportInventoryProjection.java",
+        "sha256": "5b838531d7ced8c81c1148de8b43ba01ead32d228d2fa3440f7c8569c5b2861e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/ScheduledOperationService.java",
+        "sha256": "e350ba8042328638a61400a544529ce73918d52ee534d9736c5515e6b10761f2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/SnapshotService.java",
+        "sha256": "db60b8b9368fb847c51aebf9795c9e63fcbd4427cec542cd66ae3abfa3ee7c9b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/service/platform/TargetOverviewService.java",
+        "sha256": "996d5f39044650ce6c87f5e4cedfa0e94b0415bfffbbb05e94f3da85f255f923"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/CompositeTargetRegistry.java",
+        "sha256": "dc26145a59859d6f165f29f2e7c4767fd6d12213e55c9ad9658886e677c23d85"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/ConfigurationTargetRegistry.java",
+        "sha256": "b802a2b7a2d8ca2f38ad04caec1cc9cbedc1f417bcfa0d0937b9213d7116de9b"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/DatabaseTargetRegistry.java",
+        "sha256": "1bfe1e7e7d6ead0b294679ca424fffd2302d743a3c3b94d342bb1808900f2e97"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/InfrastructureTargetConfiguration.java",
+        "sha256": "bef60adaab90e277436d15ad4a7946d3d7497c829c35354d9a90664863f42682"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/InfrastructureType.java",
+        "sha256": "77b7a43da6b55ae44e589d8f4d4ce779bf4bf8f03bb3f7fdf84a46367fcefd52"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/KeycloakTargetConfiguration.java",
+        "sha256": "0ec10f28f97947466fe926c21779c90d25f1f7f6f00b8a5cc1f5a3316e8fdbe9"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/KubernetesInstallationBinding.java",
+        "sha256": "2f11093498653cec4d1af690af8f995fd403397123cd41263ba5f9d9c84f6321"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/ObservabilityTargetConfiguration.java",
+        "sha256": "310efe9fd2cb4c67798b7a712c70fa13aaf6ebcb63f14cdc04f449ef21a60bf6"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/Target.java",
+        "sha256": "b04188d9a919ee7c9a52be807273e219b3190f86c31a45ae9aeba57c9386fe20"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetAuthorizationService.java",
+        "sha256": "24df70f8e7d98ba5644e58436d14c69277e4e75b9f0f6834ce25868c3a5046d7"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetBootstrapService.java",
+        "sha256": "23be62ba78c94d375024c0593083c9d647729b63b18ec31f516e18566facc38e"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetCapabilities.java",
+        "sha256": "aa36fbc528fb4aac21a606b3d17e2d0f2718c1b45f8599144462ce639e89b130"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetCredentialReference.java",
+        "sha256": "a7fa74e30046e191c94b5d1d0d3746468db4004a55ee91ed2adde656736f1002"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetDetails.java",
+        "sha256": "9cedfead370361b970aa820d9f796f0f677cf7874dccb15952ef5c9e06d8fcb2"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetEnvironment.java",
+        "sha256": "ae7233ed7111711d7005deb1cd2733cf3445b1ba891bbe756f78553a81887729"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetId.java",
+        "sha256": "ad2608b9f219f587f40f13bbbaa54408098f24dc402929ec06b244645e06d2ae"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetMapper.java",
+        "sha256": "b902f3411dadc3ae56b315b5cb1bb48ae70c15805e366493d217a913216cb61a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetPermission.java",
+        "sha256": "d872dc666bf87f426fbf44427e47da73355d4fa4bc8ef847a49ef404d0487333"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetRegistry.java",
+        "sha256": "2c1ca4063bba76a05977b4aad77013f00cd3433e4f3faee3a8d66b3a3ff1b874"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetResolver.java",
+        "sha256": "32a9b7292c62fe0294e9789773ddf862fa4c7f0abd39f98a7316149ca756fb80"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetStatus.java",
+        "sha256": "1f90b61c4997c86735946e7601edd9ac73efab31fcf8c83ce6d04296009fe06a"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetSummary.java",
+        "sha256": "0f2bcbe9417e6287c0344f877066e830accdb37676921d814523c4d9b3d420b0"
+      },
+      {
+        "path": "src/main/java/io/github/keycloakmcp/target/TargetType.java",
+        "sha256": "25d2df02049b356cd1b8aaa9bac3e39bd00b6d5a733e2f77fa0b632f572cd090"
+      },
+      {
+        "path": "src/main/resources/application.properties",
+        "sha256": "900532ad74da96f712aaf5807324b2863bd104b56f9a1c73e59f2698dd55380e"
+      },
+      {
+        "path": "src/main/resources/db/migration/V10__installation_confirmation.sql",
+        "sha256": "5376bc6d025f942a4427b26a0c8f43a0dca87afb7ad9e5339296ed41c6f7f3ae"
+      },
+      {
+        "path": "src/main/resources/db/migration/V1__initial_schema.sql",
+        "sha256": "23ffc3a232b025ce41435e0b12efc3dfc22ca2cdd832e52eecf765e87ad2d71a"
+      },
+      {
+        "path": "src/main/resources/db/migration/V2__assessment_tables.sql",
+        "sha256": "023abdd364361cb37d674607cffd789a311b0bb3a99f54b03dd3461c3703d768"
+      },
+      {
+        "path": "src/main/resources/db/migration/V3__health_check_tables.sql",
+        "sha256": "91d0ef661b58783212beeafef3bd68d105159085afd531db1d4ff30d8109fe13"
+      },
+      {
+        "path": "src/main/resources/db/migration/V4__audit_tables.sql",
+        "sha256": "9b6bf5eaa041fe321f02b0f387ef04f47afe5b86fe4ebe2f107e65b2d881e772"
+      },
+      {
+        "path": "src/main/resources/db/migration/V5__snapshot_tables.sql",
+        "sha256": "16ffe3e9795b4d6308fba7890433c3e4b98f56b18e4d6e6929d69a7af444662f"
+      },
+      {
+        "path": "src/main/resources/db/migration/V6__assessment_depth.sql",
+        "sha256": "70903c08db5398f7314d164519090920fcc6bb75756d2e64a75ce3f6779ef362"
+      },
+      {
+        "path": "src/main/resources/db/migration/V7__change_tables.sql",
+        "sha256": "781a88ae9bd7f0e3b61490361bd7af5190a4e74f62ad005bb37973cbcaebe1d7"
+      },
+      {
+        "path": "src/main/resources/db/migration/V8__change_plan_safety_context.sql",
+        "sha256": "86b7a12dde8c8e7279b4727b0b2f69d606b41a7285ffa8edfbb54540abbff0fe"
+      },
+      {
+        "path": "src/main/resources/db/migration/V9__installation_binding.sql",
+        "sha256": "6ea506b1145fab89d46d52efde7cb0487001085e2294674afd91f8ce83008634"
+      },
+      {
+        "path": "src/main/resources/rules/capacity.yaml",
+        "sha256": "c83553d0d4b72297520355152aa562778e1ea4da21dde42a297323670b57f30f"
+      },
+      {
+        "path": "src/main/resources/rules/common/admin-security.yaml",
+        "sha256": "09a0a017f96d653a31144e41970e2f6d3c46cf923f6ee3c02312545ba593b89c"
+      },
+      {
+        "path": "src/main/resources/rules/common/production.yaml",
+        "sha256": "466b8387950e7179b1629456a7ba2bb8a8b5a899915f6ef93ba09c7c71c79d9a"
+      },
+      {
+        "path": "src/main/resources/rules/common/security.yaml",
+        "sha256": "1bd1b705fc63e221db97b81965535570434dc9e7e6337f0357a319ae934fff3d"
+      },
+      {
+        "path": "src/main/resources/rules/index.yaml",
+        "sha256": "9bceb1ec56545295b6ff8093e4952beb3c213f7aa7df18c4bf951b68a3d61094"
+      },
+      {
+        "path": "src/main/resources/rules/keycloak/26.6/.gitkeep",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "src/main/resources/rules/keycloak/26.7/.gitkeep",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "src/main/resources/rules/kubernetes/.gitkeep",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "src/main/resources/rules/minimum-replicas.yaml",
+        "sha256": "29c291092310ef120795dcc225d87bfdb59f73e7bb6962eaee03c09c2e74ceec"
+      },
+      {
+        "path": "src/main/resources/rules/openshift/ha.yaml",
+        "sha256": "eb23d6d61757dce5724eca6a989d030ea9ca7a08f4dd6afbd879b7d4058d9a66"
+      },
+      {
+        "path": "src/main/resources/rules/performance.yaml",
+        "sha256": "68c654d1807300ac0761765e9214c25ef6cf301279a1b27e21aa7f97ccfe08e2"
+      },
+      {
+        "path": "src/main/resources/rules/rhbk/26.6/.gitkeep",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "src/main/resources/rules/vm/.gitkeep",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/infrastructure/BoundedKubernetesReaderTest.java",
+        "sha256": "c4bf6f5af384554b79444fdd22f411f42db2cedfe7d12030ab031b5204dbd4d4"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/infrastructure/DefaultClusterClientTest.java",
+        "sha256": "0402d0d4afb325814606079269b1f21d3786000dcc34b60f787f08e2caab2928"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/infrastructure/ExplicitInfrastructureConfigTest.java",
+        "sha256": "57a0d701b5ab28c2b25c5268d1d3100401d599d79faaa8856f07d1026918dc1e"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/infrastructure/InfrastructureClientFactoryIsolationTest.java",
+        "sha256": "6b5be063ef547bdce265bb83a5ea2a98a0cd6dee0137111f7653bad24548a9c3"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/infrastructure/RedirectRejectingHttpClientFactoryTest.java",
+        "sha256": "b5095291a6696ba239e0f0cf5ef0a8534f86fe679b90cdd515d45879ad60d888"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/CollectionAdminBoundaryTest.java",
+        "sha256": "2bf0f408c0f97f5156fb1d108d56c9dfe314fea7c2f7be69b8e7f745da967dd5"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/CollectionAdminTransportTest.java",
+        "sha256": "102b8292e7fab1ff553d822f232366e0455808a6198ebdd85f9bf2603bf855b1"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/CollectionDiagnosticIntegrationTest.java",
+        "sha256": "2e44478cf61ffe2d322310c4d859b738b5520cddd0292ea86770129635437e40"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/CollectionDiagnosticPolicyTest.java",
+        "sha256": "07132281afb649bf35a2e58c423dc5d637766ba2e38f3b04617515e5e73c5605"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/CollectionJsonProviderTest.java",
+        "sha256": "b4917b5255e3a50fced84ac8688d7cb3b8fc0f8c1cecdd163fc546ed6fb27466"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/KeycloakCapabilitiesTest.java",
+        "sha256": "bff450825fcfc6585254f0ae0ae56cad9d609b92485e438ac97c3b8c6b0f25cb"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/KeycloakClientFactoryTest.java",
+        "sha256": "2a0b8769af0347d17bc7c47484719fd22d6d8cec0d3b0f9d770eeea409f9cf92"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/KeycloakVersionDetectorTest.java",
+        "sha256": "d25821184415835c4c6f140faf76e415883ac8468d72dde2d299ac4cc3981939"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/StableAdminApiAdapterBudgetTest.java",
+        "sha256": "6212b05fefa7d693543c65e1179f0c2702579054ea178f3fc2e5b35642011da0"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/adapter/keycloak/StableAdminApiAdapterDiagnosticTest.java",
+        "sha256": "b0ad63e430f9ba81772b5f9b9e705b2891e9ac2363234e3f07ae47dd680112a9"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/McpExceptionMapperMetadataTest.java",
+        "sha256": "18d553763aa81a1d749eb444dcc57e3747521af89e26354d200b57ab95813603"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/ChangeResourceDelegationTest.java",
+        "sha256": "c7594b643561833d11683ce19a2424d93d17652803bba41dfdaf468fc9294169"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/ChangeResourceTest.java",
+        "sha256": "4c1e7d26bea59d30e08fed59795ac49c814d6d1069db7c9a036a6e092b2b6029"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/EventsAuthorizationTest.java",
+        "sha256": "3259739a2c255a2e0031d9a592c0df839c5ce82a8f05d47380992c8e7d7a4015"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/FleetResourceTest.java",
+        "sha256": "6305651178b50d7be23fef77e819085b12dde4ac5e5fd36a143fe60c5caf8ef5"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/OperationsReportResourceTest.java",
+        "sha256": "a790c4a9932edc36f3a12d219bab74039c928bf560a4986351d733e7a944a2b6"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/ReadSurfaceMetadataBoundaryTest.java",
+        "sha256": "2f1e3c8f45b8b18560a070a2e4a1b4c68a7017c397006895b88ccb97ed1f4860"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/TargetResourceTest.java",
+        "sha256": "64a0158c1e652392b1da02a30b682f9b0e0b1a9009677bb4a9205525802e8672"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/api/v1/UiApiResourceTest.java",
+        "sha256": "2f09bc7377cd00362af42ef90f01f42c9dd4f8a870bd0511baccf8dbad847c8e"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/assessment/engine/ConditionEvaluatorTest.java",
+        "sha256": "19aac7737b6220106f24216a960c65d6c783a5ac669dc59d5357966363f0a23f"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/assessment/engine/DeclarativeRuleValidationTest.java",
+        "sha256": "cafa1abc85bb270c69ec60466d1c4ea532fbbcd69b41c3c37734d236223dba40"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/assessment/engine/MultiTargetAssessmentIsolationTest.java",
+        "sha256": "b7714f35506f31b381f8511d262f9098c8a1aa55818bf6e934d70b4a63335180"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/assessment/engine/RuleEngineTest.java",
+        "sha256": "02bcb11d287213988c23b1e632cb3c0877a8b9e72d25c7743f5deb1ec8d4d262"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/assessment/engine/RulePackFixtureTest.java",
+        "sha256": "c3c22318c1db86dc0c22d3266d1bfdf279dc3192ba2d9dbfbc9bf23cef09d63d"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/assessment/engine/YamlRuleLoaderTest.java",
+        "sha256": "04df8e5eda56700576b7e33947a63fd82c1c652b67a23080e01bfa8af64060ff"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/assessment/scoring/AssessmentScoringTest.java",
+        "sha256": "c1f928ad2e5590b483812360cba72844f2e536dcde0d38a4e5f104c049ea059d"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/audit/AuditMetadataBoundaryTest.java",
+        "sha256": "48f52f66e03b4d25de3b5cd60c7dee58a251d5bc8e418463ec7ff172108acd44"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/audit/AuditServiceTest.java",
+        "sha256": "ab0062dc5e68f6d25434fa28b36d7e4ea8be4a65d6c5189b7a0d2e152fe8236e"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/collection/CollectionBudgetTest.java",
+        "sha256": "ae08db69783a818e3bcb86631d26a863ac2cd151dd84f2b553ba7d2912bbd901"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/collector/AssessmentCollectionCompletenessTest.java",
+        "sha256": "aea8ac05810995dacd32d2c48c86def9c7cd82dc7c63ca6ceb528df7a068d318"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/collector/keycloak/KeycloakEvidenceCollectorTest.java",
+        "sha256": "d5e459ce5bddad2f23914e352858d949cf496643f035f243327d492de119f6f4"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/collector/metrics/MetricsEvidenceCollectorTest.java",
+        "sha256": "b349e3a44ab1747b6fa2e72fe9889b905dfc89379fd36361da76c770f9d580b5"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/config/TestAssessmentConfig.java",
+        "sha256": "f73acb95c182159fce2f99366d2894c6652a64e56a5822c23fe170d218fb2222"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/credential/ConfigCredentialProviderTest.java",
+        "sha256": "e2967069954a825fc162ae5bec9a25cb0b713dc379259fe52d248bb4343a9f31"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/deploy/KubernetesAssessorRbacManifestTest.java",
+        "sha256": "186846ed0ca25641f1a2d83f1783ae7778771d401ab816f05c061d34e6369092"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/deploy/UiDeployManifestTest.java",
+        "sha256": "3bb33797615d47d861bb304c8875897e6223ed8fbd826123acc9f8f81c2967f3"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/discovery/EnvironmentDiscoveryTest.java",
+        "sha256": "efc7dfbac1a2a27f674f5a0ea3e3311a5017063196c659438187fd9c096b20b8"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/domain/inventory/InfrastructureCoverageTest.java",
+        "sha256": "88baa0e9386bf5125dd5027ea2f974d943d83c254d5f23563792e559012147f2"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/domain/inventory/InfrastructureInventoryFixtures.java",
+        "sha256": "981e5b86ca4e21f6f3e5ff0486d068286ece7ce266390b2bc7690555dccd1161"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/domain/metrics/PerformanceSummaryTest.java",
+        "sha256": "cdf39ea4847080d42c7c3873e303f9320de0a2c47bc467eb434976503e948e09"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/health/DefaultKeycloakManagementHealthProviderTest.java",
+        "sha256": "45e37dccedf7f0512df9fea6fd73cb7639e61cf32947ce66ee38cc8e9bb0bdf1"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/health/HealthCheckEngineTest.java",
+        "sha256": "c591d8ad05399ad0e96b07229f89a20bfd7902b91afe8fb03ac2743b25884345"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/health/InventoryHealthChecksTest.java",
+        "sha256": "7f29bf139e57653a5a8ee4a1183759272eb49722bcfec0c5b71637b71d5428e3"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/health/KeycloakAdminApiHealthCheckTest.java",
+        "sha256": "3964cacc81ddf37f7e7d81da64220da096110decccd456d7263f192e76847968"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/http/BoundedBodyHandlerTest.java",
+        "sha256": "ef915b4e7a03bfd78f7af966db9e7421baae7f3c1bdef617beb9c12ffdca4672"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/ControlledClientChangeIT.java",
+        "sha256": "08475bc763deb7d27885f5e3f6ca046be86ac803c094a3567c150f85c74cea19"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/DisposableKeycloakGuard.java",
+        "sha256": "b0ac8a2ab6931ebb02a70d3796bbb1b9ee35bf96b9222c4dfc5e42091f3bfefd"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/DisposableKeycloakIntegrationTestProfile.java",
+        "sha256": "762503ae8fee5687793270b2315ef46bbd65d4556ca5e772b78474206fb36b91"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/DisposableRhbkGuard.java",
+        "sha256": "71e1b21c82c3a3e24cf6cb59a1a91366a440b7122db49911ed73a2b5d9a03849"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/DisposableRhbkGuardTest.java",
+        "sha256": "a1fd7b8c60e931e0242e0b191bb9843d0d3ae427123a7a3c8845cbc59a0b751f"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/DisposableRhbkIntegrationTestProfile.java",
+        "sha256": "d4ba0c1b7ddf496c18ac07890bc1c636d199b5111fe222fa2c1792482ffdf020"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/KeycloakCommunity26_6IT.java",
+        "sha256": "9399904365922272e5f49a9db1d217d2aaa727d604a1ab5700ee845dbba992b5"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/KeycloakCommunity26_7IT.java",
+        "sha256": "ec8bc2a4e0a6d16b61afbf35645f0c45df39ae6c1bb0446a97e53e6c8f064889"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/PrometheusMetricsIT.java",
+        "sha256": "66a57102d312b9fa847a2faabc728a82efbd2ee268520dab780712fab203aa65"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/it/Rhbk26_6IT.java",
+        "sha256": "f3f9b82933fc03f0a64fa979d9de69d872e6059752a8448de75b01088656f0fe"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/GenericToolsErrorProjectionTest.java",
+        "sha256": "53d37e1d08e7afb0137ba265bae56fe06d3a088f837f083f5945b3f7d58cce4c"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/assessment/AssessmentToolsOperationsReportTest.java",
+        "sha256": "2bdf760b8b92e3f365e76783711308a7e7e2a42da0a517dcb6fb8d3cf692f43b"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/assessment/AssessmentToolsScoreAvailabilityTest.java",
+        "sha256": "f49967eccc94caeb64d7d542ca4f050f4c7618a4433c4e24178242c8beed5018"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/assessment/ReportFindingDetailsTest.java",
+        "sha256": "9cd11279afd84c93a44e7131b34f729c8b820be5f855a2a75c792c144fce49a0"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/change/ChangeToolsClientLifecycleTest.java",
+        "sha256": "f4a77e28f4755bf088f254a3311d0ffcd47c4f3794aae11043c17084c9e725c2"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/change/ChangeToolsClientSecurityTest.java",
+        "sha256": "1db433f5166415600381b7661c10e0304f073f8f6d6f7612a0d70fc3d544ff4b"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/change/ChangeToolsClientUrlsTest.java",
+        "sha256": "2bbaf606c6809bf9daf8541e98e284b973ac76b55d02eac14d9d15698aa1bbc0"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/mcp/change/ChangeToolsErrorProjectionTest.java",
+        "sha256": "711b23bc04a935c531165d27c3b1035c3d1bef6762e9dab48e84addb0ac4c060"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricAvailabilityServiceTest.java",
+        "sha256": "df26060367826af0a987ed7862612fc99fea6cb474965bbd1b34202c012312ca"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricWindowTest.java",
+        "sha256": "537fde45c49be102474d4dd4cb07466258f96dfa3977e727100fe6a6f204f8c6"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricsCredentialIsolationTest.java",
+        "sha256": "b6e561be5b748c4234644d4ec7d143d0cded811eefdaf41be0730cbf08a270ef"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricsOperationBudgetTest.java",
+        "sha256": "af79048899d2ece8a679b29bd4c635d51dfd74ee85fdb20e370d6a79b5c1e299"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricsProviderFailureTest.java",
+        "sha256": "69436d387eb41382bd3eab593bbdca6a6b6d70551049683a548fb08cc4bc8d57"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricsProviderOperationBudgetTest.java",
+        "sha256": "3eeecc31305a8aca9b3f589a52d6f9ec21e9a5a5cf43ec7bca858b3bd080e351"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricsQueryBoundsTest.java",
+        "sha256": "02039c729668abc178266c3940c5d9561f3e4040ddc6e06d816a6d4e856dc296"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricsQueryBuilderTest.java",
+        "sha256": "a4b5c73e3c5b0bbdffeafdabdf04b364ec46c06ef23db055927da015319293a4"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/MetricsQueryContextIsolationTest.java",
+        "sha256": "0ce833589923ce465de0f12db3c1eab0357d213e6f4e5b52fdc3fa558db033e3"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/PromQlEscaperTest.java",
+        "sha256": "6a8505ced0b535021d1d2110def7c82a3fd06f8f6699991021b659a21bf5a2f0"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/ScrapeObservationHttpIsolationTest.java",
+        "sha256": "6e7dc47d7592e4330e95e26419fd8fde13f3f974e32f47a3abff7b889f1b22df"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/ScrapeObservationProviderTest.java",
+        "sha256": "33fbc41dd74011f46b39687b6d7eb35f0bf5998c1f04a9a8fe6b5145ca543818"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/ServiceMonitorProbeTest.java",
+        "sha256": "0bcf3a664317f560e60076a9aa1057c843a74f932b3b59424d4e903305384b57"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/observability/metrics/prometheus/PrometheusApiClientTest.java",
+        "sha256": "5bbf620ea1b22e94d5c3a93a092161a01994db72f5de2cc59f011b247f55db40"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/AssessmentRepositoryTest.java",
+        "sha256": "9cd2c029daa6e5dc91019c13856d4b7b8284ffbdbde4fb2f22f96a7f7d147e71"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/AuditRepositoryTest.java",
+        "sha256": "924cf58a594f2ceb4c94c7af7828b55bb3508d7f90d10614e7c840304aaf35ac"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/FindingRepositoryTest.java",
+        "sha256": "3dd23316caa8282dbe299c9ce20409bea24ecc68f9ad8c208e7bae92584be484"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/HealthCheckRepositoryTest.java",
+        "sha256": "771a8d2dcebb72490a63e3dfe0261b61875fffe912bd2cd48e18529c03f52a5d"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/MultiTargetPersistenceIsolationTest.java",
+        "sha256": "cfa4f2a9eb41224948b706d71ab2e33163332094078719488f9034e8919ec3bc"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/SecretLeakagePersistenceTest.java",
+        "sha256": "0447943e033bc4379d89ed75b23d6ea6b64a22adb9053c32ccc1d6d929784de6"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/SnapshotRepositoryTest.java",
+        "sha256": "629e328a90bbc0395b23cd6286489bf8f52ab66fa0ff1a08a8bd17a1b3368b75"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/TargetRepositoryTest.java",
+        "sha256": "6f3625861df64749f201d143f27c4e87a8d7283491ce4aec7e4f0ecb9eb99fe1"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/mapper/AssessmentPersistenceMapperTest.java",
+        "sha256": "88bbf70688d1c809610971c7ab0b7b7acae804e63db22295e2f74a0145520fd5"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/persistence/mapper/ChangePersistenceMapperTest.java",
+        "sha256": "68b9f17aa915ea89429e78dc7ef34910becdfcf35be00f42206a4313922e7a87"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/AuthenticatedBoundaryTest.java",
+        "sha256": "152ac7a49eb9bad5538e1d0bc4fb3b622e6b3c3ae6e3578c1bfda3de54e7f8ee"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/AuthenticatedBoundaryTestProfile.java",
+        "sha256": "b78ac235c9ade063be14c3d994cef3668c0becf97131e45608b3a5d15098ae68"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/ConfigurationReadBoundaryTest.java",
+        "sha256": "8a08b02591f33e255295314e03ea44ce500e6232d82a5aefcda84df76889d2f8"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/ConfigurationReadBoundaryTestProfile.java",
+        "sha256": "93b38197ebfb7511fbfd880990e814d6c1165d4644093e8b66d85417e321b689"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/ConfigurationReadCacheFilterTest.java",
+        "sha256": "a82d1eb758cd6ca1291a1ed81e5f19b635fa3b0bb2f9f9d5bbabd97c7c9d30c2"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/ConfigurationReadFixtureIdentityAugmentor.java",
+        "sha256": "024e47040159f1473726721c15189f5fd8dbc4ae641b7c00cb7327d04ea980af"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/SensitiveDataFilterTest.java",
+        "sha256": "d1d5c5b235267531123a69611411a26feaf0dbb742e5a9d4ff2f2d12874d2aae"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/security/ToolAuthorizationChangeTest.java",
+        "sha256": "264f6dda788b7eb1f2ccdfeec6a75f0ab31b17054eab6bfcf6be327761dbe3b5"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/ClientServiceTest.java",
+        "sha256": "6967dc3e32710b28a29fe7e73168e9b4f5139f4cf87a4c2d62cd314c39f73af8"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/MultiTargetIsolationTest.java",
+        "sha256": "fc19eda8fc2342ffbeec53760f19daf9d7619541681003b5d0c994add9974482"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/ReadServiceMetadataTest.java",
+        "sha256": "3ee7f73e75f05edcd87ced7ffe2e22d870030f81d6edccac970662cb8ecb6812"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/RealmServiceTest.java",
+        "sha256": "8358473c1363080f381c270eee7c96861650bad30a994010e98d5bd6cf049daf"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/UserServiceTest.java",
+        "sha256": "1bd96fe5a2de4fd670f1f2a3d3e36db5cebcced84675f6ba0567a7050e331eec"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/ChangeManagementServiceTest.java",
+        "sha256": "d4ff8832a50a355b152d5d30b28a8edf3e93891f28c9602909eb65b084814116"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/ChangeMetadataBoundaryTest.java",
+        "sha256": "2018a72dcbc8d06a0097942cbb1876e41186e307ae977a0fd56a3cc4a036985f"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/ChangePolicyAndRiskTest.java",
+        "sha256": "3b9024df5a220b916d575858952bb39045e569709619a867ee9e037f0b4bf9c2"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/ClientConfigChangeSupportTest.java",
+        "sha256": "5fc61e3268211880dc4f927bcba9fdef0c8eb74f4ffcb886198e05eb075fa247"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/ClientLifecycleChangeSupportTest.java",
+        "sha256": "a7f2fb157c34f3e720d6a0ab39beda8a767ba16424cbd94d138f10c7b064fd2b"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/ClientSecuritySettingsChangeSupportTest.java",
+        "sha256": "53347d44b12643728d4db69c68144c9000b192a844a890cf8a48b2eda1dbd75f"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/ClientUrlSettingsChangeSupportTest.java",
+        "sha256": "79c2d1809c54b0a6103150915a849afecf5de4f1958f48ce53ea8e1fa780f78f"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/change/WriteEnabledTestProfile.java",
+        "sha256": "6f896efd6ace2640237535c14904d2aa753144d8a55dbb0f12823e864fdc6377"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/configuration/ConfigurationReadPolicyTest.java",
+        "sha256": "6669e1d3e9f3af2ed82dd0b7202c37021a54edcd4ba3f61649beb0d75b499cf8"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/configuration/ConfigurationReadServiceTest.java",
+        "sha256": "069fdd04670b7d83a80a13ef20bf2c44ad548949cdc20b0b1dbc72b11dc04cce"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/AssessmentHistoryServiceEventTest.java",
+        "sha256": "d6941a9842ec3b50688e623f828b888203347a04e6fcbbad41b202f8c3c06db1"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/AssessmentHistoryServiceMetadataTest.java",
+        "sha256": "35e1904cb417b79e8c8438a5e716b27e7cc59a8fdc128bb38fea61f85d0956df"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/BundledRuleCatalogRevisionTest.java",
+        "sha256": "6a4d43921b430342c629b589d203e58b6c05646a7f870a7bda87a3ed08549a76"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/EnvironmentChangeServiceTest.java",
+        "sha256": "519588e515e39dc1220c77fe6d3a0e58bebb7349ebbfdc1f6707d5bcb6ddd181"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/FleetScoreAvailabilityTest.java",
+        "sha256": "00f465f81afc0ccbbf5d3de78a1456ada28348ea6e4baea30e13797bf3bcf2ba"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/HealthCheckMetadataTest.java",
+        "sha256": "691757e5187a4a5b16ef513c067fb9975a18770318b843cc41b7ca0a82e03e0f"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InstallationCandidateCollectorTest.java",
+        "sha256": "fb368a7ac3c8e60ba4b95cdf286c94327cf152ea5f88ff03b8a61a834dae5a63"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InstallationNetworkingCollectorTest.java",
+        "sha256": "4348a29b9bb040ffff799c8a7dfe806780690e79364066e6c0dc29e99adba667"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InstallationOnboardingServiceTest.java",
+        "sha256": "f80036fac0196765124cb26b7132fe511b5b420fefc0490302b0571c00e9dfc7"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InstallationServiceAssociationTest.java",
+        "sha256": "11b7d73a5b8efd1e8a80dc8ead5be0af2e024729b74bc9f3dd52ae2e26458eec"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InventoryCollectionBudgetTest.java",
+        "sha256": "e00ce0105a4a22cc51a8d688aa92a6d13f540f020b01638a4bdbb6998af44a01"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InventoryEnvelopeTest.java",
+        "sha256": "078348590dc50b33a6c1e4b86a84ebfcea190df39a8faffaaffe780ce53770ae"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InventoryEvidenceMappingTest.java",
+        "sha256": "a6f8529b82a4a0d7ee4b24a137ff14486a4a0878f465a976167574d6d40c7c40"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/InventoryServiceMockTest.java",
+        "sha256": "a4431a57013130529b1badca8f79d17d2f3bcc508de3f6dfa38d9eefb48c5978"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/MultiTargetMetricsIsolationTest.java",
+        "sha256": "8a41435370bedf866007aadcdee624407488b316224339053498bf435a5e1a3b"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/OperationsReportServiceTest.java",
+        "sha256": "8b9e0158fa26d0f430227482d03ebbe2f196b77de363c59b9e477c006c2b675f"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/PerformanceSummaryServiceTest.java",
+        "sha256": "2fae57bfdf75edeac5dc4327b254b0f109253edbc0e086fef327f06bf20e308c"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/ReportInventoryProjectionTest.java",
+        "sha256": "d0bd11ba620c700a2b9923a714fa673ee7aaac4d0c869592abc299abdb004839"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/SnapshotServiceTest.java",
+        "sha256": "f6ee995c4ffa44dff811c063ae4c920b6bb7d5be0d1a78b9ba94299fbf54303a"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/service/platform/TargetOverviewSignalsTest.java",
+        "sha256": "245a9ce3aaa367b83167c2ca0b02a7146846f9264b231b2ededbe0baa558b446"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/target/InstallationConfigMappingTest.java",
+        "sha256": "574c0191843eca83b0f51bb4119319c011ebf47b8401f6fb0fed5144400d5c91"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/target/KubernetesInstallationBindingTest.java",
+        "sha256": "236f54dc73007fe8b2d8970611b01c3964cfd057b1cf2d34917eb08b1df6fee2"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/target/ManagedInstallationBootstrapTest.java",
+        "sha256": "bf24126b2948999e6bb7c30cc141d9184603ec360d6d1482ea551d21d8f2e3e3"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/target/TargetAuthorizationTest.java",
+        "sha256": "d40902a89bf2f118a3f92f44f9a39abbd669e32446e4c032fbbd341dbcff8ec9"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/target/TargetRegistryTest.java",
+        "sha256": "07da7b5738e57db5e6bc7fdb5be5c83db52cea265855368fa9c0cd59fe0c8fb0"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/target/TargetResolverTest.java",
+        "sha256": "b902c5d72549bd366fafa6b1c2813bacfcec4ccf649913ca4f795e6544472204"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/target/TargetSanitizationTest.java",
+        "sha256": "e46c24cffe6101184669a6a1155d62827e5e270be9cb2c9983c68486734bc2c1"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/testing/TypedKubernetesCrud.java",
+        "sha256": "014f1022ae0f09e62c169c0513b58fbfc9aeec0c6a658f700fb9b51d3d5e2e91"
+      },
+      {
+        "path": "src/test/java/io/github/keycloakmcp/testsupport/PostgresTestResource.java",
+        "sha256": "027b361394ea6ead533e48e64506dc8146a340fe7d033aecae01003aac36cf1e"
+      },
+      {
+        "path": "src/test/resources/META-INF/services/io.quarkus.test.common.QuarkusTestResourceLifecycleManager",
+        "sha256": "19170e139dfc5726080958152532b262b1d0c53afd542e724bda1e76eb0bedfb"
+      },
+      {
+        "path": "src/test/resources/application.properties",
+        "sha256": "6c94e3f2c5f923ff9d5c34f832a270b39e6d24fb85e87fd7ba467b1b8c0ca618"
+      },
+      {
+        "path": "ui/.env.example",
+        "sha256": "6dc691d3cf58495e95aba1f08a192a22e7b8fdcc687bf52c746ae6a117bd950f"
+      },
+      {
+        "path": "ui/Dockerfile",
+        "sha256": "8a0c878eecf28f8808c5798cc0e6ff7961c395589e7feceaf105cb078a6e389c"
+      },
+      {
+        "path": "ui/README.md",
+        "sha256": "cc289eb427828c5a0386390d1347ed65baa24c195b38d4ac0c56fc9fe4ba26de"
+      },
+      {
+        "path": "ui/index.html",
+        "sha256": "e5951e911d1a75516f4b7eb07cb1e70c5a64976736b52da6f494015be4b70e72"
+      },
+      {
+        "path": "ui/nginx.conf",
+        "sha256": "533211536a9a66124587ee747bea99636663dec8cc1dfec7388a9c725b3b0339"
+      },
+      {
+        "path": "ui/package-lock.json",
+        "sha256": "e65afe33130083b5590e3360cfa80277ae517122432d170e556523269750f34e"
+      },
+      {
+        "path": "ui/package.json",
+        "sha256": "a66058f2fcd2fc08879ef2ef53baf31cc7dc209845f70b9080203c4d00b1005c"
+      },
+      {
+        "path": "ui/src/App.tsx",
+        "sha256": "0d4c379ce753c3d346577e848d2003eb415647f3c42571150b90d4f2214522f4"
+      },
+      {
+        "path": "ui/src/api/assessments.ts",
+        "sha256": "4c24f8d3d6a258d85769618a4f29b5c9be4eb2250aaaaef1006067393308aede"
+      },
+      {
+        "path": "ui/src/api/audit.ts",
+        "sha256": "f37cc7429e790e2683c91cf7c529fa2c9523bc005a8a74b2669f24e7ea8bd204"
+      },
+      {
+        "path": "ui/src/api/changes.ts",
+        "sha256": "29e9cc92bc5ff72cb55333408cb333792188e31224684fd391db8d51adb30232"
+      },
+      {
+        "path": "ui/src/api/client.ts",
+        "sha256": "d84982121d0686c356a7cb001652b147e2c3c9cdce38f4b1dc9af0c195979e11"
+      },
+      {
+        "path": "ui/src/api/configurationReads.ts",
+        "sha256": "b7e0cc655a5f30934e183736cd04220169204721b3f5db2cd61e0760f0c80936"
+      },
+      {
+        "path": "ui/src/api/events.ts",
+        "sha256": "8074e9091e1a40b450999ca63a290593e57ead3c33cafd4f708adafdff9a2656"
+      },
+      {
+        "path": "ui/src/api/findings.ts",
+        "sha256": "b260920b28a5c82badd735922d293667aeda5799ad97f4f934d8c68a4b77b20d"
+      },
+      {
+        "path": "ui/src/api/fleet.ts",
+        "sha256": "5b3e67e2e2c9b66b518775ab3fc5379240d114a64da278150790791ed46578d5"
+      },
+      {
+        "path": "ui/src/api/health.ts",
+        "sha256": "68a40c0ddbe8f0c3f88c9028627a31337e2281e71ec8685c8d140b6ed576538d"
+      },
+      {
+        "path": "ui/src/api/installations.ts",
+        "sha256": "caa40077daef62c2c54aa1a8873d51b0e6948d68badc7da3e7c86e76de1a073f"
+      },
+      {
+        "path": "ui/src/api/inventory.ts",
+        "sha256": "001697a1d5de8fd26d7a52f2ff0e806e699f23a4c4ee5bba318585180a8495f5"
+      },
+      {
+        "path": "ui/src/api/me.ts",
+        "sha256": "a436d077d47e170e6b83f1f72e75505b93e7d127690bd9bc3bc002f112cd3db3"
+      },
+      {
+        "path": "ui/src/api/metrics.ts",
+        "sha256": "42c2d8f2ba21fc3bbe846ad0a651dd475dff9cbb0b6256eb8182158edb0c82f1"
+      },
+      {
+        "path": "ui/src/api/reports.ts",
+        "sha256": "66e9d4f7f3681e5488887ee1ebe405df4ae6875ce7599aaae6745201ad5d9e14"
+      },
+      {
+        "path": "ui/src/api/session.ts",
+        "sha256": "dd1e17b4e24ec8d0720700026967093086cfd5e10d2f1d930e0661fc63ba8961"
+      },
+      {
+        "path": "ui/src/api/snapshots.ts",
+        "sha256": "cf0993a14c9769c3889e1881ac88f8e014931040cf15da22ced3a781b3e5a35c"
+      },
+      {
+        "path": "ui/src/api/targets.ts",
+        "sha256": "14d7a45a27ba792bb02f72924cca974ee06368f2406a0835aa11265d2083345e"
+      },
+      {
+        "path": "ui/src/api/types.ts",
+        "sha256": "babfa7f4a7e67eb6b2fa474626617d716bf7a10f3ab04ea61983fdde51c53a05"
+      },
+      {
+        "path": "ui/src/auth/AuthProvider.tsx",
+        "sha256": "03fbb35247855cdc940bb47ba371eee472ad29f7bf92a72854e396515c7ef47f"
+      },
+      {
+        "path": "ui/src/auth/oidc.ts",
+        "sha256": "29da1e11bea4cb59bfe055cfa02065b21f46a8d218361d9e251d8dae104e6714"
+      },
+      {
+        "path": "ui/src/auth/returnPath.ts",
+        "sha256": "16d90b8d8e09a9d8ac3f0b2288d05a4b37ea1c147352927f536cb6e26533d74a"
+      },
+      {
+        "path": "ui/src/auth/useAuth.ts",
+        "sha256": "0f8394360e30a14577ec40c5afd77e99f08ea05fb4d0551b5cce64db46f864c4"
+      },
+      {
+        "path": "ui/src/components/AssessmentScore.tsx",
+        "sha256": "6eaf65d5cd0af35dfe0debe06a5eb44632f2b04d8e9704c33fdcf3f13b1c726b"
+      },
+      {
+        "path": "ui/src/components/EmptyState.tsx",
+        "sha256": "c816d1cee27276ab3682460f655ec867f186db8409de832e69e3f9668210b409"
+      },
+      {
+        "path": "ui/src/components/EnvBadge.tsx",
+        "sha256": "9175721787c2baa6a51010dc4193ea1e54b4ed4746ec83e3de5a0088b766d3f7"
+      },
+      {
+        "path": "ui/src/components/ErrorState.tsx",
+        "sha256": "712d0ff6f5b20fe92fa53f9b2ae1e46be21405dfcee290dedc22672a78a94fa0"
+      },
+      {
+        "path": "ui/src/components/FindingList.tsx",
+        "sha256": "97fd7eebde3559584c789fe8aa4a4917c24e80eb38241fdb4d12fe0a282acf47"
+      },
+      {
+        "path": "ui/src/components/LoadingState.tsx",
+        "sha256": "b5e71d6152e2e95626f572771f76e675db4bf6e8da5566ce9c42287684ed3c9a"
+      },
+      {
+        "path": "ui/src/components/MetricValue.tsx",
+        "sha256": "4b94eb54d327347d9c2da2e2c84f2ce4267da9c7483de19943ca7dc3a7e9a723"
+      },
+      {
+        "path": "ui/src/components/ScoreBar.tsx",
+        "sha256": "6812878753ee378f9a27895d77f5532b11b810c6d034b82247c9d60a22c591cd"
+      },
+      {
+        "path": "ui/src/components/StatusBadge.tsx",
+        "sha256": "ff549b632304bba451f46403b08c95eca27d3311dffb341f89547c238ea8031e"
+      },
+      {
+        "path": "ui/src/components/TargetContextBar.tsx",
+        "sha256": "774eec157898566eb28d7d62fa3e5a0d531b65751b155458dbff3e447fb35495"
+      },
+      {
+        "path": "ui/src/hooks/useEvents.ts",
+        "sha256": "9918927742dc2608d5d90fadf28246c05f95edc3929c0d52588e1199f0934f3b"
+      },
+      {
+        "path": "ui/src/hooks/useFleet.ts",
+        "sha256": "f514304d7c0c5ba84124dc5b198755c5724ddb25109a51647dcf55a3ee598154"
+      },
+      {
+        "path": "ui/src/hooks/useTargetOverview.ts",
+        "sha256": "f75148e1183edeaf2b3ef4b59a72cc180e7575ea01bd9fcbc03bb3505a68674a"
+      },
+      {
+        "path": "ui/src/layouts/AppLayout.tsx",
+        "sha256": "fa97f485e7c9efa85e6172443d65d51b61cbebe620951b8c64f01da31cbc2e12"
+      },
+      {
+        "path": "ui/src/layouts/TargetLayout.tsx",
+        "sha256": "984aeaa7cc17952a5133461fd4d4f6883d166d6592654e73be83d8d4834a79ea"
+      },
+      {
+        "path": "ui/src/main.tsx",
+        "sha256": "127608d6e1331528b4ab57645ec845c50318a664673c4eeee7c3ece139ebab92"
+      },
+      {
+        "path": "ui/src/pages/AssessmentPage.tsx",
+        "sha256": "bb426aa806a5a2343b2852c683ea83583f2f39acd7d4feff556e9fec1ba542b0"
+      },
+      {
+        "path": "ui/src/pages/ChangeDetailPage.tsx",
+        "sha256": "816fd95f91e7b7997e8d2a25b10c8e4e973ff0aa6dde79a665ca89b073667ae4"
+      },
+      {
+        "path": "ui/src/pages/ChangesPage.tsx",
+        "sha256": "aba5ab96617c19e17bd74eef3240fd19d1d84efaabb16dee4923aca653aa12e0"
+      },
+      {
+        "path": "ui/src/pages/ConfigurationPage.tsx",
+        "sha256": "5e7b0d89b53478bc31a440069c4728c8566825656ba63f392d402025f77ab5b2"
+      },
+      {
+        "path": "ui/src/pages/FleetPage.tsx",
+        "sha256": "4600904192e6b20407b9e0a8287fde6b1aafd6f873f74060d10958e18e8da583"
+      },
+      {
+        "path": "ui/src/pages/HealthPage.tsx",
+        "sha256": "2d268722d124d73b76765ae4a6210bd296bf9fb657babdfa2273f820b7369065"
+      },
+      {
+        "path": "ui/src/pages/HistoryPage.tsx",
+        "sha256": "551c1824fdbff7ae9c1563ac87e2546a19d08ac88f5403d314f06cf738699fee"
+      },
+      {
+        "path": "ui/src/pages/InfrastructurePage.tsx",
+        "sha256": "746c0364ff0f6b81377ed7aaf473e89589dd391a07f87ab063681859a9415b48"
+      },
+      {
+        "path": "ui/src/pages/InstallationPage.tsx",
+        "sha256": "008c61f167b921bd561393a070d3047fbeadc56e8dbdbf4b8cf1f07ca6ae01a9"
+      },
+      {
+        "path": "ui/src/pages/OperationsReportPage.tsx",
+        "sha256": "2027ea7f3eacda1d4687124581ee6076cb337ba437424a8a62765127954c0691"
+      },
+      {
+        "path": "ui/src/pages/PerformancePage.tsx",
+        "sha256": "28abbd3857bb8376594e471f0493806d32728d2b1e7da947786fffa2a9988a5e"
+      },
+      {
+        "path": "ui/src/pages/TargetOverviewPage.tsx",
+        "sha256": "7352beb7f73104cd295ccebb7c93fb222a125f6b0d262b4ea35fa92b06a7f019"
+      },
+      {
+        "path": "ui/src/routes/index.tsx",
+        "sha256": "555b0b3df3a2d0dfaa358dd63787bb132b9e6462096e84a1a90406cfe26e143e"
+      },
+      {
+        "path": "ui/src/styles/global.css",
+        "sha256": "f7ad9c56a9df87952cacf62216a637468bb64b7edf8c6c17d2d3f05db90e6fbb"
+      },
+      {
+        "path": "ui/src/styles/tokens.css",
+        "sha256": "d313630f2a9ef3e32e924cfcf3efd8c8e91e296d1662fc1943d4cf07a2b52c15"
+      },
+      {
+        "path": "ui/src/test/ApiError.test.tsx",
+        "sha256": "a6e7703fb54bfd325a21620310243ed1d42f6b58504d8ee638bba52d494c8ab7"
+      },
+      {
+        "path": "ui/src/test/AssessmentPage.test.tsx",
+        "sha256": "28409423e30db4f889f253125c506d7c79937080e3b369df8e68d687cf41e53f"
+      },
+      {
+        "path": "ui/src/test/AssessmentScore.test.tsx",
+        "sha256": "93c855f73035db8f90f4ad26a5aa096fa4dfa298a0f91a5fa8e19a5decc543e3"
+      },
+      {
+        "path": "ui/src/test/AuthProvider.test.tsx",
+        "sha256": "59af85a7b20dbd998d4c2851fcc514132ef4df026a366454620924442ac544e7"
+      },
+      {
+        "path": "ui/src/test/AuthenticatedEvents.test.ts",
+        "sha256": "e73a2c3c9f06919b2a4a1bb0892b6d89d83a8227e593ba1c2741c8423a2b7728"
+      },
+      {
+        "path": "ui/src/test/ChangeDetailPage.test.tsx",
+        "sha256": "4044e2613f8a5b1820b2df05822a8bcf90c9babf9868939396c01c1e3fc39705"
+      },
+      {
+        "path": "ui/src/test/ChangesPage.test.tsx",
+        "sha256": "b2bbe552067d6c27b280b47478fc2f5a329e2c9491c621d1459bdae6dd125536"
+      },
+      {
+        "path": "ui/src/test/ConfigurationPage.test.tsx",
+        "sha256": "6c2245ec9a7f02a53b11016e4536e90d05e84c5a47b14ac6c6505c46b60b5299"
+      },
+      {
+        "path": "ui/src/test/FindingList.test.tsx",
+        "sha256": "22f55c6736dda83492bf223d5b00bc14ae7b8ddf6fa05bc440506a5d63464c8d"
+      },
+      {
+        "path": "ui/src/test/FleetPage.test.tsx",
+        "sha256": "610cd640cb4428a8b2cf61668aa6189a11c26f5c1f043296e87e545404907b44"
+      },
+      {
+        "path": "ui/src/test/HistoryPage.test.tsx",
+        "sha256": "3646e2112bb951bc171859a469b04218932fa3541fb2c78c7e0296784e75389f"
+      },
+      {
+        "path": "ui/src/test/InstallationPage.test.tsx",
+        "sha256": "d67bd72d0bee7fb1942d566942fd78499845e06d7d9b0fb1fc0bce98c9e7bd1b"
+      },
+      {
+        "path": "ui/src/test/MetricValue.test.tsx",
+        "sha256": "0bc3f8fb37774e079eb0deb4136db42ee0df7578e1465edbe42dd79ee62667ee"
+      },
+      {
+        "path": "ui/src/test/OidcReturnIntegration.test.ts",
+        "sha256": "2387cc5d6a388c8bf96166e3142564c2ed038d78bb8f8dfb48508aeadb33eae7"
+      },
+      {
+        "path": "ui/src/test/OidcSession.test.ts",
+        "sha256": "7c46feb230baa7b3445efe529d5dfd464b9b2f258fe0796488ae89ca95ce89de"
+      },
+      {
+        "path": "ui/src/test/OperationsReportPage.test.tsx",
+        "sha256": "50f966c65c3d775cf737b38ac83dcb1c12fc5806a628f4800fe0c90d040860de"
+      },
+      {
+        "path": "ui/src/test/ReturnPath.test.ts",
+        "sha256": "b05bfd23be8325ae0ddba9a305ed47075cd2a0d393d34ed3e883a09c4ecf9041"
+      },
+      {
+        "path": "ui/src/test/SessionBoundaryIntegration.test.tsx",
+        "sha256": "74f702e5dcf80a9cff9d28f5a9e20eddb70b51979e61446576aba08d92bba02c"
+      },
+      {
+        "path": "ui/src/test/SessionTransport.test.ts",
+        "sha256": "07df4e83f7a5c7a6eacef69a690b453ada5677ce5fd0f889200092c433ba9f9d"
+      },
+      {
+        "path": "ui/src/test/StatusBadge.test.tsx",
+        "sha256": "4cbf2b2b09589daebb651a2a1c3c0ad967ac2bfe5af2bc1b489a7d84033300c0"
+      },
+      {
+        "path": "ui/src/test/TargetIsolation.test.tsx",
+        "sha256": "e1b32bbddb4334c734623d6dd34d36f361475e284694189c197033273c92cc61"
+      },
+      {
+        "path": "ui/src/test/TargetLayoutBoundary.test.tsx",
+        "sha256": "9c87036e768cdc0ebd75f63afa3531279a66715400ec9a85ed9f4113a4313416"
+      },
+      {
+        "path": "ui/src/test/TargetNavigation.test.tsx",
+        "sha256": "adf09b4cdf812ac514416371c6155fc0b48e5825e49e4b7565dba1844623fe43"
+      },
+      {
+        "path": "ui/src/test/fixtures.ts",
+        "sha256": "758a05ce168ffffa65f4d018ad1e515d5aab7e4e03377f0a3c6682d2101d88d0"
+      },
+      {
+        "path": "ui/src/test/setup.ts",
+        "sha256": "940d6ac8cb162eed8754303a3acc1af2cdbb081c450572cb0012b5e1363ae6ce"
+      },
+      {
+        "path": "ui/src/vite-env.d.ts",
+        "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+      },
+      {
+        "path": "ui/tsconfig.app.json",
+        "sha256": "2829744bc4d9341c6509541fec0a7cef9e2ad72b9a5068d966c738db5eaf1fb1"
+      },
+      {
+        "path": "ui/tsconfig.json",
+        "sha256": "770b4140bbb581e2dfd9ea9946ffc9c75a1d86ba7d2db5f77c83e37cbdf9d808"
+      },
+      {
+        "path": "ui/tsconfig.node.json",
+        "sha256": "faac00839ed971dc42933903b739d8faaf1e6970f77c2fb7421bf9e9b6dcd7c6"
+      },
+      {
+        "path": "ui/vite.config.ts",
+        "sha256": "1a703b0a39568200defb80971ea8a0aba324bb176525cc5a9a63af269ed9794b"
+      }
+    ],
+    "previousManifest": {
+      "path": "docs/development/evidence/secops-catalogue-2026-09-19.json",
+      "sha256": "070df50ebdf428ca9064134f6870979cdc4b680b165c6ff092e70adf13a077ab"
+    },
+    "previousAggregate": "5d12d13d3523a4c182767f01cc6847c54ce9cb13edf4e69c718784bdd4440e04",
+    "changed": [
+      "src/main/java/io/github/keycloakmcp/audit/AuditService.java",
+      "ui/src/auth/returnPath.ts",
+      "ui/src/layouts/AppLayout.tsx",
+      "ui/src/routes/index.tsx",
+      "ui/src/styles/global.css",
+      "ui/src/test/ReturnPath.test.ts"
+    ],
+    "added": [
+      "dev/configuration-browser/README.md",
+      "dev/configuration-browser/fixture.css",
+      "dev/configuration-browser/index.html",
+      "dev/configuration-browser/main.tsx",
+      "dev/configuration-browser/vite.config.mjs",
+      "src/main/java/io/github/keycloakmcp/api/v1/ConfigurationReadCacheFilter.java",
+      "src/main/java/io/github/keycloakmcp/api/v1/ConfigurationReadResource.java",
+      "src/main/java/io/github/keycloakmcp/config/ConfigurationReadConfig.java",
+      "src/main/java/io/github/keycloakmcp/domain/configuration/ConfigurationKind.java",
+      "src/main/java/io/github/keycloakmcp/domain/configuration/ConfigurationObservation.java",
+      "src/main/java/io/github/keycloakmcp/domain/configuration/ConfigurationScope.java",
+      "src/main/java/io/github/keycloakmcp/mcp/configuration/ConfigurationReadTools.java",
+      "src/main/java/io/github/keycloakmcp/service/configuration/ConfigurationReadPolicy.java",
+      "src/main/java/io/github/keycloakmcp/service/configuration/ConfigurationReadService.java",
+      "src/test/java/io/github/keycloakmcp/audit/AuditServiceTest.java",
+      "src/test/java/io/github/keycloakmcp/security/ConfigurationReadBoundaryTest.java",
+      "src/test/java/io/github/keycloakmcp/security/ConfigurationReadBoundaryTestProfile.java",
+      "src/test/java/io/github/keycloakmcp/security/ConfigurationReadCacheFilterTest.java",
+      "src/test/java/io/github/keycloakmcp/security/ConfigurationReadFixtureIdentityAugmentor.java",
+      "src/test/java/io/github/keycloakmcp/service/configuration/ConfigurationReadPolicyTest.java",
+      "src/test/java/io/github/keycloakmcp/service/configuration/ConfigurationReadServiceTest.java",
+      "ui/src/api/configurationReads.ts",
+      "ui/src/pages/ConfigurationPage.tsx",
+      "ui/src/test/ConfigurationPage.test.tsx"
+    ],
+    "removed": []
+  },
+  "validation": {
+    "baseline": {
+      "backendPassed": 1705,
+      "skippedOptIn": 9,
+      "uiPassed": 195
+    },
+    "final": {
+      "surefire": {
+        "tests": 1820,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "failsafe": {
+        "tests": 9,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 9
+      }
+    },
+    "java": "21.0.10 via per-command jenv; no global selection changes",
+    "reports": [
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.BoundedKubernetesReaderTest.txt",
+        "sha256": "b1d6d3a6d3fc48085aee46b3f887ff42bf65557e458d707ae142de61035338cf",
+        "tests": 81,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.DefaultClusterClientTest.txt",
+        "sha256": "9ceb063c724a104f4710d2c19fc31951573fb5c96742b0734bcc9cb96ca564e3",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.ExplicitInfrastructureConfigTest.txt",
+        "sha256": "7fd8ba3bd3813ccfb74816f5c4a17a910191e9a1725dc2ca0853c79fc7d85934",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.InfrastructureClientFactoryIsolationTest.txt",
+        "sha256": "c182bcb3d196d869b076f8a0db14751f759bb1988f01dcf953fe341be0060266",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.infrastructure.RedirectRejectingHttpClientFactoryTest.txt",
+        "sha256": "a396f59572a1aa0b743e766adc9b90ab8e68b8f5d84a75f5f3644ef0737ed2ad",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.CollectionAdminBoundaryTest.txt",
+        "sha256": "bf71c9a53056d112994b8d2143af33ac232392d0cf9e12b68972e68f4129d317",
+        "tests": 55,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.CollectionAdminTransportTest.txt",
+        "sha256": "baf38f0d1e6e3bcd9c8bb7756272bbb02925bd268296fce5bcf0545e2e0db4da",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.CollectionDiagnosticIntegrationTest.txt",
+        "sha256": "d8d4ef50b5ada9e83e0081cbb6f0490dce21430dae305c0692ccc10ec72ee6e5",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.CollectionDiagnosticPolicyTest.txt",
+        "sha256": "87a1964eee981079b04f0cdbf61b4ebdde13a380dc530bcbbc02a1a4a8bf5669",
+        "tests": 33,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.CollectionJsonProviderTest.txt",
+        "sha256": "84f6b84bd16554c9a62883841d774768c5d504591fdea7ccde6baaa23d143f0a",
+        "tests": 80,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakCapabilitiesTest.txt",
+        "sha256": "e42235738d9e019a513cf3bd409252753bf1c3be7a22c312367a3ea07b3d0283",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakClientFactoryTest.txt",
+        "sha256": "0c36287187f96647d58dd1617cb5e143053b9d176c7d79264a8791896a809190",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.KeycloakVersionDetectorTest.txt",
+        "sha256": "880d4a895903ed8b5c8cafa96702d71e318da09dbdfecf2d0ab571aa2cca7974",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapterBudgetTest.txt",
+        "sha256": "8ab5b5036f5333ae274e105005856a175b77e260b8ec4b2681e0632e8404a421",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.adapter.keycloak.StableAdminApiAdapterDiagnosticTest.txt",
+        "sha256": "9824dc09a287eb5eb2ccede8bb301a5ba9a3c38b6e3d5eb5dc89ca496a978aac",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.McpExceptionMapperMetadataTest.txt",
+        "sha256": "33461a2f62319787ff4d9e2bebbce9744c5a3776543425cebc7a48a35e254ab4",
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.ChangeResourceDelegationTest.txt",
+        "sha256": "655dba40aac8ee42c896571155e227f447191b1c928427bf753d641e20dc1150",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.ChangeResourceTest.txt",
+        "sha256": "5cefd91dcbd0bd36dfcff8df2e87ce24da6b9a61118ca9f4de4bbe62a9971685",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.EventsAuthorizationTest.txt",
+        "sha256": "f74528253529f36423226b0d16c6b5d5e66c5d7c26b411b5be0ba8cd4524be52",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.FleetResourceEnrichedTest.txt",
+        "sha256": "811c99300910c2e57022283dc30b04bccdc928386866c4043c7f85662dccfec8",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.FleetResourceTest.txt",
+        "sha256": "3da26027381541616dba2e9011a2cf8cecdf5db079da4922d83e6f2a71a77f68",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.MeResourceTest.txt",
+        "sha256": "db4bd79518cf9ae3afe84f7429e2490ef2a699389151a3b41dc73b810ef6cbde",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.OperationsReportResourceTest.txt",
+        "sha256": "f4441f99d99d81db160791cff386fe1d6d39842cc898c9206484081e98c7f207",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.ReadSurfaceMetadataBoundaryTest.txt",
+        "sha256": "dae4d0cad221e6f000cd62a2c1970d2e540f46edd73fd7e830749378e46234ab",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.api.v1.TargetResourceTest.txt",
+        "sha256": "3e90e2a391bb3028c05e6e089b4c76a880d41c2808059ecf85e525455312386e",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.ConditionEvaluatorTest.txt",
+        "sha256": "a022d8a624345dea0122f1ddc8bbf1db5ec8d2e6d9df489217d16b8ccd675812",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.DeclarativeRuleValidationTest.txt",
+        "sha256": "bb18e0f2c24d9c5cb042c145623563f968e16de2a399d8be2ecb122398d7e96f",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.MultiTargetAssessmentIsolationTest.txt",
+        "sha256": "6c4d8ae31780db7e370c27afba78fc6514c0f3b60d306ffe1a92110c2a4483f6",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.RuleEngineTest.txt",
+        "sha256": "956c88c5eaea2202f4e5996c9b5ffefb6174a576358938ef3ed39a3bbbdb9af8",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.RulePackFixtureTest.txt",
+        "sha256": "9205530d96549a5bbd2f5898c9ea70376b748dd4808013ee257f90f262633056",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.engine.YamlRuleLoaderTest.txt",
+        "sha256": "97f3b14935a1108360dfc807a8607d2fc129df7f30e7da3e5152abd7d9f42d20",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.assessment.scoring.AssessmentScoringTest.txt",
+        "sha256": "918542a9d2668d3478f6d234ce65ebfd1d8323f70ea424dde5a7569497f65e89",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.audit.AuditMetadataBoundaryTest.txt",
+        "sha256": "2b7db1caf457aa18330c13304077ded66f9a61b4b73766ae6ed8639a6c4219bb",
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.audit.AuditServiceTest.txt",
+        "sha256": "1c9a14d009c4a46eb90c5003e43eb6488797be6e564688808122e14e13fa647e",
+        "tests": 38,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.collection.CollectionBudgetTest.txt",
+        "sha256": "6637263b027206d040391191096f8ae67d379cd266e5e072aaa7d3ef9c61330a",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.collector.AssessmentCollectionCompletenessTest.txt",
+        "sha256": "a56a5385bc14cd2c723d965ee62ebaa81c8ba20e683d56b828426b0392f512fd",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.collector.keycloak.KeycloakEvidenceCollectorTest.txt",
+        "sha256": "79ba5ed8646146e7038d4843c0140969a612b65a404d3c935fa4d7ac8b2ccda1",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.collector.metrics.MetricsEvidenceCollectorTest.txt",
+        "sha256": "63099dbedc4723bb2db53088d6537b1ef8d41491228680ea647d448c9e6448ac",
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.credential.ConfigCredentialProviderTest.txt",
+        "sha256": "b6298d5405b2b5f302cec9da5b71911512fb829cd30aca442281e276e5e75509",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.deploy.KubernetesAssessorRbacManifestTest.txt",
+        "sha256": "7ff889baf00d1f907a701e71789ff732a8a94d52a849f872793702454262d79e",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.deploy.UiDeployManifestTest.txt",
+        "sha256": "2ab375b37dace81e10ff424ea403f3cbdbca37e4dfb7c50e620361c9ad808c78",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.discovery.EnvironmentDiscoveryTest.txt",
+        "sha256": "5f6190113d022089097696a593b2de4ae96756023780829d7b89818b9321b86a",
+        "tests": 56,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.domain.inventory.InfrastructureCoverageTest.txt",
+        "sha256": "edfa4eb39fb3b5f892bc4699f3afe1c49d413529a93a95ab714f30b8dd1cd3e0",
+        "tests": 27,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.domain.metrics.PerformanceSummaryTest.txt",
+        "sha256": "aa0d4dbe3cefecfa7220d69a21347a7775a0de1d41ee510bd6feb4482af08faf",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.DefaultKeycloakManagementHealthProviderTest.txt",
+        "sha256": "87a9d62d5f667f388b7c24b8d05f89f14554a0ee39d8a40e68c9670c60364905",
+        "tests": 65,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.HealthCheckEngineTest.txt",
+        "sha256": "da4dcab0d940345c4700faa9732c17649940361652085af1292802d5088e9500",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.InventoryHealthChecksTest.txt",
+        "sha256": "9594ae583bd8e865a243d963b8212bcafef2c9e2af80f4cc80a12c29e2116c7a",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.health.KeycloakAdminApiHealthCheckTest.txt",
+        "sha256": "06a3aedd692f39ac9c53197612752dbb6a94a9a58a2edde96dad9a018855cd2a",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.http.BoundedBodyHandlerTest.txt",
+        "sha256": "89cd91e40e00504251e2f8ca2172e0a145c496262dd13e22be5b3fee3259f73d",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.it.DisposableRhbkGuardTest.txt",
+        "sha256": "5d9d2a18c0e339f1bc303059e661c51c7e43cb1ec06505e93a281832924d02d3",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.GenericToolsErrorProjectionTest.txt",
+        "sha256": "e539de854e340aff10b21ad50fc5ebeadcfecb1746e04c6ce0d284dff9bac654",
+        "tests": 122,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.assessment.AssessmentToolsOperationsReportTest.txt",
+        "sha256": "9ca5fe78d262ee0d1c41296045bdb5dd4db126c81c21e5ddf7fe41fdfbfba578",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.assessment.AssessmentToolsScoreAvailabilityTest.txt",
+        "sha256": "5cc00caaad1d9116e128c4c5d8f2415bc58295e46673d2816e198c4eeb382651",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.assessment.ReportFindingDetailsTest.txt",
+        "sha256": "cfdbf5a83e455cad3b47a601a1ecdd2da39eb5790b61ace7b7f28556b4769674",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientLifecycleTest.txt",
+        "sha256": "187f857f79f51f55d76f0ee88d62149eed68673024bc63e8375e419c8bced3a3",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientSecurityTest.txt",
+        "sha256": "6c69d0b64d845f6767db81ccd1c5054dc542bebda476b84f02b939da84aed88d",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsClientUrlsTest.txt",
+        "sha256": "b8115af61d58c56b55003089d12f0c1bb40927e38222a5d3caa4a82a52e2f0b1",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.mcp.change.ChangeToolsErrorProjectionTest.txt",
+        "sha256": "f09e9aceab5c8bf7ba20234d9f249993a95f68a12752a0a8a50a9fae7ac2e8e0",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricAvailabilityServiceTest.txt",
+        "sha256": "6041066dda7f22ec39c7d341179af5905917d9c4a850744f452231f26d707d89",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricWindowTest.txt",
+        "sha256": "7c733018b63e55c498187c3e2c6615564b6fa87e67e24f92ba5d75622930e1f2",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsCredentialIsolationTest.txt",
+        "sha256": "5ee9efe53b6a70019303eb61dd99a21d956709dd41627c37c5a5a44ed3db5afd",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsOperationBudgetTest.txt",
+        "sha256": "26edbb785e3c9a3a9f86dc0f7e86281babd5eef7429a88cef9df9569fef93d8b",
+        "tests": 13,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsProviderFailureTest.txt",
+        "sha256": "89bf0d68a658e4ab5d9da7b2aeec645706eaf6402e4b6b1fefe236a76f5ec7ec",
+        "tests": 17,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsProviderOperationBudgetTest.txt",
+        "sha256": "ad3f7dd3f7525d304a09b3de43628c382571e3db48c8eb6cf72e68fb9a2b9c59",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryBoundsTest.txt",
+        "sha256": "49c36b822d3ee15391edefc2b1a0abe608ba6c51233485b59f4e7dbbc333fe27",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryBuilderTest.txt",
+        "sha256": "748d1f29afd1823e3ae2d190540f4a28650a55a45725ce4726d94d5199026d82",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.MetricsQueryContextIsolationTest.txt",
+        "sha256": "0facdeb3c56acba20bbac1b1bc9f37621473754ee3fa679ad3dda3ef8fb680db",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.PromQlEscaperTest.txt",
+        "sha256": "471c7c242af648acdb53029756b906504494b66e7a81abc00f9f14bcb220e67d",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.ScrapeObservationHttpIsolationTest.txt",
+        "sha256": "6726438a85f0fb9b6df94fdf8fbbc9b432cf314e20734438524e620ec1316380",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.ScrapeObservationProviderTest.txt",
+        "sha256": "96159a7d696bf10bba293d326d3560f922e5d29ef4aec71715f2656c5b632829",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.ServiceMonitorProbeTest.txt",
+        "sha256": "a6a5992c7762512d66930eef79a8aaf8c0340e65d6fd843ee39c7aca53bdbfa2",
+        "tests": 97,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.observability.metrics.prometheus.PrometheusApiClientTest.txt",
+        "sha256": "8875f1cf90a8b87ce2b11ec3720b8532bd9df5c19187b1f1c50aaaafce105d06",
+        "tests": 35,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.AssessmentRepositoryTest.txt",
+        "sha256": "ac82de0be970ed2c7ae7041f6102bcf20359d540f42f47a4b278d9619e293c11",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.AuditRepositoryTest.txt",
+        "sha256": "cfbe62478c28c10791c493a958b3a81e13e66814c6ac93046b559acc643fc628",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.FindingRepositoryTest.txt",
+        "sha256": "714937691f4380e0cfade2cf92b8befab4531e27e036d2e07b63679355be0295",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.HealthCheckRepositoryTest.txt",
+        "sha256": "7991bd9f3ca3e975de7716fde53b9a68a50a9bfd0cbb32ff6a1334d4b948318e",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.MultiTargetPersistenceIsolationTest.txt",
+        "sha256": "59a2100ffd953ef9f2a96dca4837d8c02eaa5a4ff1737da098e2a696dc09679e",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.SecretLeakagePersistenceTest.txt",
+        "sha256": "e328c1a7ec2f843c478ed6e2114ec49e333cf5695314d723cda4c74ddd3d2a39",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.SnapshotRepositoryTest.txt",
+        "sha256": "1c72290d9e06bc47cd4d1ae015fd74d5a1e71ea5e71b19e63bbf19d09ccb107c",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.TargetRepositoryTest.txt",
+        "sha256": "e48820c74cae8d8ac169846815e338f7b56859629b6aacf85e1779afd0b4b91e",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.mapper.AssessmentPersistenceMapperTest.txt",
+        "sha256": "082b66aa5ae0dcdcdaa237eb48828fe0ebf8246482e190105f796b75ef00d4d6",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.persistence.mapper.ChangePersistenceMapperTest.txt",
+        "sha256": "0c4b5979b1dd2ba2c67652c06e70b3e3572e23f7bdbd49c19557c420dd511fcf",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.AuthenticatedBoundaryTest.txt",
+        "sha256": "ede2f60ebbe1dbe3b59355832437491c7c3bfb852875cbbc2d3f0ea9149cafae",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.ConfigurationReadBoundaryTest.txt",
+        "sha256": "731ab5aa6eaba181659c2ce4b7cd864e16302772d1f0ee84eeeaffe2cb006ade",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.ConfigurationReadCacheFilterTest.txt",
+        "sha256": "f84dd07f2bf1e8e355cfae1a5e591db53546e4340892d9b293cf92162d5a488b",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.SensitiveDataFilterTest.txt",
+        "sha256": "6f55f04fe7c929b341cdecb83c64ef92958e4e4ec241d8a23bb6e891154d3d6c",
+        "tests": 56,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.security.ToolAuthorizationChangeTest.txt",
+        "sha256": "c28a6f6e25ed313412d304a3ee628d0a6e93cd885c8a10ab564ef052225b3a43",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.ClientServiceTest.txt",
+        "sha256": "7441f3d7bd4cfd07c889c2922b9657f7f4e79f0451684b350e8ad9cdfb705829",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.MultiTargetIsolationTest.txt",
+        "sha256": "29f85b491e54a5ef1d92418d95379101b36efe0227c7e2b1b1993d8c2f662d3c",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.ReadServiceMetadataTest.txt",
+        "sha256": "1ba4f5515bb3096ef0e84005464ba4d68b3e732ca0238cc923530fdd1be62a3a",
+        "tests": 56,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.RealmServiceTest.txt",
+        "sha256": "aa486865572877ea916b233e580152fc98f309016bfbf41fe96571148ac78304",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.UserServiceTest.txt",
+        "sha256": "9204ba78d5a27b652b33be441e2e2d7b6c25784003767f1f794fa730356ad2cd",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ChangeManagementServiceTest.txt",
+        "sha256": "a27bde5f45cb3c60b5a81f2d190a8c0909c99840bbf29ee15a2b413c7320680c",
+        "tests": 34,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ChangeMetadataBoundaryTest.txt",
+        "sha256": "053b8a11dfcb0f8da46c4c869fdcf312f8867d6ec16802e7e75399d9fd759726",
+        "tests": 42,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ChangePolicyAndRiskTest.txt",
+        "sha256": "b1532b91a947111e40a96fbfe7c534c0409e24b7b1cf28cc16d7450047c4e116",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientConfigChangeSupportTest.txt",
+        "sha256": "a0aef6bfac2ef82134f43bfbe0b6c24d8bbfe74b94f714934159ed22ef805f4c",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientLifecycleChangeSupportTest.txt",
+        "sha256": "f0ca790a9f62d6a19a601ef1dda3ca132c90dac81d20357d4aee9c344484f124",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientSecuritySettingsChangeSupportTest.txt",
+        "sha256": "99a84c1e47da6b9939883dc5cf7907973b0c7c4f36bbbd81663eb9417529fe08",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.change.ClientUrlSettingsChangeSupportTest.txt",
+        "sha256": "c9e900bc5bfa6938a8c0bf6e0e0c02ba5282a6ca96797efbfc26eee4aa5662f1",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.configuration.ConfigurationReadPolicyTest.txt",
+        "sha256": "c7745098163f81aed342d303f2e9afb6b3c915dd055ee2c262889a80755fd364",
+        "tests": 35,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.configuration.ConfigurationReadServiceTest.txt",
+        "sha256": "f7bafa6a3bb97ab724d4516b073589e91c575d73c81f5418c87f505b645ffb6d",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.AssessmentHistoryServiceEventTest.txt",
+        "sha256": "7c08b0ee395d4c87f978c5d0a62662b7640df020dc4be48830a2177fd41db756",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.AssessmentHistoryServiceMetadataTest.txt",
+        "sha256": "0248e79f5c35bca8dc005f02e29aafdec16fa7634b75eda5f56910fc5b754b4f",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.BundledRuleCatalogRevisionTest.txt",
+        "sha256": "3b1244e5193d08241fe32a14d482647dade9ebc51b1f6c2374a2aa71eb380894",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.EnvironmentChangeServiceTest.txt",
+        "sha256": "ece0fdb91f37c4f3068f0c8b8c8d0df814af2ecc65489b74bb93053ec124d32a",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.FleetScoreAvailabilityTest.txt",
+        "sha256": "c24ce38bd276dce1fe8a86ca01e8edd05fe80ab849a2234cad74c003b14ba173",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.HealthCheckMetadataTest.txt",
+        "sha256": "a29aeb5161cc22b498038a81dd3f2516e252eba8514d80c1dac71316335e1966",
+        "tests": 14,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationCandidateCollectorTest.txt",
+        "sha256": "eb1099acdbe7a4f35c434fa29a9d9f14059d05a9fe453f13bc2a6e0e99da8d04",
+        "tests": 43,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationNetworkingCollectorTest.txt",
+        "sha256": "20af7ef1d20e5bbea55b69bc9e7a417efe1a4a121953f540f485d54b8578c959",
+        "tests": 31,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationOnboardingServiceTest.txt",
+        "sha256": "1bae60e6fdd179358130ddc44275e37a2fd45b8f9b34eaf993baa9c820106b32",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InstallationServiceAssociationTest.txt",
+        "sha256": "028d0f9958f4377ae974d54f1d0e6243e7fe5c7b5345cc3bf7df81d6a63e997b",
+        "tests": 37,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryCollectionBudgetTest.txt",
+        "sha256": "4ed1692f0d1090690333157079c05b61a2b7b6dc2c66529761215c2382959db0",
+        "tests": 7,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryEnvelopeTest.txt",
+        "sha256": "fd15a2cd0724bc1fc7394ac64e654e59b3f7bc86792bfb565731e1a11c47e3bf",
+        "tests": 27,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryEvidenceMappingTest.txt",
+        "sha256": "d88b3ef1716d4827244f147ccc24928b8ffd0a862fd5983be1f88c2d65612c33",
+        "tests": 20,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.InventoryServiceMockTest.txt",
+        "sha256": "3f9659d1b92ffcf5c695292c02b54ca9d6b3f73b8253f2bf8c90329e88909922",
+        "tests": 33,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.MultiTargetMetricsIsolationTest.txt",
+        "sha256": "629017e136a802918427e6eef6e51225865584a731ee534c7c8efd25c46bc02a",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.OperationsReportServiceTest.txt",
+        "sha256": "9f0763800c4099ac4d2c37d9fcd0816ae21cc505c0558576a707a988b61f4bf3",
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.PerformanceSummaryServiceTest.txt",
+        "sha256": "e2bdd241cac306b216d73ca9f6ee03489a4bca46867697af7b83c1599cd557b0",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.ReportInventoryProjectionTest.txt",
+        "sha256": "a3e344344acd3eb6ad17ce74e928351f3e993d4431f68a758ed66165b416ba2c",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.SnapshotServiceTest.txt",
+        "sha256": "6d87d4b4fc17463c6ff7ecd29bfd63b2f0809ee58e95f4c7977add0ef86b6f39",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.service.platform.TargetOverviewSignalsTest.txt",
+        "sha256": "7a7709375d4e41f83e00681532c1cb76310dcfa415c26519675a9eebc7b9ce9f",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.InstallationConfigMappingTest.txt",
+        "sha256": "9c57679bf6568cb6ed988c614e353db1ffec82a1f116c1f825019f683d20b731",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.KubernetesInstallationBindingTest.txt",
+        "sha256": "aa1025803c7ae035a245d84ce2e5332b317b83bc7b8a53132917247f951aa06a",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.ManagedInstallationBootstrapTest.txt",
+        "sha256": "b9bcf683addb685f63fc5861a5f2dd7cda5bfa70d7c98f34e73ce16892577fa2",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetAuthorizationTest.txt",
+        "sha256": "5883f80e9bece3d9f5788445b77e1bf88623bcd493b3115cfa5c57852ca89a79",
+        "tests": 10,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetRegistryTest.txt",
+        "sha256": "30e04fe3ee1e4fa199cc876ee1166f44b89cbcf9b8d4e7d4e3c4458136af5757",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetResolverTest.txt",
+        "sha256": "06dd254963a61df20cb78a1b7abae7c1a7f7dc554a91c02652aeceeb17f1fbd4",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/surefire-reports/io.github.keycloakmcp.target.TargetSanitizationTest.txt",
+        "sha256": "cb620f951ea2212814465873efac815f22b95ca46a6a783e8096d716ee0acb19",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.ControlledClientChangeIT.txt",
+        "sha256": "ddc321e266928f719834036bc35710150ccd06347ebc3dbeaddd4638b4e06235",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 4
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.KeycloakCommunity26_6IT.txt",
+        "sha256": "9da52ad185fc2cd99211c78198b069d58e9b92dd6e45f6c031043a40f2eb6e04",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.KeycloakCommunity26_7IT.txt",
+        "sha256": "a2bfbe20ea1d1a5a0862ad22756732f8245711df886a07aa8ff8986487caa0de",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.PrometheusMetricsIT.txt",
+        "sha256": "032c66bdb9f10b8c693dbc9ee878b6fb6df4d131d122ea93f79aa3904d4d6bba",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 1
+      },
+      {
+        "path": "target/failsafe-reports/io.github.keycloakmcp.it.Rhbk26_6IT.txt",
+        "sha256": "8452e09016e1330170494f93fc2b583166e9c3b67bb73023e693b291e94b5661",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 2
+      }
+    ],
+    "logs": [
+      {
+        "path": "/private/tmp/kcops-agt2-read-baseline-20260919.log",
+        "sha256": "b890b3e3e8a38f0acdbb2caa39cd9e11979d0dbe3c527273578c27ad002943a0",
+        "summary": [
+          "[INFO] Tests run: 1705, Failures: 0, Errors: 0, Skipped: 0",
+          "[INFO] BUILD SUCCESS",
+          "[INFO] Total time:  01:50 min"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-ui-baseline-20260919.log",
+        "sha256": "fd2fb2280b313b75d26a8787e97650df636943912a84d90859f935f77f726c0a",
+        "summary": [
+          " Test Files  22 passed (22)",
+          "      Tests  195 passed (195)"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-compile-20260919.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "summary": []
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-http-20260919.log",
+        "sha256": "e87157834b1c5d12b6ed7edc98f66e2e981316ee2875e9b6912150b6b626f6e5",
+        "summary": [
+          "[INFO] BUILD FAILURE",
+          "[INFO] Total time:  10.466 s"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-restricted-unit-20260919.log",
+        "sha256": "c238f9c3415d4deae9a142cb7a2be08ea143e75a403b0d3ba6202683637d1ca7",
+        "summary": [
+          "[ERROR] Tests run: 93, Failures: 0, Errors: 35, Skipped: 0",
+          "[INFO] BUILD FAILURE",
+          "[INFO] Total time:  12.569 s"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-restricted-unit-final-20260919.log",
+        "sha256": "1a58660d456b018367e8e60486958541b9f08f5f77c0b95ed78d8622d674133d",
+        "summary": [
+          "[INFO] Tests run: 93, Failures: 0, Errors: 0, Skipped: 0",
+          "[INFO] BUILD SUCCESS",
+          "[INFO] Total time:  10.738 s"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-verify-20260919.log",
+        "sha256": "333d3efbe1ffefc8d24843bcc2842f509eba3a3149373b07f3fe630398e9153b",
+        "summary": [
+          "[ERROR] Tests run: 1811, Failures: 5, Errors: 0, Skipped: 0",
+          "[INFO] BUILD FAILURE",
+          "[INFO] Total time:  01:47 min"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-cache-red-20260919.log",
+        "sha256": "e12a510e6281fce1d8c2126bf55433057e4723d398c81c896ff4ddacb2d79de7",
+        "summary": [
+          "[ERROR] Tests run: 8, Failures: 2, Errors: 0, Skipped: 0",
+          "[INFO] BUILD FAILURE",
+          "[INFO] Total time:  8.937 s"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-http-green-20260919.log",
+        "sha256": "b3c447361eff7050c26e40a3febfaf3b73ca3ee2007466918f65cc71587f8397",
+        "summary": [
+          "[INFO] Tests run: 21, Failures: 0, Errors: 0, Skipped: 0",
+          "[INFO] BUILD SUCCESS",
+          "[INFO] Total time:  18.481 s"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-verify-final-20260919.log",
+        "sha256": "2b78b62f0ae69eb062d6d743eae370347dfeaeb5ef92b5735791b7b4052897ff",
+        "summary": [
+          "[INFO] Tests run: 1820, Failures: 0, Errors: 0, Skipped: 0",
+          "[INFO] BUILD SUCCESS",
+          "[INFO] Total time:  01:50 min"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-node-20260919.log",
+        "sha256": "6d09108e44c4c011ce3d6e0da4318e05440b237a08e20a68345d0631828fe1d7",
+        "summary": [
+          "ℹ tests 167",
+          "ℹ pass 167",
+          "ℹ fail 0",
+          "ℹ cancelled 0",
+          "ℹ skipped 0",
+          "ℹ duration_ms 1841.003"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-ui-final-20260919.log",
+        "sha256": "fda4286eda111343f3dff31824befda88be6def890bf1374eea660b39052d4cf",
+        "summary": [
+          " Test Files  23 passed (23)",
+          "      Tests  232 passed (232)"
+        ]
+      },
+      {
+        "path": "/private/tmp/kcops-agt2-ui-build-20260919.log",
+        "sha256": "53414ce774fcba755afe0628e150dc60ad9b61ccbb762d1fb0b5a1d4ec021a15",
+        "summary": [
+          "✓ built in 717ms"
+        ]
+      }
+    ],
+    "ui": {
+      "tests": 232,
+      "files": 23,
+      "typescript": true,
+      "productionBuild": true
+    },
+    "node": {
+      "referenceProfile": 115,
+      "secopsCatalogue": 52,
+      "passed": 167
+    },
+    "failedAttempts": [
+      {
+        "name": "http",
+        "reason": "Test compilation caught a mutable local in a newly authored test lambda; test fixture corrected."
+      },
+      {
+        "name": "restricted-unit",
+        "reason": "Mockito nested stubbing in policy fixtures; corrected before final93/93."
+      },
+      {
+        "name": "verify",
+        "tests": 1811,
+        "failures": 5,
+        "reason": "Leading slash in REST UriInfo path prevented no-store header; normalized, added8regressioncases."
+      },
+      {
+        "name": "cache-red",
+        "tests": 8,
+        "failures": 2,
+        "reason": "Minimal leading-slash regression before correction."
+      }
+    ],
+    "browser": {
+      "kind": "Real in-app browser against synthetic loopback HTTP fixture, no OIDC/provider",
+      "origin": "http://127.0.0.1:18312",
+      "scenarios": [
+        "manual inspection only",
+        "late realm reply after selecting client",
+        "client COMPLETE true/false",
+        "realm PARTIAL and null shown Unknown",
+        "403 clears prior result",
+        "wrong scope rejected",
+        "inconsistent COMPLETE rejected",
+        "empty catalogue",
+        "catalogue503",
+        "logout during pending read stays cleared after reply",
+        "Tab/Return button activation",
+        "390x844 viewport without horizontal page overflow"
+      ],
+      "consoleWarnings": 0,
+      "consoleErrors": 0,
+      "limits": [
+        "Native select arrow-only sequence inconclusive; semantic selection and Tab/Return activation checked.",
+        "No screen-reader or full WCAG audit."
+      ],
+      "ownedServerStopped": true,
+      "temporaryTabClosed": true,
+      "viewportReset": true
+    }
+  },
+  "runtime": {
+    "connection": "podman-machine-default-root",
+    "before": {
+      "containers": 0,
+      "volumes": 0
+    },
+    "after": {
+      "containers": 0,
+      "volumes": 0
+    },
+    "reusableImagesUnchanged": [
+      "cc689d358fe6 quay.io/keycloak/keycloak:26.7.1",
+      "02ad0fee02ae docker.io/library/postgres:16",
+      "e7affbc8b409 registry.redhat.io/rhbk/keycloak-rhel9:26.6",
+      "f59c592ea6d9 docker.io/prom/prometheus:v2.55.1"
+    ],
+    "cleanup": "Owned named/labelled auto-removed temporary PostgreSQL with tmpfs; no global prune, persistent volume or VM restart."
+  },
+  "versions": {
+    "backend": "0.8.1-SNAPSHOT",
+    "ui": "0.8.1-dev.0",
+    "configurationObservation": "1.0",
+    "referenceProfile": "0.2.1",
+    "report": "1.1",
+    "findingDetails": "1.0",
+    "migrations": "V1–V10",
+    "privateCatalogue": "1",
+    "decision": "Additive unreleased contract; no product/profile/dependency/migration/default-grant change."
+  },
+  "historyIntegrity": {
+    "path": "docs/development/evidence/agt1-synthetic-model-trial-2026-09-19.json",
+    "sha256": "3d30f90523ec3e4283a72414b13bf08ee4f0d9a0a9ce25e44223437eb0641eef",
+    "verifiedArtifacts": 29,
+    "repairedResponses": 0
+  },
+  "documentation": {
+    "checkedAt": "2026-09-19T23:57:16.313Z",
+    "sourceInputsRechecked": 655,
+    "documents": 155,
+    "localLinks": 1077,
+    "requirements": 152,
+    "milestones": 17,
+    "errors": 0,
+    "warnings": 0,
+    "parserSelfChecks": 6,
+    "log": {
+      "path": "/private/tmp/kcops-agt2-configuration-docs-20260919.log",
+      "sha256": "9f07df6bd74b672f22ea36de9482892ff58df550af9e9a0d9a8ec417193ea36f"
+    }
+  },
+  "independentReview": {
+    "securityBlockersFound": 0,
+    "documentationCorrections": 1,
+    "correction": "Cooperative collection budget is not a hard wall-clock SLA.",
+    "additionalRuntimeTests": false
+  },
+  "limits": {
+    "newModelCalls": 0,
+    "realKeycloakRhbkRuns": 0,
+    "clusterRuns": 0,
+    "githubCiExecuted": false,
+    "commit": false,
+    "push": false,
+    "rebase": false
+  }
+}

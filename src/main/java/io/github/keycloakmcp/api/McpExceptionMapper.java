@@ -4,12 +4,17 @@ import java.util.Map;
 
 import io.github.keycloakmcp.domain.error.ErrorCode;
 import io.github.keycloakmcp.domain.error.McpException;
+import io.github.keycloakmcp.security.SensitiveDataFilter;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class McpExceptionMapper implements ExceptionMapper<McpException> {
+
+    @Inject
+    SensitiveDataFilter sensitiveDataFilter;
 
     @Override
     public Response toResponse(McpException exception) {
@@ -30,7 +35,8 @@ public class McpExceptionMapper implements ExceptionMapper<McpException> {
         return Response.status(status)
                 .entity(Map.of(
                         "code", code.name(),
-                        "message", exception.getMessage() == null ? code.name() : exception.getMessage()))
+                        "message", exception.getMessage() == null
+                                ? code.name() : sensitiveDataFilter.redactString(exception.getMessage())))
                 .build();
     }
 }

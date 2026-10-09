@@ -19,7 +19,7 @@ function KeyIcon() {
 }
 
 export function AppLayout() {
-  const { displayName, authMode } = useAuth();
+  const { displayName, authMode, logout } = useAuth();
   const { connected } = useEvents(true);
 
   return (
@@ -38,6 +38,14 @@ export function AppLayout() {
             }
           >
             Fleet
+          </NavLink>
+          <NavLink
+            to="/configuration"
+            className={({ isActive }) =>
+              'topbar__nav-link' + (isActive ? ' topbar__nav-link--active' : '')
+            }
+          >
+            Configuration
           </NavLink>
           <NavLink
             to="/changes"
@@ -62,6 +70,7 @@ export function AppLayout() {
             <span title="Open Lab mode — no authentication required">Open Lab</span>
           )}
           {displayName && <span>{displayName}</span>}
+          {authMode === 'OIDC' && <button className="btn" onClick={logout}>Sign out</button>}
         </div>
       </header>
 

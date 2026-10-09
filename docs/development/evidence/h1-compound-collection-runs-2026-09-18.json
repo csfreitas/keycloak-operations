@@ -1,0 +1,115 @@
+{
+  "capturedAt": "2026-09-18T20:16:31.852Z",
+  "scope": "Unsigned local retained excerpts; process exits were observed by the coordinator. Not complete logs or release attestation.",
+  "sourceAggregate": "638cc43ff36dec5c588ec691e6fca2c9cc926177063187b36af83a452d80c302",
+  "java": "21.0.10 via per-command jenv",
+  "node": "25.6.1 for standalone lab scripts only; no UI rerun",
+  "runs": [
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-baseline-20260918.log",
+      "sha256": "a9f58279af99f7386cf48c7f1b5cc907e9353a341ef3149fb5fdcbeb04c21696",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "[INFO] Tests run: 970, Failures: 0, Errors: 0, Skipped: 0",
+        "[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-09-18T16:54:12-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-focused-20260918.log",
+      "sha256": "c822b94af129f53f604e27b3c6ec22d186dd6e0a3cafa1d12d3900f5719ee5a8",
+      "observedProcessExit": 1,
+      "excerpts": [
+        "[ERROR] COMPILATION ERROR : ",
+        "[INFO] BUILD FAILURE",
+        "[INFO] Finished at: 2026-09-18T17:03:40-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-focused2-20260918.log",
+      "sha256": "f86b77c56f38764a0d3c7e3c82df8383f97242c9f84f53b8b1a8fff56df47ff9",
+      "observedProcessExit": 1,
+      "excerpts": [
+        "[ERROR] Tests run: 410, Failures: 0, Errors: 2, Skipped: 0",
+        "[INFO] BUILD FAILURE",
+        "[INFO] Finished at: 2026-09-18T17:05:59-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-focused3-20260918.log",
+      "sha256": "b2f9c95de8de8f1ebefb1c0be4e50498372ad38ce8604c754a16517865745f45",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "[INFO] Tests run: 410, Failures: 0, Errors: 0, Skipped: 0",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-09-18T17:06:54-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-verify-20260918.log",
+      "sha256": "7028d32daf9dede264d57c434c80bc844dc24687f60d65ae0b161b29c2e6f095",
+      "observedProcessExit": 1,
+      "excerpts": [
+        "[ERROR] Tests run: 1048, Failures: 2, Errors: 0, Skipped: 0",
+        "[INFO] BUILD FAILURE",
+        "[INFO] Finished at: 2026-09-18T17:08:46-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-verify2-20260918.log",
+      "sha256": "401c5de815aa64fad2ffc3962c0957adaddd01866ad26564650afb4ebb5c0434",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "[INFO] Tests run: 1050, Failures: 0, Errors: 0, Skipped: 0",
+        "[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9",
+        "[INFO] BUILD SUCCESS",
+        "[INFO] Finished at: 2026-09-18T17:12:26-03:00"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-metrics-20260918.log",
+      "sha256": "4783dcbcf2026f2a2d6d82a8351e81064bed09cf86f7e68275877e202189ff07",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.",
+        "PASS: no compact JWT found in local lab logs",
+        "Local diagnostic logs: /private/tmp/kcops-identity.sRVHZZ"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-installation-20260918.log",
+      "sha256": "f0ea7b6a1177904466f7ca813bf9f0b8c05d671ab8b9646680e7ad50a323de92",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.",
+        "PASS: no compact JWT found in local lab logs",
+        "Local installation diagnostic logs: /private/tmp/kcops-installation.AWzInD"
+      ]
+    },
+    {
+      "path": "/private/tmp/kcops-h1-compound-collection-default-20260918.log",
+      "sha256": "6f6484687b87b22e2156e82a0465a7a0a28e670e0f1faa409f6bd12bf942ccea",
+      "observedProcessExit": 0,
+      "excerpts": [
+        "Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.",
+        "PASS: no compact JWT found in local lab logs",
+        "Local diagnostic logs: /private/tmp/kcops-identity.ABYnt7"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "target/quarkus-app/quarkus-run.jar",
+      "sha256": "43bf37e7e6e00caf9a1e1fe01421e2cde7232885cfcded7ed3c35fdae9db7b8d"
+    },
+    {
+      "path": "target/quarkus-app/app/keycloak-operations-mcp-0.8.1-SNAPSHOT.jar",
+      "sha256": "f6647b6e619add8024f62eda7614eab233f479e3a4d2a9a3a68b7efed0b7da04"
+    },
+    {
+      "path": "target/quarkus-app/quarkus-app-dependencies.txt",
+      "sha256": "74af1297f6bd06812ff42e8914c83ef7a59b28a0fa2e6337701936609ea232e7"
+    }
+  ]
+}

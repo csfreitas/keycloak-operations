@@ -1,0 +1,287 @@
+D1 installation identity validation — 2026-09-18
+Unsigned local check summaries; see the accompanying evidence ledger for scope and limits.
+Backend baseline: 392 passed, 9 opt-in ITs skipped; build SUCCESS; Java 21 selected through jenv.
+UI: 133 tests across 19 files passed; production build successful.
+Synthetic cluster fixture: 7 tests passed.
+Shared runner/helper: 13 tests passed.
+Initial exploratory run failed after 8 checks: persisted targets inspected before lazy registry initialization. Cleanup completed. Corrected before the following passing runs.
+
+Installation clean run 1
+Log: /private/tmp/kcops-installation-live2-20260918.log
+PASS 1: Real authenticated principal accepted: assessor-a
+PASS 2: Real authenticated principal accepted: assessor-b
+PASS 3: Real authenticated principal accepted: installer-a
+PASS 4: Real authenticated principal accepted: installer-a2
+PASS 5: Real authenticated principal accepted: installer-b
+PASS 6: Real authenticated principal accepted: installer-both
+PASS 7: Real authenticated principal accepted: installer-bind-only
+PASS 8: Same-target setup actors have distinct authenticated subjects
+PASS 9: Target registry initialized through authenticated read (read-only=false)
+PASS 10: Target registry initialized through authenticated read (read-only=true)
+PASS 11: Fresh disposable database has two unbound targets and no binding audit
+PASS 12: Only synthetic namespace fixtures are connected
+PASS 13: Reader cannot discover or confirm: a
+PASS 14: Reader discovery denied before cluster access: a
+PASS 15: Reader cannot discover or confirm: b
+PASS 16: Reader discovery denied before cluster access: b
+PASS 17: Anonymous discovery denied
+PASS 18: Explicit namespace-scoped candidates: a/installer-a
+PASS 19: Discovery alone does not select or bind
+PASS 20: Reader confirmation denied
+PASS 21: Reader confirmation denied: binding, runs and success audit unchanged
+PASS 22: Reader confirmation denied: rejected before cluster access
+PASS 23: BIND without DISCOVER denied
+PASS 24: BIND without DISCOVER denied: binding, runs and success audit unchanged
+PASS 25: BIND without DISCOVER denied: rejected before cluster access
+PASS 26: Same-target different actor cannot consume run
+PASS 27: Same-target different actor cannot consume run: binding, runs and success audit unchanged
+PASS 28: Same-target different actor cannot consume run: rejected before cluster access
+PASS 29: Unreturned candidate rejected
+PASS 30: Unreturned candidate rejected: binding, runs and success audit unchanged
+PASS 31: Unreturned candidate rejected: rejected before cluster access
+PASS 32: Unauthorized target denied
+PASS 33: Unauthorized target denied: binding, runs and success audit unchanged
+PASS 34: Unauthorized target denied: rejected before cluster access
+PASS 35: Explicit namespace-scoped candidates: a/installer-both
+PASS 36: Run cannot cross targets even for multi-target setup actor
+PASS 37: Run cannot cross targets even for multi-target setup actor: binding, runs and success audit unchanged
+PASS 38: Run cannot cross targets even for multi-target setup actor: rejected before cluster access
+PASS 39: Granted setup actor can discover but not confirm in read-only instance
+PASS 40: Global read-only blocks otherwise authorized binding
+PASS 41: Global read-only blocks otherwise authorized binding: binding, runs and success audit unchanged
+PASS 42: Global read-only blocks otherwise authorized binding: rejected before cluster access
+PASS 43: Explicit namespace-scoped candidates: a/installer-a2
+PASS 44: Explicit confirmation succeeds: a/installer-a
+PASS 45: Binding, consumed run and mandatory audit agree: a
+PASS 46: Other target binding is unchanged: a
+PASS 47: Fresh reader observes complete selected binding: a
+PASS 48: Successful confirmation cannot be replayed
+PASS 49: Successful confirmation cannot be replayed: binding, runs and success audit unchanged
+PASS 50: Successful confirmation cannot be replayed: rejected before cluster access
+PASS 51: Independent actor run with old binding revision rejected
+PASS 52: Independent actor run with old binding revision rejected: binding, runs and success audit unchanged
+PASS 53: Independent actor run with old binding revision rejected: rejected before cluster access
+PASS 54: Explicit namespace-scoped candidates: a/installer-a
+PASS 55: Explicit namespace-scoped candidates: a/installer-a
+PASS 56: Rediscovery invalidates previous same-actor run
+PASS 57: Rediscovery invalidates previous same-actor run: binding, runs and success audit unchanged
+PASS 58: Rediscovery invalidates previous same-actor run: rejected before cluster access
+PASS 59: Recreated resource UID requires rediscovery
+PASS 60: Recreated resource UID requires rediscovery: binding, runs and success audit unchanged
+PASS 61: Cluster permission loss rejects confirmation
+PASS 62: Cluster permission loss rejects confirmation: binding, runs and success audit unchanged
+PASS 63: Denied cluster discovery exposes no confirmable partial run
+PASS 64: Injected expired run is rejected
+PASS 65: Injected expired run is rejected: binding, runs and success audit unchanged
+PASS 66: Injected expired run is rejected: rejected before cluster access
+PASS 67: Explicit namespace-scoped candidates: a/installer-a
+PASS 68: Explicit confirmation succeeds: a/installer-a
+PASS 69: Binding, consumed run and mandatory audit agree: a
+PASS 70: Other target binding is unchanged: a
+PASS 71: Fresh reader observes complete selected binding: a
+PASS 72: Explicit namespace-scoped candidates: b/installer-b
+PASS 73: Read-only instance also denies its own fresh run
+PASS 74: Read-only instance also denies its own fresh run: binding, runs and success audit unchanged
+PASS 75: Read-only instance also denies its own fresh run: rejected before cluster access
+PASS 76: Explicit confirmation succeeds: b/installer-b
+PASS 77: Binding, consumed run and mandatory audit agree: b
+PASS 78: Other target binding is unchanged: b
+PASS 79: Fresh reader observes complete selected binding: b
+PASS 80: Reader observes persisted binding without gaining setup rights: a
+PASS 81: Reader observes persisted binding without gaining setup rights: b
+PASS 82: Synthetic cluster received only allowlisted reads, never writes or Secret requests
+PASS 83: Three successful bindings have mandatory audits and nothing else
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+Local installation diagnostic logs: /private/tmp/kcops-installation.AycmFa
+
+Installation clean run 2 + browser
+Log: /private/tmp/kcops-installation-live3-browser-20260918.log
+PASS 1: Real authenticated principal accepted: assessor-a
+PASS 2: Real authenticated principal accepted: assessor-b
+PASS 3: Real authenticated principal accepted: installer-a
+PASS 4: Real authenticated principal accepted: installer-a2
+PASS 5: Real authenticated principal accepted: installer-b
+PASS 6: Real authenticated principal accepted: installer-both
+PASS 7: Real authenticated principal accepted: installer-bind-only
+PASS 8: Same-target setup actors have distinct authenticated subjects
+PASS 9: Target registry initialized through authenticated read (read-only=false)
+PASS 10: Target registry initialized through authenticated read (read-only=true)
+PASS 11: Fresh disposable database has two unbound targets and no binding audit
+PASS 12: Only synthetic namespace fixtures are connected
+PASS 13: Reader cannot discover or confirm: a
+PASS 14: Reader discovery denied before cluster access: a
+PASS 15: Reader cannot discover or confirm: b
+PASS 16: Reader discovery denied before cluster access: b
+PASS 17: Anonymous discovery denied
+PASS 18: Explicit namespace-scoped candidates: a/installer-a
+PASS 19: Discovery alone does not select or bind
+PASS 20: Reader confirmation denied
+PASS 21: Reader confirmation denied: binding, runs and success audit unchanged
+PASS 22: Reader confirmation denied: rejected before cluster access
+PASS 23: BIND without DISCOVER denied
+PASS 24: BIND without DISCOVER denied: binding, runs and success audit unchanged
+PASS 25: BIND without DISCOVER denied: rejected before cluster access
+PASS 26: Same-target different actor cannot consume run
+PASS 27: Same-target different actor cannot consume run: binding, runs and success audit unchanged
+PASS 28: Same-target different actor cannot consume run: rejected before cluster access
+PASS 29: Unreturned candidate rejected
+PASS 30: Unreturned candidate rejected: binding, runs and success audit unchanged
+PASS 31: Unreturned candidate rejected: rejected before cluster access
+PASS 32: Unauthorized target denied
+PASS 33: Unauthorized target denied: binding, runs and success audit unchanged
+PASS 34: Unauthorized target denied: rejected before cluster access
+PASS 35: Explicit namespace-scoped candidates: a/installer-both
+PASS 36: Run cannot cross targets even for multi-target setup actor
+PASS 37: Run cannot cross targets even for multi-target setup actor: binding, runs and success audit unchanged
+PASS 38: Run cannot cross targets even for multi-target setup actor: rejected before cluster access
+PASS 39: Granted setup actor can discover but not confirm in read-only instance
+PASS 40: Global read-only blocks otherwise authorized binding
+PASS 41: Global read-only blocks otherwise authorized binding: binding, runs and success audit unchanged
+PASS 42: Global read-only blocks otherwise authorized binding: rejected before cluster access
+PASS 43: Explicit namespace-scoped candidates: a/installer-a2
+PASS 44: Explicit confirmation succeeds: a/installer-a
+PASS 45: Binding, consumed run and mandatory audit agree: a
+PASS 46: Other target binding is unchanged: a
+PASS 47: Fresh reader observes complete selected binding: a
+PASS 48: Successful confirmation cannot be replayed
+PASS 49: Successful confirmation cannot be replayed: binding, runs and success audit unchanged
+PASS 50: Successful confirmation cannot be replayed: rejected before cluster access
+PASS 51: Independent actor run with old binding revision rejected
+PASS 52: Independent actor run with old binding revision rejected: binding, runs and success audit unchanged
+PASS 53: Independent actor run with old binding revision rejected: rejected before cluster access
+PASS 54: Explicit namespace-scoped candidates: a/installer-a
+PASS 55: Explicit namespace-scoped candidates: a/installer-a
+PASS 56: Rediscovery invalidates previous same-actor run
+PASS 57: Rediscovery invalidates previous same-actor run: binding, runs and success audit unchanged
+PASS 58: Rediscovery invalidates previous same-actor run: rejected before cluster access
+PASS 59: Recreated resource UID requires rediscovery
+PASS 60: Recreated resource UID requires rediscovery: binding, runs and success audit unchanged
+PASS 61: Cluster permission loss rejects confirmation
+PASS 62: Cluster permission loss rejects confirmation: binding, runs and success audit unchanged
+PASS 63: Denied cluster discovery exposes no confirmable partial run
+PASS 64: Injected expired run is rejected
+PASS 65: Injected expired run is rejected: binding, runs and success audit unchanged
+PASS 66: Injected expired run is rejected: rejected before cluster access
+PASS 67: Explicit namespace-scoped candidates: a/installer-a
+PASS 68: Explicit confirmation succeeds: a/installer-a
+PASS 69: Binding, consumed run and mandatory audit agree: a
+PASS 70: Other target binding is unchanged: a
+PASS 71: Fresh reader observes complete selected binding: a
+PASS 72: Explicit namespace-scoped candidates: b/installer-b
+PASS 73: Read-only instance also denies its own fresh run
+PASS 74: Read-only instance also denies its own fresh run: binding, runs and success audit unchanged
+PASS 75: Read-only instance also denies its own fresh run: rejected before cluster access
+PASS 76: Explicit confirmation succeeds: b/installer-b
+PASS 77: Binding, consumed run and mandatory audit agree: b
+PASS 78: Other target binding is unchanged: b
+PASS 79: Fresh reader observes complete selected binding: b
+PASS 80: Reader observes persisted binding without gaining setup rights: a
+PASS 81: Reader observes persisted binding without gaining setup rights: b
+PASS 82: Synthetic cluster received only allowlisted reads, never writes or Secret requests
+PASS 83: Three successful bindings have mandatory audits and nothing else
+Installation validation: 83 checks passed. Real local identity; synthetic cluster; expiry uses explicit disposable-database fault injection.
+PASS: no compact JWT found in local lab logs
+Local installation diagnostic logs: /private/tmp/kcops-installation.hTuaog
+
+Normal identity/report regression
+Log: /private/tmp/kcops-installation-default-regression-20260918.log
+PASS 1: Anonymous denied /api/v1/me
+PASS 2: Anonymous denied /api/v1/targets
+PASS 3: Anonymous denied /api/v1/events
+PASS 4: Anonymous denied /mcp
+PASS 5: Real signed Identity A accepted: a
+PASS 6: Target listing isolated: a
+PASS 7: Own target readable: a
+PASS 8: Foreign target denied: a
+PASS 9: Authenticated SSE connects: a
+PASS 10: Reader cannot plan a write: a
+PASS 11: Separate Identity B credential works: a
+PASS 12: Target credential cannot authenticate to the platform: a
+PASS 13: Identity B can inspect target clients: a
+PASS 14: Foreign Identity B credential denied: a
+PASS 15: Real authenticated MCP initializes: a
+PASS 16: MCP target listing isolated: a
+PASS 17: MCP foreign target denied: a
+PASS 18: MCP report retains target identity and schema: a
+OBSERVED: MCP a performance=SKIPPED; message=Metrics provider is not configured for this target
+PASS 19: MCP performance section matches explicit configuration: a
+PASS 20: MCP Markdown projects unknown infrastructure: a
+PASS 21: MCP report preserves inconclusive score and unavailable replay: a
+PASS 22: MCP report contains deterministic Markdown without fixture secrets: a
+PASS 23: MCP report rejects foreign target: a
+PASS 24: Real signed Identity A accepted: b
+PASS 25: Target listing isolated: b
+PASS 26: Own target readable: b
+PASS 27: Foreign target denied: b
+PASS 28: Authenticated SSE connects: b
+PASS 29: Reader cannot plan a write: b
+PASS 30: Separate Identity B credential works: b
+PASS 31: Target credential cannot authenticate to the platform: b
+PASS 32: Identity B can inspect target clients: b
+PASS 33: Foreign Identity B credential denied: b
+PASS 34: Real authenticated MCP initializes: b
+PASS 35: MCP target listing isolated: b
+PASS 36: MCP foreign target denied: b
+PASS 37: MCP report retains target identity and schema: b
+OBSERVED: MCP b performance=SKIPPED; message=Metrics provider is not configured for this target
+PASS 38: MCP performance section matches explicit configuration: b
+PASS 39: MCP Markdown projects unknown infrastructure: b
+PASS 40: MCP report preserves inconclusive score and unavailable replay: b
+PASS 41: MCP report contains deterministic Markdown without fixture secrets: b
+PASS 42: MCP report rejects foreign target: b
+PASS 43: SSE delivers own persisted health events: a
+PASS 44: SSE excludes foreign target events: a
+PASS 45: SSE delivers own persisted health events: b
+PASS 46: SSE excludes foreign target events: b
+PASS 47: Authenticated report retains target identity: a
+OBSERVED: REST a performance=SKIPPED; message=Metrics provider is not configured for this target
+PASS 48: REST performance section matches explicit configuration: a
+PASS 49: Report infrastructure defaults are unknown, not observed absence: a
+PASS 50: Unconfigured metrics do not leak other target telemetry: a
+PASS 51: Scoped readable fixture is not mislabeled as Admin API outage: a
+OBSERVED: a admin health=HEALTHY; reason=NONE; versionAvailable=false
+PASS 52: Uncollected infrastructure counts stay unknown: a
+PASS 53: Report does not claim retained replay: a
+PASS 54: Report assessment history is readable by owner: a
+PASS 55: Report assessment history denied to foreign caller: a
+PASS 56: Report omits known fixture credentials: a
+PASS 57: Authenticated report retains target identity: b
+OBSERVED: REST b performance=SKIPPED; message=Metrics provider is not configured for this target
+PASS 58: REST performance section matches explicit configuration: b
+PASS 59: Report infrastructure defaults are unknown, not observed absence: b
+PASS 60: Unconfigured metrics do not leak other target telemetry: b
+PASS 61: Scoped readable fixture is not mislabeled as Admin API outage: b
+OBSERVED: b admin health=HEALTHY; reason=NONE; versionAvailable=false
+PASS 62: Uncollected infrastructure counts stay unknown: b
+PASS 63: Report does not claim retained replay: b
+PASS 64: Report assessment history is readable by owner: b
+PASS 65: Report assessment history denied to foreign caller: b
+PASS 66: Report omits known fixture credentials: b
+PASS 67: Authenticated principal without grants sees no targets
+PASS 68: Wrong audience denied
+PASS 69: Tampered signature denied
+PASS 70: Expired real token denied
+Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.xmlF63
+
+Browser observations (separate from the 83 automated checks):
+- Setup login restored A Installation deep link, initial alternate-a/uid-a-2 revision 2.
+- Discovery returned two unselected choices; Confirm installation disabled.
+- Selecting sso-a/uid-a-1 showed previous/selected UID; confirmation still disabled.
+- Acknowledgement enabled confirmation.
+- Confirm produced saved/audited status and sso-a/uid-a-1 revision 3.
+- Logout returned to local IdP login.
+- Reader alice-a Fleet listed only A; Installation showed revision 3 with discovery disabled and setup permission explanations.
+- Reader logged out; owned browser tab closed.
+PASS browser persistence: A sso-a/uid-a-1 revision 3; B sso-b/uid-b-1 revision 1 unchanged; 4 binding audits total; browser success audit matches consumed run actor and before/after UID.
+PASS browser cluster trace: 31 reads, 0 writes, 0 dropped entries.
+
+Final local inventory:
+- 0 containers; 0 volumes.
+- Only default podman network.
+- 4 reusable images retained: Community Keycloak26.7.1, PostgreSQL16, RHBK26.6, Prometheusv2.55.1.
+- No listeners on 15432,18080,18180,18280,18081,18082,19001,19002,18590,18300.
+- Shared lab lock absent.
+- Only owned transient lab containers/network/database and host processes were removed; no global prune.

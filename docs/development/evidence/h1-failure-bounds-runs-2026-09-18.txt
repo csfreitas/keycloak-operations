@@ -1,0 +1,258 @@
+H1 failure/bounds validation — 2026-09-18
+Unsigned local excerpts, retained for traceability, not a signed attestation.
+No browser, real cluster or opt-in Maven IT acceptance is claimed.
+Source manifest: h1-failure-bounds-source-2026-09-18.json
+Final source: 536 files, aggregate 85dd6fa7989a53eae40c99ec9003a88b9bf14d5b359f1413c418d15cedf90408
+
+Fresh backend baseline
+Command: JENV_VERSION=21 jenv exec mvn clean verify
+Process exit: 0
+Raw local log: /private/tmp/kcops-h1-failure-bounds-baseline-20260918.log
+Raw log SHA-256: 8b26b84d444003f4d2ec5aac39847cdc6e55d550a828e50112190e3f48edd64c
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.198 s -- in io.github.keycloakmcp.assessment.engine.MultiTargetAssessmentIsolationTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in io.github.keycloakmcp.assessment.engine.RuleEngineTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.075 s -- in io.github.keycloakmcp.health.HealthCheckEngineTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in io.github.keycloakmcp.observability.metrics.prometheus.PrometheusApiClientTest
+[INFO] Tests run: 392, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Total time:  01:03 min
+[INFO] Finished at: 2026-09-18T13:56:58-03:00
+
+Focused intermediate backend tests
+Command: JENV_VERSION=21 jenv exec mvn test -Dtest=BoundedBodyHandlerTest,PrometheusApiClientTest,MetricsProviderFailureTest,DefaultKeycloakManagementHealthProviderTest,HealthCheckEngineTest,InventoryHealthChecksTest,RuleEngineTest,MultiTargetAssessmentIsolationTest
+Process exit: 0
+Raw local log: /private/tmp/kcops-h1-failure-bounds-focused-20260918.log
+Raw log SHA-256: 5c401ea634c306f5410a98b59f76d3b7a1403fa33d8258f055e9b47128b608e5
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.099 s -- in io.github.keycloakmcp.assessment.engine.MultiTargetAssessmentIsolationTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.077 s -- in io.github.keycloakmcp.assessment.engine.RuleEngineTest
+[INFO] Tests run: 57, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.592 s -- in io.github.keycloakmcp.health.DefaultKeycloakManagementHealthProviderTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.055 s -- in io.github.keycloakmcp.health.HealthCheckEngineTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.101 s -- in io.github.keycloakmcp.health.InventoryHealthChecksTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.147 s -- in io.github.keycloakmcp.http.BoundedBodyHandlerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.083 s -- in io.github.keycloakmcp.observability.metrics.MetricsProviderFailureTest
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.658 s -- in io.github.keycloakmcp.observability.metrics.prometheus.PrometheusApiClientTest
+[INFO] Tests run: 126, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+[INFO] Total time:  14.906 s
+[INFO] Finished at: 2026-09-18T14:02:13-03:00
+
+Final backend verify
+Command: JENV_VERSION=21 jenv exec mvn clean verify
+Process exit: 0
+Raw local log: /private/tmp/kcops-h1-failure-bounds-verify-20260918.log
+Raw log SHA-256: e6d65b2a05d4d10a9fd4132908e80dc18221cfe8d1b497f63187195ea987ccc8
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.213 s -- in io.github.keycloakmcp.assessment.engine.MultiTargetAssessmentIsolationTest
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in io.github.keycloakmcp.assessment.engine.RuleEngineTest
+[INFO] Tests run: 57, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.673 s -- in io.github.keycloakmcp.health.DefaultKeycloakManagementHealthProviderTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.160 s -- in io.github.keycloakmcp.health.HealthCheckEngineTest
+[INFO] Tests run: 12, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.147 s -- in io.github.keycloakmcp.health.InventoryHealthChecksTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.252 s -- in io.github.keycloakmcp.http.BoundedBodyHandlerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.081 s -- in io.github.keycloakmcp.observability.metrics.MetricsProviderFailureTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.203 s -- in io.github.keycloakmcp.observability.metrics.prometheus.PrometheusApiClientTest
+[INFO] Tests run: 496, Failures: 0, Errors: 0, Skipped: 0
+[WARNING] Tests run: 9, Failures: 0, Errors: 0, Skipped: 9
+[INFO] BUILD SUCCESS
+[INFO] Total time:  01:04 min
+[INFO] Finished at: 2026-09-18T14:05:05-03:00
+
+UI tests (approved retry after initial sandbox permission error)
+Command: npm run test:run
+Process exit: 0
+Raw local log: /private/tmp/kcops-h1-failure-bounds-ui-baseline-20260918.log
+Raw log SHA-256: 6f2bcd48e091cf35ca3a6627fd87f2077e40e3fd4153211e78003a0e8df2106f
+ Test Files  19 passed (19)
+      Tests  133 passed (133)
+
+UI production build
+Command: npm run build
+Process exit: 0
+Raw local log: /private/tmp/kcops-h1-failure-bounds-ui-build-20260918.log
+Raw log SHA-256: 04367bdf79e7fe084b465e14858c2c67bc6d3b6750b9c96271b2f9c0450b1bbf
+✓ built in 597ms
+
+Real local identity plus Prometheus
+Command: bash scripts/validate-identity-lab.sh --metrics
+Process exit: 0
+Raw local log: /private/tmp/kcops-h1-failure-bounds-metrics-20260918.log
+Raw log SHA-256: 274692f883120571ba32c670d262640d410e64e2ffa741baefbe58172e919f4d
+PASS 1: Real Prometheus scrapes both separately labelled local targets
+PASS 2: Anonymous denied /api/v1/me
+PASS 3: Anonymous denied /api/v1/targets
+PASS 4: Anonymous denied /api/v1/events
+PASS 5: Anonymous denied /mcp
+PASS 6: Real signed Identity A accepted: a
+PASS 7: Target listing isolated: a
+PASS 8: Own target readable: a
+PASS 9: Foreign target denied: a
+PASS 10: Authenticated SSE connects: a
+PASS 11: Reader cannot plan a write: a
+PASS 12: Separate Identity B credential works: a
+PASS 13: Target credential cannot authenticate to the platform: a
+PASS 14: Identity B can inspect target clients: a
+PASS 15: Foreign Identity B credential denied: a
+PASS 16: Real authenticated MCP initializes: a
+PASS 17: MCP target listing isolated: a
+PASS 18: MCP foreign target denied: a
+PASS 19: MCP report retains target identity and schema: a
+PASS 20: MCP performance section matches explicit configuration: a
+PASS 21: MCP explicit heap policy reaches assessment evidence: a
+PASS 22: MCP Markdown projects unknown infrastructure: a
+PASS 23: MCP report preserves inconclusive score and unavailable replay: a
+PASS 24: MCP report contains deterministic Markdown without fixture secrets: a
+PASS 25: MCP report rejects foreign target: a
+PASS 26: Real signed Identity A accepted: b
+PASS 27: Target listing isolated: b
+PASS 28: Own target readable: b
+PASS 29: Foreign target denied: b
+PASS 30: Authenticated SSE connects: b
+PASS 31: Reader cannot plan a write: b
+PASS 32: Separate Identity B credential works: b
+PASS 33: Target credential cannot authenticate to the platform: b
+PASS 34: Identity B can inspect target clients: b
+PASS 35: Foreign Identity B credential denied: b
+PASS 36: Real authenticated MCP initializes: b
+PASS 37: MCP target listing isolated: b
+PASS 38: MCP foreign target denied: b
+PASS 39: MCP report retains target identity and schema: b
+PASS 40: MCP performance section matches explicit configuration: b
+PASS 41: MCP Markdown projects unknown infrastructure: b
+PASS 42: MCP report preserves inconclusive score and unavailable replay: b
+PASS 43: MCP report contains deterministic Markdown without fixture secrets: b
+PASS 44: MCP report rejects foreign target: b
+PASS 45: SSE delivers own persisted health events: a
+PASS 46: SSE excludes foreign target events: a
+PASS 47: SSE delivers own persisted health events: b
+PASS 48: SSE excludes foreign target events: b
+PASS 49: Authenticated report retains target identity: a
+PASS 50: REST performance section matches explicit configuration: a
+PASS 51: REST explicit heap policy reaches assessment evidence: a
+PASS 52: Report infrastructure defaults are unknown, not observed absence: a
+PASS 53: REST report contains real scoped JVM metrics
+PASS 54: Missing container metrics are not invented as zero
+PASS 55: Available telemetry does not make incomplete assessment conclusive
+PASS 56: Scoped readable fixture is not mislabeled as Admin API outage: a
+PASS 57: Uncollected infrastructure counts stay unknown: a
+PASS 58: Report does not claim retained replay: a
+PASS 59: Report assessment history is readable by owner: a
+PASS 60: Report assessment history denied to foreign caller: a
+PASS 61: Report omits known fixture credentials: a
+PASS 62: Authenticated report retains target identity: b
+PASS 63: REST performance section matches explicit configuration: b
+PASS 64: Report infrastructure defaults are unknown, not observed absence: b
+PASS 65: Unconfigured metrics do not leak other target telemetry: b
+PASS 66: Scoped readable fixture is not mislabeled as Admin API outage: b
+PASS 67: Uncollected infrastructure counts stay unknown: b
+PASS 68: Report does not claim retained replay: b
+PASS 69: Report assessment history is readable by owner: b
+PASS 70: Report assessment history denied to foreign caller: b
+PASS 71: Report omits known fixture credentials: b
+PASS 72: Authenticated principal without grants sees no targets
+PASS 73: Wrong audience denied
+PASS 74: Tampered signature denied
+PASS 75: Expired real token denied
+Identity validation: 75 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.VwNqBJ
+
+Real local identity, metrics disabled
+Command: bash scripts/validate-identity-lab.sh
+Process exit: 0
+Raw local log: /private/tmp/kcops-h1-failure-bounds-identity-20260918.log
+Raw log SHA-256: 793c4b693eb1a5b9a7a60e904deb49d2dffb3f6754d805380d7c07f299997ec2
+PASS 1: Anonymous denied /api/v1/me
+PASS 2: Anonymous denied /api/v1/targets
+PASS 3: Anonymous denied /api/v1/events
+PASS 4: Anonymous denied /mcp
+PASS 5: Real signed Identity A accepted: a
+PASS 6: Target listing isolated: a
+PASS 7: Own target readable: a
+PASS 8: Foreign target denied: a
+PASS 9: Authenticated SSE connects: a
+PASS 10: Reader cannot plan a write: a
+PASS 11: Separate Identity B credential works: a
+PASS 12: Target credential cannot authenticate to the platform: a
+PASS 13: Identity B can inspect target clients: a
+PASS 14: Foreign Identity B credential denied: a
+PASS 15: Real authenticated MCP initializes: a
+PASS 16: MCP target listing isolated: a
+PASS 17: MCP foreign target denied: a
+PASS 18: MCP report retains target identity and schema: a
+PASS 19: MCP performance section matches explicit configuration: a
+PASS 20: MCP Markdown projects unknown infrastructure: a
+PASS 21: MCP report preserves inconclusive score and unavailable replay: a
+PASS 22: MCP report contains deterministic Markdown without fixture secrets: a
+PASS 23: MCP report rejects foreign target: a
+PASS 24: Real signed Identity A accepted: b
+PASS 25: Target listing isolated: b
+PASS 26: Own target readable: b
+PASS 27: Foreign target denied: b
+PASS 28: Authenticated SSE connects: b
+PASS 29: Reader cannot plan a write: b
+PASS 30: Separate Identity B credential works: b
+PASS 31: Target credential cannot authenticate to the platform: b
+PASS 32: Identity B can inspect target clients: b
+PASS 33: Foreign Identity B credential denied: b
+PASS 34: Real authenticated MCP initializes: b
+PASS 35: MCP target listing isolated: b
+PASS 36: MCP foreign target denied: b
+PASS 37: MCP report retains target identity and schema: b
+PASS 38: MCP performance section matches explicit configuration: b
+PASS 39: MCP Markdown projects unknown infrastructure: b
+PASS 40: MCP report preserves inconclusive score and unavailable replay: b
+PASS 41: MCP report contains deterministic Markdown without fixture secrets: b
+PASS 42: MCP report rejects foreign target: b
+PASS 43: SSE delivers own persisted health events: a
+PASS 44: SSE excludes foreign target events: a
+PASS 45: SSE delivers own persisted health events: b
+PASS 46: SSE excludes foreign target events: b
+PASS 47: Authenticated report retains target identity: a
+PASS 48: REST performance section matches explicit configuration: a
+PASS 49: Report infrastructure defaults are unknown, not observed absence: a
+PASS 50: Unconfigured metrics do not leak other target telemetry: a
+PASS 51: Scoped readable fixture is not mislabeled as Admin API outage: a
+PASS 52: Uncollected infrastructure counts stay unknown: a
+PASS 53: Report does not claim retained replay: a
+PASS 54: Report assessment history is readable by owner: a
+PASS 55: Report assessment history denied to foreign caller: a
+PASS 56: Report omits known fixture credentials: a
+PASS 57: Authenticated report retains target identity: b
+PASS 58: REST performance section matches explicit configuration: b
+PASS 59: Report infrastructure defaults are unknown, not observed absence: b
+PASS 60: Unconfigured metrics do not leak other target telemetry: b
+PASS 61: Scoped readable fixture is not mislabeled as Admin API outage: b
+PASS 62: Uncollected infrastructure counts stay unknown: b
+PASS 63: Report does not claim retained replay: b
+PASS 64: Report assessment history is readable by owner: b
+PASS 65: Report assessment history denied to foreign caller: b
+PASS 66: Report omits known fixture credentials: b
+PASS 67: Authenticated principal without grants sees no targets
+PASS 68: Wrong audience denied
+PASS 69: Tampered signature denied
+PASS 70: Expired real token denied
+Identity validation: 70 checks passed. Browser token lifecycle, immediate revocation and real cluster acceptance are separate gates.
+PASS: no compact JWT found in local lab logs
+Local diagnostic logs: /private/tmp/kcops-identity.k5QZXk
+
+Final hygiene (read-only Podman inspection after both successful cleanups):
+containers: []
+volumes: []
+networks: podman only
+reusable images: quay.io/keycloak/keycloak:26.7.1; docker.io/library/postgres:16; registry.redhat.io/rhbk/keycloak-rhel9:26.6; docker.io/prom/prometheus:v2.55.1
+fixture listeners: none on ports 15432,18080,18180,18280,18081,19001,18300,18490
+shared lock /private/tmp/kcops-identity-lab.lock: absent
+Only owned transient lab resources removed. Images preserved; no global prune.
+
+Final static reconciliation:
+node /private/tmp/kcops-doc-review.mjs --self-test: 6 parser groups passed
+node /private/tmp/kcops-doc-review.mjs /Users/csfreitas/redhat/rhbk/mcp-server-keycloak
+122 Markdown documents; 130 fenced blocks; 970 headings
+630 local links; 2 fragments; 48 external links skipped
+138 requirement definitions; 217 occurrences; 128 referenced IDs
+15/15 milestone specs: structure only, not acceptance
+0 errors; 0 warnings
+git diff --check: passed
+536/536 manifest source hashes match; no mismatches
+Three retained dependency artifacts match original SHA-256
+pom.xml, ui/package.json and ui/package-lock.json match reviewed dependency input hashes
+Artifact versions 0.8.1-SNAPSHOT / 0.8.1-dev.0; schema 1.1; V1-V10 unchanged
